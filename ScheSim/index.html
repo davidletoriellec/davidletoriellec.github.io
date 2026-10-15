@@ -33,60 +33,76 @@ select{font:inherit;padding:6px;border-radius:8px;border:1px solid var(--bd);bac
 @keyframes bl{50%{background:#7a0c06}}
 .sch.shorted{outline:4px solid #c62828}
 svg .sh{stroke:#e53935;stroke-width:4}
+.sp{transform-origin:120px 470px;animation:cw 2.4s linear infinite}.sp.rev{animation-name:ccw}
+@keyframes cw{to{transform:rotate(360deg)}}@keyframes ccw{to{transform:rotate(-360deg)}}
+.mini{display:flex;gap:6px;margin-bottom:6px;align-items:center}.mini button{padding:3px 8px;font-size:13px}
+input{font:inherit;padding:6px;border-radius:8px;border:1px solid var(--bd);background:var(--card);color:var(--fg);min-width:150px}
 </style>
 </head>
 <body>
 <body>
-<h1>⚡ Démarrage direct 1 sens : établi, câblage et simulation</h1>
+<body>
+<h1>⚡ Démarrage direct : établi, câblage et simulation</h1>
 <div class="lv"><select id="ex"></select><button id="bE" class="on">✏️ Édition</button><button id="bS">▶ Simulation</button></div>
 <div class="card"><div class="cons" id="cons"></div><div class="hint" id="hint"></div></div>
 <div class="card" id="palc"><b>Établi</b> <span class="hint">: touchez un composant puis la zone de travail (ou glissez-le).</span><div class="pal" id="pal"></div></div>
 <div id="alert"></div>
-<div class="card sch" id="sch"></div>
+<div class="card"><div class="mini"><button id="mE" class="on">✏️ Édition</button><button id="mS">▶ Simulation</button></div><div class="sch" id="sch"></div></div>
 <div class="lv"><button id="chk" class="on">Vérifier</button><button id="del">Supprimer la sélection</button><button id="rst">Recommencer</button><button id="sol">Voir la solution</button></div>
+<div class="lv"><input id="nm" placeholder="Nom de l'étudiant"><button id="pdf">📄 Exporter en PDF</button></div>
 <div class="msg" id="msg"></div>
 <script>
-var PW=[["L1","Q1.1"],["L2","Q1.3"],["L3","Q1.5"],["Q1.2","KM1.1"],["Q1.4","KM1.3"],["Q1.6","KM1.5"],["KM1.2","F2.1"],["KM1.4","F2.3"],["KM1.6","F2.5"],["F2.2","M1.U"],["F2.4","M1.V"],["F2.6","M1.W"]];
-var TY={stop:{nc:1,h:"push",ev:"hold",n:"Arrêt",s:"BP NF"},start:{nc:0,h:"push",ev:"hold",n:"Marche",s:"BP NO"},au:{nc:1,h:"mush",ev:"tog",n:"Arrêt d'urgence",s:"NF"},th:{nc:1,h:"th",ev:"tog",n:"Relais thermique",s:"F1 95-96 NF"},thno:{nc:0,h:"th",ev:"tog",n:"Relais thermique",s:"F1 97-98 NO"},q1no:{nc:0,h:"",n:"Précoupure",s:"Q1 NO"},kmno:{nc:0,h:"",n:"KM1",s:"13-14 NO"},kmnc:{nc:1,h:"",n:"KM1",s:"21-22 NF"},pedal:{nc:0,h:"ped",ev:"hold",n:"Pédale",s:"NO"},coil:{coil:1,n:"Bobine",s:"KM1"},lamp:{lamp:1,n:"Voyant",s:"H1"},lamp2:{lamp:1,n:"Voyant",s:"H2"},lamp3:{lamp:1,n:"Voyant",s:"H3"}};
-var NM={stop:"bouton Arrêt",start:"bouton Marche",au:"arrêt d'urgence",th:"contact du relais thermique",pedal:"pédale",lamp:"voyant H1",coil:"bobine KM1",kmno:"contact KM1 13-14 (NO)"};
+var PW1=[["L1","Q1.1"],["L2","Q1.3"],["L3","Q1.5"],["Q1.2","KM1.1"],["Q1.4","KM1.3"],["Q1.6","KM1.5"],["KM1.2","F2.1"],["KM1.4","F2.3"],["KM1.6","F2.5"],["F2.2","M1.U"],["F2.4","M1.V"],["F2.6","M1.W"]];
+var PW2=PW1.concat([["Q1.2","KM2.1"],["Q1.4","KM2.3"],["Q1.6","KM2.5"],["KM2.2","F2.1"],["KM2.4","F2.5"],["KM2.6","F2.3"]]);
+var TY={stop:{nc:1,h:"push",ev:"hold",n:"Arrêt",s:"BP NF"},start:{nc:0,h:"push",ev:"hold",n:"Marche",s:"BP NO"},au:{nc:1,h:"mush",ev:"tog",n:"Arrêt d'urgence",s:"NF"},th:{nc:1,h:"th",ev:"tog",n:"Relais thermique",s:"F1 95-96 NF"},thno:{nc:0,h:"th",ev:"tog",n:"Relais thermique",s:"F1 97-98 NO"},q1no:{nc:0,h:"",n:"Précoupure",s:"Q1 NO"},kmno:{nc:0,h:"",n:"KM1",s:"13-14 NO"},kmnc:{nc:1,h:"",n:"KM1",s:"21-22 NF"},km2no:{nc:0,h:"",n:"KM2",s:"13-14 NO",k2:1},km2nc:{nc:1,h:"",n:"KM2",s:"21-22 NF",k2:1},pedal:{nc:0,h:"ped",ev:"hold",n:"Pédale",s:"NO"},coil:{coil:1,n:"Bobine",s:"KM1"},coil2:{coil:1,n:"Bobine",s:"KM2",k2:1},lamp:{lamp:1,n:"Voyant",s:"H1"},lamp2:{lamp:1,n:"Voyant",s:"H2"},lamp3:{lamp:1,n:"Voyant",s:"H3"}};
+var NM={stop:"bouton Arrêt",start:"bouton Marche",au:"arrêt d'urgence",th:"contact du relais thermique",pedal:"pédale",lamp:"voyant H1",coil:"bobine KM1",coil2:"bobine KM2",kmno:"contact KM1 13-14 (NO)",km2no:"contact KM2 13-14 (NO)",kmnc:"contact KM1 21-22 (NF)",km2nc:"contact KM2 21-22 (NF)"};
 var EX=[
-{t:"1 · Puissance : câblage",c:"Câblez le circuit de puissance : L1-L2-L3 → sectionneur Q1 → contacteur KM1 → relais thermique F2 → moteur M1. Puis passez en Simulation, fermez Q1 et testez avec « Forcer KM1 »."},
-{t:"2 · Commande de base",need:{stop:1,start:1,lamp:1},c:"Prenez sur l'établi ce qu'il faut pour une commande Marche/Arrêt avec auto-maintien de KM1 et un voyant H1 en parallèle sur la bobine. Placez, puis câblez."},
-{t:"3 · Commande avec sécurités",need:{stop:1,start:1,au:1,th:1,lamp:1},c:"Construisez la commande complète : Marche/Arrêt avec auto-maintien, voyant H1, plus l'arrêt d'urgence et le contact NF du relais thermique F1."},
-{t:"4 · Commande avec 2 postes",need:{stop:2,start:2,au:1,th:1,lamp:1},c:"Construisez la commande avec sécurités et un 2e poste de commande (2 Arrêt, 2 Marche)."},
-{t:"5 · Commande avec pédale",need:{stop:2,start:2,au:1,th:1,pedal:1,lamp:1},c:"Construisez la commande complète (sécurités, 2 postes) avec une pédale : le moteur ne doit tourner que tant qu'elle reste appuyée."}];
-function genSol(n){var it=[],w=[],c=[],y=function(i,t,x,yy){it.push({id:i,type:t,x:x,y:yy});return i};
-if(n.th)c.push(y("th1","th",320,95));if(n.au)c.push(y("au1","au",320,155));
-c.push(y("stop1","stop",320,215));if(n.stop>1)c.push(y("stop2","stop",320,275));
-y("start1","start",320,355);y("kmno1","kmno",400,355);if(n.start>1)y("start2","start",480,355);
-if(n.pedal)y("pedal1","pedal",320,425);y("coil1","coil",320,495);if(n.lamp)y("lamp1","lamp",560,495);
+{t:"1 · Puissance : câblage",need:null,pw:null,c:"Câblez le circuit de puissance : L1-L2-L3 → sectionneur Q1 → contacteur KM1 → relais thermique F1 → moteur M1. Puis passez en Simulation, fermez Q1 et testez avec « Forcer KM1 »."},
+{t:"2 · Commande de base",need:{stop:1,start:1,lamp:1},pw:PW1,c:"Prenez sur l'établi ce qu'il faut pour une commande Marche/Arrêt avec auto-maintien de KM1 et un voyant H1 en parallèle sur la bobine. Placez, puis câblez."},
+{t:"3 · Commande avec sécurités",need:{stop:1,start:1,au:1,th:1,lamp:1},pw:PW1,c:"Construisez la commande complète : Marche/Arrêt avec auto-maintien, voyant H1, plus l'arrêt d'urgence et le contact NF du relais thermique F1."},
+{t:"4 · Commande avec 2 postes",need:{stop:2,start:2,au:1,th:1,lamp:1},pw:PW1,c:"Construisez la commande avec sécurités et un 2e poste de commande (2 Arrêt, 2 Marche)."},
+{t:"5 · Commande avec pédale",need:{stop:2,start:2,au:1,th:1,pedal:1,lamp:1},pw:PW1,c:"Construisez la commande complète (sécurités, 2 postes) avec une pédale : le moteur ne doit tourner que tant qu'elle reste appuyée."},
+{t:"6 · 2 sens : puissance",two:1,need:null,pw:PW1,c:"Ajoutez KM2 au circuit de puissance pour inverser le sens : KM2 doit permuter deux phases. Testez avec « Forcer KM1 » puis « Forcer KM2 » : la flèche du moteur doit s'inverser."},
+{t:"7 · 2 sens : commande avec verrouillage",two:1,need:{stop:1,start:2,kmno:1,km2no:1,kmnc:1,km2nc:1,coil:1,coil2:1},pw:PW2,c:"Construisez la commande 2 sens : un Arrêt, une Marche par sens, auto-maintien de chaque contacteur et verrouillage électrique (contacts NF croisés). On passe par l'arrêt pour changer de sens."},
+{t:"8 · 2 sens : avec sécurités",two:1,need:{stop:1,start:2,au:1,th:1,kmno:1,km2no:1,kmnc:1,km2nc:1,coil:1,coil2:1},pw:PW2,c:"Même commande 2 sens, avec en plus l'arrêt d'urgence et le contact NF du relais thermique F1."}];
+function gs(e){var n={};for(var k in e.need)n[k]=e.need[k];n.two=e.two;return genSol(n)}
+function genSol(n){var it=[],w=[],c=[],z=n.two?520:300,y=function(i,t,x,yy){it.push({id:i,type:t,x:z+x,y:yy});return i};
+if(n.th)c.push(y("th1","th",20,95));if(n.au)c.push(y("au1","au",20,155));c.push(y("stop1","stop",20,215));
+if(!n.two&&n.stop>1)c.push(y("stop2","stop",20,275));
 w.push(["P24a",c[0]+".a"]);for(var i=0;i<c.length-1;i++)w.push([c[i]+".b",c[i+1]+".a"]);
-var j=c[c.length-1]+".b";w.push([j,"start1.a"],[j,"kmno1.a"],["start1.b","kmno1.b"]);
+var j=c[c.length-1]+".b";
+if(n.two){y("start1","start",20,300);y("kmno1","kmno",110,300);y("km2nc1","km2nc",20,390);y("coil1","coil",20,490);y("start2","start",260,300);y("km2no1","km2no",350,300);y("kmnc1","kmnc",260,390);y("coil2","coil2",260,490);
+w.push([j,"start1.a"],[j,"kmno1.a"],[j,"start2.a"],[j,"km2no1.a"],["start1.b","kmno1.b"],["kmno1.b","km2nc1.a"],["km2nc1.b","coil1.a"],["coil1.b","P0a"],["start2.b","km2no1.b"],["km2no1.b","kmnc1.a"],["kmnc1.b","coil2.a"],["coil2.b","P0b"]);return{items:it,wires:w}}
+y("start1","start",20,355);y("kmno1","kmno",100,355);if(n.start>1)y("start2","start",180,355);
+if(n.pedal)y("pedal1","pedal",20,425);y("coil1","coil",20,495);if(n.lamp)y("lamp1","lamp",260,495);
+w.push([j,"start1.a"],[j,"kmno1.a"],["start1.b","kmno1.b"]);
 if(n.start>1)w.push([j,"start2.a"],["start2.b","kmno1.b"]);
 if(n.pedal)w.push(["kmno1.b","pedal1.a"],["pedal1.b","coil1.a"]);else w.push(["kmno1.b","coil1.a"]);
 w.push(["coil1.b","P0a"]);if(n.lamp)w.push(["coil1.a","lamp1.a"],["coil1.b","lamp1.b"]);return{items:it,wires:w}}
 var ex=0,mode="E",items=[],W=[],st,res,P,pend=null,sel=null,selT=null,seq=0,drag=null,held={};
-function closed(it,s,km){var id=it.id;switch(it.type){case"stop":case"au":return!s[id];case"th":return!s.T;case"thno":return!!s.T;case"q1no":return!!s.Q;case"start":case"pedal":return!!s[id];case"kmno":return km;case"kmnc":return!km}return false}
-function net(s,W,items,km){var par={};function f(a){if(par[a]===undefined)par[a]=a;while(par[a]!==a){par[a]=par[par[a]];a=par[a]}return a}
+function zx(){return EX[ex].two?520:300}
+function closed(it,s,km,km2){var id=it.id;switch(it.type){case"stop":case"au":return!s[id];case"th":return!s.T;case"thno":return!!s.T;case"q1no":return!!s.Q;case"start":case"pedal":return!!s[id];case"kmno":return km;case"kmnc":return!km;case"km2no":return km2;case"km2nc":return!km2}return false}
+function net(s,W,items,km,km2){var par={};function f(a){if(par[a]===undefined)par[a]=a;while(par[a]!==a){par[a]=par[par[a]];a=par[a]}return a}
 function u(a,b){par[f(a)]=f(b)}
-u("P24a","P24b");u("P24a","P24c");u("P0a","P0b");u("P0a","P0c");W.forEach(function(w){u(w[0],w[1])});
-[1,3,5].forEach(function(i){if(s.Q)u("Q1."+i,"Q1."+(i+1));u("F2."+i,"F2."+(i+1));if(km)u("KM1."+i,"KM1."+(i+1))});
-items.forEach(function(it){if(!TY[it.type].coil&&!TY[it.type].lamp&&closed(it,s,km))u(it.id+".a",it.id+".b")});
-var ph=["L1","L2","L3"],used=[];
+["a","b","c","d","e"].forEach(function(c){u("P24a","P24"+c);u("P0a","P0"+c)});W.forEach(function(w){u(w[0],w[1])});
+[1,3,5].forEach(function(i){if(s.Q)u("Q1."+i,"Q1."+(i+1));u("F2."+i,"F2."+(i+1));if(km)u("KM1."+i,"KM1."+(i+1));if(km2)u("KM2."+i,"KM2."+(i+1))});
+items.forEach(function(it){var d=TY[it.type];if(!d.coil&&!d.lamp&&closed(it,s,km,km2))u(it.id+".a",it.id+".b")});
+var ph=["L1","L2","L3"],used=[],ks=[];
 var sp=f("L1")==f("L2")||f("L2")==f("L3")||f("L1")==f("L3"),sc=f("P24a")==f("P0a"),short=sp||sc;
-var motor=!short&&["M1.U","M1.V","M1.W"].every(function(m){var k=ph.findIndex(function(p){return f(p)==f(m)});if(k<0||used[k])return false;used[k]=1;return true});
-var coil={},lamp={},ac=false,al=false;
+var motor=!short&&["M1.U","M1.V","M1.W"].every(function(m,j){var k=ph.findIndex(function(p){return f(p)==f(m)});if(k<0||used[k])return false;used[k]=1;ks[j]=k;return true});
+var dir=motor?(((ks[1]-ks[0]+3)%3==1)?1:-1):0;
+var coil={},lamp={},ac=false,ac2=false,al=false;
 items.forEach(function(it){var a=f(it.id+".a"),b=f(it.id+".b"),p=f("P24a"),z=f("P0a");
-if(it.type=="coil"){coil[it.id]=a==p&&b==z;ac=ac||coil[it.id]}
+if(it.type=="coil"||it.type=="coil2"){coil[it.id]=a==p&&b==z;if(it.type=="coil")ac=ac||coil[it.id];else ac2=ac2||coil[it.id]}
 if(TY[it.type].lamp){lamp[it.id]=a!=b&&(a==p&&b==z||a==z&&b==p);if(it.type=="lamp")al=al||lamp[it.id]}});
-return{f:f,short:short,sp:sp,sc:sc,motor:motor,coil:coil,lamp:lamp,ac:ac,al:al}}
-function solve(s,W,items){var km=!!s.km,r;for(var i=0;i<6;i++){r=net(s,W,items,km);var c=r.ac||!!s.F;if(c==km)break;km=c}r.km=km;return r}
+return{f:f,short:short,sp:sp,sc:sc,motor:motor,dir:dir,coil:coil,lamp:lamp,ac:ac,ac2:ac2,al:al}}
+function solve(s,W,items){var km=!!s.km,km2=!!s.km2,r;for(var i=0;i<8;i++){r=net(s,W,items,km,km2);var c=r.ac||!!s.F,c2=r.ac2||!!s.F2;if(c==km&&c2==km2)break;km=c;km2=c2}r.km=km;r.km2=km2;return r}
 function reg(i,x,y){P[i]=[x,y]}
-function lab(it){var k=Math.max(0,items.filter(function(x){return x.type==it.type}).indexOf(it)),t=it.type;return t=="stop"?"S"+(2*k+1):t=="start"?"S"+(2*k+2):{au:"AU",th:"F1 95-96",thno:"F1 97-98",q1no:"Q1 "+(k?"23-24":"13-14"),kmno:"KM1",kmnc:"KM1",pedal:"S5",coil:"KM1",lamp:"H1",lamp2:"H2",lamp3:"H3"}[t]}
+function lab(it){var k=Math.max(0,items.filter(function(x){return x.type==it.type}).indexOf(it)),t=it.type;return t=="stop"?"S"+(2*k+1):t=="start"?"S"+(2*k+2):{au:"AU",th:"F1 95-96",thno:"F1 97-98",q1no:"Q1 "+(k?"23-24":"13-14"),kmno:"KM1",kmnc:"KM1",km2no:"KM2",km2nc:"KM2",pedal:"S5",coil:"KM1",coil2:"KM2",lamp:"H1",lamp2:"H2",lamp3:"H3"}[t]}
 function drawItem(it,s,r){var d=TY[it.type],x=it.x,y=it.y,id=it.id,L=lab(it),on,g;reg(id+".a",x,y-22);reg(id+".b",x,y+22);
-if(d.coil){on=r.coil[id];return'<g class="cp" data-item="'+id+'"><rect x="'+(x-18)+'" y="'+(y-15)+'" width="36" height="30" class="'+(on?'y':'')+'"/><path d="M'+x+' '+(y-22)+'V'+(y-15)+'M'+x+' '+(y+15)+'V'+(y+22)+'"/><text x="'+x+'" y="'+(y+4)+'" text-anchor="middle" class="b '+(on?'dk':'')+'">KM1</text><text x="'+(x+22)+'" y="'+(y-10)+'" class="s m">A1</text><text x="'+(x+22)+'" y="'+(y+20)+'" class="s m">A2</text></g>'}
+if(d.coil){on=r.coil[id];return'<g class="cp" data-item="'+id+'"><rect x="'+(x-18)+'" y="'+(y-15)+'" width="36" height="30" class="'+(on?'y':'')+'"/><path d="M'+x+' '+(y-22)+'V'+(y-15)+'M'+x+' '+(y+15)+'V'+(y+22)+'"/><text x="'+x+'" y="'+(y+4)+'" text-anchor="middle" class="b '+(on?'dk':'')+'">'+L+'</text><text x="'+(x+22)+'" y="'+(y-10)+'" class="s m">A1</text><text x="'+(x+22)+'" y="'+(y+20)+'" class="s m">A2</text></g>'}
 if(d.lamp){on=r.lamp[id];return'<g class="cp" data-item="'+id+'"><path d="M'+x+' '+(y-22)+'V'+(y-12)+'M'+x+' '+(y+12)+'V'+(y+22)+'"/><circle cx="'+x+'" cy="'+y+'" r="12" class="'+(on?'y':'')+'"/><path d="M'+(x-8)+' '+(y-8)+'L'+(x+8)+' '+(y+8)+'M'+(x+8)+' '+(y-8)+'L'+(x-8)+' '+(y+8)+'"/><text x="'+(x+18)+'" y="'+(y+4)+'" class="b">'+L+'</text></g>'}
-var ky=(it.type=="th"||it.type=="thno")?"T":it.type=="q1no"?"Q":id,cl=closed(it,s,r.km),pr=s[ky],nc=d.nc,hx=x-30+(pr?5:0),t=nc?(cl?[x-9,y-8]:[x-13,y]):(cl?[x,y-8]:[x-9,y-8]),mx=(x+t[0])/2;
+var ky=(it.type=="th"||it.type=="thno")?"T":it.type=="q1no"?"Q":id,cl=closed(it,s,r.km,r.km2),pr=s[ky],nc=d.nc,hx=x-30+(pr?5:0),t=nc?(cl?[x-9,y-8]:[x-13,y]):(cl?[x,y-8]:[x-9,y-8]),mx=(x+t[0])/2;
 g='<g class="cp" data-item="'+id+'" '+(d.ev=="hold"?'data-hold="'+id+'"':d.ev=="tog"?'data-tog="'+ky+'"':'')+'><rect x="'+(d.h?x-70:x-14)+'" y="'+(y-22)+'" width="'+(d.h?130:60)+'" height="44" fill="transparent" stroke="none"/>';
 g+='<path d="M'+x+' '+(y-22)+'V'+(y-8)+(nc?'H'+(x-13):'')+'M'+x+' '+(y+22)+'V'+(y+8)+'M'+x+' '+(y+8)+'L'+t[0]+' '+t[1]+'"/>';
 if(d.h)g+='<path d="M'+mx+' '+y+'H'+hx+'" stroke-dasharray="3 2"/>';
@@ -102,57 +118,68 @@ if(bar)s+='<path d="M'+(t[0]-6)+' '+t[1]+'H'+(t[0]+6)+'"/>';return s}
 function pwr(x,y,cl){return'<path d="M'+x+' '+(y-30)+'V'+(y-8)+'M'+x+' '+(y+15)+'V'+(y+30)+'" stroke-width="3"/><path d="M'+x+' '+(y-17)+'a4.5 4.5 0 0 0 0 9"/><path d="M'+x+' '+(y+15)+'L'+(cl?x:x-15)+' '+(y-8)+'"/>'}
 function sect(x,cl){return'<path d="M'+x+' 78V96M'+(x-8)+' 96H'+(x+8)+'M'+x+' 150V164" stroke-width="3"/><g transform="rotate('+(cl?0:-22)+' '+x+' 150)"><rect x="'+(x-5)+'" y="110" width="10" height="26" fill="var(--card)"/><path d="M'+x+' 150V96M'+x+' 105V141"/></g>'}
 function fus(x,y){return'<path d="M'+x+' '+(y-8)+'V'+y+'M'+x+' '+(y+26)+'V'+(y+34)+'"/><rect x="'+(x-5)+'" y="'+y+'" width="10" height="26"/><path d="M'+x+' '+y+'V'+(y+26)+'"/>'}
-function render(){P={};var o=[],s=st,r=res,ctl=ex>0;
+
+function arrow(d){var c=[120,470],R=54,a0=d>0?-160:-20,a1=d>0?-40:-140,p=function(a){var t=a*Math.PI/180;return[c[0]+R*Math.cos(t),c[1]+R*Math.sin(t)]},e=p(a1),t1=a1*Math.PI/180,tx=-d*Math.sin(t1),ty=d*Math.cos(t1),nx=Math.cos(t1),ny=Math.sin(t1),h1=[e[0]-9*tx+5*nx,e[1]-9*ty+5*ny],h2=[e[0]-9*tx-5*nx,e[1]-9*ty-5*ny],s=p(a0);
+return'<g class="sp'+(d<0?' rev':'')+'" stroke="#e08a00" stroke-width="3"><path d="M'+s+'A54 54 0 0 '+(d>0?1:0)+' '+e+'"/><path d="M'+h1+'L'+e+'L'+h2+'"/></g><text x="120" y="532" text-anchor="middle" class="s b">sens '+(d>0?'horaire':'anti-horaire')+'</text>'}
+function render(){P={};var o=[],s=st,r=res,e=EX[ex],ctl=!!e.need,z=zx(),Wd=z+810,two=!!e.two;
 [["L1",60],["L2",120],["L3",180]].forEach(function(a){reg(a[0],a[1],40);o.push('<text x="'+(a[1]-6)+'" y="28" class="b">'+a[0]+'</text>')});
 o.push('<text x="196" y="44" class="s m">réseau 3~</text>');
 [60,120,180].forEach(function(x,i){var mx=[84,120,156][i];
-reg("Q1."+(2*i+1),x,78);reg("Q1."+(2*i+2),x,164);o.push(sect(x,s.Q));[[78,164,0],[205,265,1],[283,367,0]].forEach(function(a){var t=a[2]?(2*i+1)+"/L"+(i+1):""+(2*i+1),b=a[2]?(2*i+2)+"/T"+(i+1):""+(2*i+2);o.push('<text x="'+(x-8)+'" y="'+(a[0]+4)+'" text-anchor="end" class="s m">'+t+'</text><text x="'+(x-8)+'" y="'+(a[1]+4)+'" text-anchor="end" class="s m">'+b+'</text>')});
+reg("Q1."+(2*i+1),x,78);reg("Q1."+(2*i+2),x,164);o.push(sect(x,s.Q));
+[[78,164,0],[205,265,1],[283,367,0]].forEach(function(a){var t=a[2]?(2*i+1)+"/L"+(i+1):""+(2*i+1),b=a[2]?(2*i+2)+"/T"+(i+1):""+(2*i+2);o.push('<text x="'+(x-8)+'" y="'+(a[0]+4)+'" text-anchor="end" class="s m">'+t+'</text><text x="'+(x-8)+'" y="'+(a[1]+4)+'" text-anchor="end" class="s m">'+b+'</text>')});
 reg("KM1."+(2*i+1),x,205);reg("KM1."+(2*i+2),x,265);o.push(pwr(x,235,r.km));
 reg("F2."+(2*i+1),x,283);reg("F2."+(2*i+2),x,367);
 o.push('<path d="M'+x+' 283V310H'+(x+18)+'V340H'+x+'V367" '+(s.T?'stroke="var(--ko)"':'')+'/>');
-reg(["M1.U","M1.V","M1.W"][i],mx,420);o.push('<path d="M'+mx+' 420V'+(i==1?430:452)+'"/>')});
+reg(["M1.U","M1.V","M1.W"][i],mx,420);o.push('<path d="M'+mx+' 420V'+(i==1?430:452)+'"/>');
+if(two){var x2=320+60*i;reg("KM2."+(2*i+1),x2,205);reg("KM2."+(2*i+2),x2,265);o.push(pwr(x2,235,r.km2));
+o.push('<text x="'+(x2-8)+'" y="209" text-anchor="end" class="s m">'+(2*i+1)+'/L'+(i+1)+'</text><text x="'+(x2-8)+'" y="269" text-anchor="end" class="s m">'+(2*i+2)+'/T'+(i+1)+'</text>')}});
+var lx=two?205:218;
 o.push('<path d="M32 124H200" stroke-dasharray="3 2"/><path d="M36 238H175" stroke-dasharray="3 2"/><path d="M36 325H205" stroke-dasharray="3 2"/>');
+if(two)o.push('<path d="M306 238H450" stroke-dasharray="3 2"/>');
 o.push('<g class="cp" data-tog="Q"><rect x="8" y="114" width="24" height="20" rx="3" fill="'+(s.Q?'#18794e':'var(--card)')+'"/><text x="12" y="128" class="s">Q1</text></g>');
-o.push('<text x="218" y="96" class="b">Q1</text><text x="218" y="108" class="s m">sectionneur</text><text x="218" y="118" class="s m">porte-fusibles</text><text x="218" y="222" class="b">KM1</text><text x="218" y="233" class="s m">contacteur</text>');
-o.push('<g class="cp" data-hold="F"><rect x="218" y="240" width="56" height="18" rx="4" class="'+(s.F?'y':'')+'"/><text x="224" y="253" class="s '+(s.F?'dk':'')+'">Forcer KM1</text></g>');
+o.push('<text x="218" y="96" class="b">Q1</text><text x="218" y="108" class="s m">sectionneur</text><text x="218" y="118" class="s m">porte-fusibles</text><text x="'+lx+'" y="222" class="b">KM1</text><text x="'+lx+'" y="233" class="s m">contacteur</text>');
+o.push('<g class="cp" data-hold="F"><rect x="'+lx+'" y="246" width="56" height="18" rx="4" class="'+(s.F?'y':'')+'"/><text x="'+(lx+6)+'" y="259" class="s '+(s.F?'dk':'')+'">Forcer KM1</text></g>');
+if(two){o.push('<text x="462" y="222" class="b">KM2</text><text x="462" y="233" class="s m">contacteur</text><g class="cp" data-hold="F2"><rect x="462" y="246" width="56" height="18" rx="4" class="'+(s.F2?'y':'')+'"/><text x="468" y="259" class="s '+(s.F2?'dk':'')+'">Forcer KM2</text></g>')}
 o.push('<text x="218" y="322" class="b">F1</text><text x="218" y="333" class="s m">relais thermique</text>');
 o.push('<circle cx="120" cy="470" r="40" class="'+(r.motor?'y':'')+'"/><text x="120" y="466" text-anchor="middle" class="b '+(r.motor?'dk':'')+'">M</text><text x="120" y="483" text-anchor="middle" class="'+(r.motor?'dk':'')+'">3~</text>');
-if(ctl){o.push('<rect data-ws="1" x="290" y="52" width="400" height="476" rx="8" class="wsf"/><text x="298" y="66" class="s m">Zone de travail</text>');
-o.push('<path d="M300 40H680M300 540H680"/><text x="302" y="32" class="b">+24 V</text><text x="302" y="556" class="b">0 V</text>');
-[["P24a",320,40],["P24b",420,40],["P24c",520,40],["P0a",320,540],["P0b",420,540],["P0c",520,540]].forEach(function(a){reg(a[0],a[1],a[2])});
+if(r.motor)o.push(arrow(r.dir));
+if(ctl){o.push('<rect data-ws="1" x="'+(z-10)+'" y="52" width="800" height="610" rx="8" class="wsf"/><text x="'+(z-2)+'" y="66" class="s m">Zone de travail</text>');
+o.push('<path d="M'+z+' 40H'+(z+790)+'M'+z+' 680H'+(z+790)+'"/><text x="'+(z+2)+'" y="32" class="b">+24 V</text><text x="'+(z+2)+'" y="696" class="b">0 V</text>');
+var ox=[20,110,260,350,440],oz=[20,260,110,350,440];["a","b","c","d","e"].forEach(function(c,j){reg("P24"+c,z+ox[j],40);reg("P0"+c,z+oz[j],680)});
 items.forEach(function(it){o.push(drawItem(it,s,r));if(it.id==sel&&mode=="E")o.push('<rect x="'+(it.x-72)+'" y="'+(it.y-27)+'" width="134" height="54" rx="6" class="sl"/>')})}
 var hotN=[r.f("P24a"),r.f("L1"),r.f("L2"),r.f("L3")];
 W.forEach(function(w,i){var a=P[w[0]],b=P[w[1]];if(!a||!b)return;var m=(a[1]+b[1])/2+((i%5)-2)*6,
 d=a[0]==b[0]||a[1]==b[1]?'M'+a[0]+' '+a[1]+'L'+b[0]+' '+b[1]:'M'+a[0]+' '+a[1]+'V'+m+'H'+b[0]+'V'+b[1],hot=hotN.indexOf(r.f(w[0]))>=0;
 o.push('<g class="cp" data-w="'+i+'"><path d="'+d+'" class="wr '+(hot?(r.short?'sh':'hot'):'')+'"/>'+(mode=="E"?'<path d="'+d+'" stroke="transparent" stroke-width="12"/>':'')+'</g>')});
 for(var k in P)o.push('<g data-t="'+k+'" class="cp"><circle cx="'+P[k][0]+'" cy="'+P[k][1]+'" r="4" class="td '+(pend==k?'pd':'')+'"/>'+(mode=="E"?'<circle cx="'+P[k][0]+'" cy="'+P[k][1]+'" r="11" fill="transparent" stroke="none"/>':'')+'</g>');
-document.getElementById("sch").innerHTML='<svg viewBox="0 0 700 570" width="700" height="570">'+o.join("")+'</svg>'}
+document.getElementById("sch").innerHTML='<svg viewBox="0 0 '+Wd+' 710" width="'+Wd+'" height="710">'+o.join("")+'</svg>'}
 var cause="",lastAct="";
-function actLabel(k){if(k=="F")return"« Forcer KM1 »";if(k=="Q")return st.Q?"fermeture de Q1":"ouverture de Q1";if(k=="T")return st.T?"déclenchement du relais thermique":"réarmement du thermique";var it=items.filter(function(x){return x.id==k})[0];return it?(st[k]?"actionnement de ":"relâchement de ")+lab(it):k}
+function actLabel(k){if(k=="F")return"« Forcer KM1 »";if(k=="F2")return"« Forcer KM2 »";if(k=="Q")return st.Q?"fermeture de Q1":"ouverture de Q1";if(k=="T")return st.T?"déclenchement du relais thermique":"réarmement du thermique";var it=items.filter(function(x){return x.id==k})[0];return it?(st[k]?"actionnement de ":"relâchement de ")+lab(it):k}
 function alertUI(){var a=document.getElementById("alert"),r=res,s=document.getElementById("sch");
 if(!r.short){a.style.display="none";s.classList.remove("shorted");return}
 var t=[];if(r.sp)t.push("phases L1 / L2 / L3 reliées entre elles");if(r.sc)t.push("+24 V relié à 0 V");
 a.innerHTML="⚠ COURT-CIRCUIT<small>"+t.join(" · ")+(mode=="S"&&cause?" — provoqué par : "+cause:"")+"</small>";a.style.display="block";s.classList.add("shorted")}
 function sync(){var was=res&&res.short;res=solve(st,W,items);st.km=res.km?1:0;if(res.short&&!was)cause=lastAct;if(!res.short)cause="";alertUI();render()}
+
 function msg(t,c){var m=document.getElementById("msg");m.textContent=t;m.className="msg "+(c||"")}
 function pal(){var p=document.getElementById("pal");p.innerHTML="";var Q=P;P={};
-for(var k in TY){var e=document.createElement("div");e.className="tile"+(selT==k?" sel":"");e.dataset.k=k;e.draggable=true;
+for(var k in TY){if(TY[k].k2&&!EX[ex].two)continue;var e=document.createElement("div");e.className="tile"+(selT==k?" sel":"");e.dataset.k=k;e.draggable=true;
 e.innerHTML='<svg viewBox="0 0 110 60" width="104" height="57">'+drawItem({id:"tmp",type:k,x:60,y:30},{},{km:false,coil:{},lamp:{}})+'</svg><small>'+TY[k].n+' '+TY[k].s+'</small>';p.appendChild(e)}P=Q}
-function modeUI(){document.getElementById("bE").className=mode=="E"?"on":"";document.getElementById("bS").className=mode=="S"?"on":"";
-document.getElementById("palc").style.display=mode=="E"&&ex>0?"":"none";
-document.getElementById("hint").textContent=mode=="E"?"Édition : touchez une borne puis une autre pour tirer un fil (touchez un fil pour le supprimer). Faites glisser un composant pour le déplacer ; touchez-le pour le sélectionner.":"Simulation : maintenez un bouton pour l'actionner ; touchez Q1, AU ou le contact 95-96 du thermique pour les basculer. Jaune = actif."}
-function setMode(m){mode=m;pend=null;if(m=="S")st={Q:st.Q,km:0,F:0,T:0};sel=null;modeUI();sync()}
+function modeUI(){["bE","mE"].forEach(function(i){document.getElementById(i).className=mode=="E"?"on":""});["bS","mS"].forEach(function(i){document.getElementById(i).className=mode=="S"?"on":""});
+document.getElementById("palc").style.display=mode=="E"&&EX[ex].need?"":"none";
+document.getElementById("hint").textContent=mode=="E"?"Édition : touchez une borne puis une autre pour tirer un fil (touchez un fil pour le supprimer). Faites glisser un composant pour le déplacer ; touchez-le pour le sélectionner.":"Simulation : maintenez un bouton pour l'actionner ; touchez Q1, AU ou le contact du thermique pour les basculer. Jaune = actif."}
+function setMode(m){mode=m;pend=null;if(m=="S")st={Q:st.Q,km:0,km2:0,F:0,F2:0,T:0};sel=null;modeUI();sync()}
 var sch=document.getElementById("sch");
 function pt(e){var v=sch.querySelector("svg"),p=v.createSVGPoint();p.x=e.clientX;p.y=e.clientY;var q=p.matrixTransform(v.getScreenCTM().inverse());return[q.x,q.y]}
 function snap(v,a,b){return Math.max(a,Math.min(b,Math.round(v/10)*10))}
-function place(k,p){var id=k+(++seq);items.push({id:id,type:k,x:snap(p[0],330,620),y:snap(p[1],80,500)});selT=null;pal();msg("");sync()}
+function place(k,p){var z=zx(),id=k+(++seq);items.push({id:id,type:k,x:snap(p[0],z+30,z+760),y:snap(p[1],80,640)});selT=null;pal();msg("");sync()}
 sch.addEventListener("pointerdown",function(e){
 if(mode=="S"){var h=e.target.closest("[data-hold]");if(h){held[h.dataset.hold]=1;st[h.dataset.hold]=1;lastAct=actLabel(h.dataset.hold);sync()}return}
 if(e.target.closest("[data-t]"))return;var g=e.target.closest("[data-item]");
 if(g){var it=items.filter(function(x){return x.id==g.dataset.item})[0],p=pt(e);drag={id:it.id,dx:it.x-p[0],dy:it.y-p[1],x0:e.clientX,y0:e.clientY,mv:false}}});
 document.addEventListener("pointermove",function(e){if(!drag)return;
 if(!drag.mv&&Math.abs(e.clientX-drag.x0)+Math.abs(e.clientY-drag.y0)>6)drag.mv=true;
-if(drag.mv){var it=items.filter(function(x){return x.id==drag.id})[0],p=pt(e);it.x=snap(p[0]+drag.dx,330,620);it.y=snap(p[1]+drag.dy,80,500);sel=it.id;sync()}});
+if(drag.mv){var z=zx(),it=items.filter(function(x){return x.id==drag.id})[0],p=pt(e);it.x=snap(p[0]+drag.dx,z+30,z+760);it.y=snap(p[1]+drag.dy,80,640);sel=it.id;sync()}});
 function up(){var ch=0;for(var k in held){st[k]=0;lastAct=actLabel(k);ch=1}held={};
 if(drag){if(!drag.mv)sel=sel==drag.id?null:drag.id;drag=null;ch=1}if(ch)sync()}
 document.addEventListener("pointerup",up);document.addEventListener("pointercancel",up);
@@ -162,11 +189,11 @@ if(t.dataset.w!==undefined){W.splice(+t.dataset.w,1);msg("");sync()}
 else if(t.dataset.t){var id=t.dataset.t;if(!pend)pend=id;else{if(pend!=id&&!W.some(function(w){return w[0]==pend&&w[1]==id||w[0]==id&&w[1]==pend}))W.push([pend,id]);pend=null;msg("")}sync()}
 else if(t.dataset.ws){if(selT)place(selT,pt(e));else{sel=null;sync()}}});
 sch.addEventListener("dragover",function(e){e.preventDefault()});
-sch.addEventListener("drop",function(e){e.preventDefault();var k=e.dataTransfer.getData("text/plain");if(TY[k]&&mode=="E"&&ex>0)place(k,pt(e))});
+sch.addEventListener("drop",function(e){e.preventDefault();var k=e.dataTransfer.getData("text/plain");if(TY[k]&&mode=="E"&&EX[ex].need)place(k,pt(e))});
 var pl=document.getElementById("pal");
 pl.addEventListener("click",function(e){var t=e.target.closest(".tile");if(!t)return;selT=selT==t.dataset.k?null:t.dataset.k;pal()});
 pl.addEventListener("dragstart",function(e){var t=e.target.closest(".tile");if(t)e.dataTransfer.setData("text/plain",t.dataset.k)});
-document.getElementById("bE").onclick=function(){setMode("E")};document.getElementById("bS").onclick=function(){setMode("S")};
+["bE","mE"].forEach(function(i){document.getElementById(i).onclick=function(){setMode("E")}});["bS","mS"].forEach(function(i){document.getElementById(i).onclick=function(){setMode("S")}});
 document.getElementById("del").onclick=function(){if(!sel)return;var p=sel+".";items=items.filter(function(x){return x.id!=sel});W=W.filter(function(w){return w[0].indexOf(p)!=0&&w[1].indexOf(p)!=0});sel=null;msg("");sync()};
 function ids(t){return items.filter(function(x){return x.type==t}).map(function(x){return x.id})}
 function stepsFor(need){var sc=[],S=ids("start"),T=ids("stop"),PD=ids("pedal"),AU=ids("au"),pre=need.pedal?[[PD.map(function(i){return[i,1]}),0,"appui sur la pédale"]]:[],L=function(i){return lab(items.filter(function(x){return x.id==i})[0])};
@@ -177,7 +204,7 @@ AU.forEach(function(u){sc.push(run([go,rl,[[[u,1]],0,"arrêt d'urgence"],[[[u,0]
 if(need.th){sc.push(run([go,rl,[[["T",1]],0,"déclenchement du relais thermique"],[[["T",0]],0,"réarmement du thermique"]]));sc.push(run([[[["T",1]],0,"déclenchement du thermique"],[[[a0,1]],0,"appui sur "+L(a0)+" thermique déclenché"],[[[a0,0]],0,"relâchement"]]))}
 if(need.pedal)PD.forEach(function(p){sc.push([[[[a0,1]],0,"Marche sans la pédale"],[[[a0,0]],0,"relâchement de Marche"],[[[p,1]],0,"appui sur la pédale"],[[[a0,1]],1,"Marche pédale appuyée"],[[[a0,0]],1,"relâchement de Marche"],[[[p,0]],0,"relâchement de la pédale"]])})}
 return sc}
-function check(){var need=EX[ex].need;
+function check1(){var need=EX[ex].need;
 if(!need){var sc=[[[["Q",1]],0,"fermeture de Q1"],[[["F",1]],1,"contacteur actionné (Forcer)"],[[["F",0]],0,"contacteur relâché"],[[["Q",0]],0,"ouverture de Q1"],[[["F",1]],0,"Q1 ouvert et contacteur actionné"]],s={Q:0,km:0,F:0,T:0},r=solve(s,W,items);
 if(r.short)return"Court-circuit détecté.";
 for(var j=0;j<sc.length;j++){sc[j][0].forEach(function(c){s[c[0]]=c[1]});r=solve(s,W,items);s.km=r.km?1:0;if(r.short)return"Court-circuit après « "+sc[j][2]+" ».";if(r.motor!=!!sc[j][1])return"Après « "+sc[j][2]+" » : le moteur devrait "+(sc[j][1]?"tourner.":"être à l'arrêt.")}return null}
@@ -190,12 +217,63 @@ if(r.short)return"Court-circuit après « "+d+" ».";
 if(r.km!=e)return"Après « "+d+" » : KM1 devrait "+(e?"être collé.":"être retombé.");
 if(need.lamp&&r.al!=e)return"Après « "+d+" » : le voyant H1 devrait être "+(e?"allumé.":"éteint.");
 if(r.motor!=e)return"Après « "+d+" » : le moteur devrait "+(e?"tourner (vérifiez la puissance).":"être à l'arrêt.")}}return null}
+
+function checkP1(){return check1()}
+function checkP2(){var s={Q:1,km:0,km2:0,F:0,F2:0,T:0},r=solve(s,W,items),d1;
+if(r.short)return"Court-circuit détecté.";
+s.F=1;r=solve(s,W,items);if(r.short)return"Court-circuit avec KM1 seul.";if(!r.motor)return"Avec KM1 actionné, le moteur devrait tourner.";d1=r.dir;
+s.F=0;s.F2=1;r=solve(s,W,items);if(r.short)return"Court-circuit avec KM2 seul.";if(!r.motor)return"Avec KM2 actionné, le moteur devrait tourner.";
+if(r.dir==d1)return"KM2 doit inverser le sens du moteur : permutez deux phases.";return null}
+function check2(need){for(var k in need){var n=ids(k).length;if(n<need[k])return"Il manque : "+(need[k]-n)+" × "+(NM[k]||k)+"."}
+var S=ids("start"),T=ids("stop"),AU=ids("au"),s={Q:1,km:0,km2:0,F:0,F2:0,T:0},r=solve(s,W,items),A=0,B=0,dA=0,
+L=function(i){return lab(items.filter(function(x){return x.id==i})[0])};
+if(r.short)return"Court-circuit détecté dès le départ.";
+var a=S[0],b=S[1],t=T[0],q=function(i){return[i,1,0,"appui sur "+L(i)]},R=function(i,c){return[i,0,c,"relâchement de "+L(i)]};
+var st=[[a,1,"A","appui sur "+L(a)],R(a,"a"),[t,1,0,"appui sur "+L(t)],R(t,0),[b,1,"B","appui sur "+L(b)],R(b,"b"),[a,1,"b","appui sur "+L(a)+" pendant la marche de "+L(b)+" (verrouillage)"],R(a,"b"),[t,1,0,"appui sur "+L(t)],R(t,0),[a,1,"A","appui sur "+L(a)],R(a,"a"),[b,1,"a","appui sur "+L(b)+" pendant la marche de "+L(a)+" (verrouillage)"],R(b,"a"),[t,1,0,"appui sur "+L(t)],R(t,0)];
+if(need.au)AU.forEach(function(u){st.push([a,1,"A","appui sur "+L(a)],R(a,"a"),[u,1,0,"arrêt d'urgence"],[u,0,0,"déverrouillage de l'arrêt d'urgence"])});
+if(need.th)st.push([b,1,"B","appui sur "+L(b)],R(b,"b"),["T",1,0,"déclenchement du relais thermique"],["T",0,0,"réarmement du thermique"],["T",1,0,"déclenchement du thermique"],[a,1,0,"appui sur "+L(a)+" thermique déclenché"],R(a,0),["T",0,0,"réarmement du thermique"]);
+for(var i=0;i<st.length;i++){var x=st[i];s[x[0]]=x[1];r=solve(s,W,items);s.km=r.km?1:0;s.km2=r.km2?1:0;
+if(r.short)return"Court-circuit après « "+x[3]+" »"+(r.sp?" : KM1 et KM2 fermés ensemble (verrouillage manquant ?).":".");
+var c=(r.km?1:0)+(r.km2?2:0),e=x[2],bad=null;
+if(e===0){if(c)bad="le contacteur devrait retomber"}
+else if(e=="A"){if(c!=1&&c!=2)bad="un seul contacteur (KM1 ou KM2) doit coller";else{A=c;dA=r.dir;if(!r.motor)bad="le moteur devrait tourner"}}
+else if(e=="B"){if((c!=1&&c!=2)||c==A)bad="l'autre contacteur doit coller (pas le même que pour l'autre sens)";else{B=c;if(!r.motor)bad="le moteur devrait tourner";else if(r.dir==dA)bad="le sens du moteur doit s'inverser (KM2 doit permuter deux phases)"}}
+else if(e=="a"){if(c!=A)bad="le contacteur devrait rester collé"}
+else if(e=="b"){if(c!=B)bad="le contacteur devrait rester collé (auto-maintien / verrouillage)"}
+if(bad)return"Après « "+x[3]+" » : "+bad+"."}
+return null}
+function check(){var e=EX[ex];if(e.two)return e.need?check2(e.need):checkP2();return check1()}
 document.getElementById("chk").onclick=function(){var e=check();if(e)msg("✘ "+e,"ko");else msg("✔ Correct : le montage se comporte comme attendu, sans court-circuit.","ok")};
 document.getElementById("rst").onclick=function(){load(ex)};
-document.getElementById("sol").onclick=function(){var n=EX[ex].need,g=n?genSol(n):{items:[],wires:[]};items=g.items;W=PW.concat(g.wires);seq=100;sel=null;msg("");sync()};
-function load(i){ex=i;mode="E";pend=null;sel=null;selT=null;seq=0;st={Q:i>=1?1:0,km:0,F:0,T:0};items=[];W=i>=1?PW.slice():[];
-
-document.getElementById("ex").value=i;document.getElementById("cons").textContent=EX[i].c;msg("");pal();modeUI();sync()}
+document.getElementById("sol").onclick=function(){var e=EX[ex],g=e.need?gs(e):{items:[],wires:[]};items=g.items;W=(e.two?PW2:PW1).concat(g.wires);seq=100;sel=null;msg("");sync()};
+function bs(s){var b=new Uint8Array(s.length);for(var i=0;i<s.length;i++)b[i]=s.charCodeAt(i)&255;return b}
+function lat(s){return String(s).replace(/[^\x20-\xff]/g,"?").replace(/[\\()]/g,"\\$&")}
+function buildPdf(jpg,iw,ih,lines,W,H){var out=[],off=[],pos=0;function put(x){var b=typeof x=="string"?bs(x):x;out.push(b);pos+=b.length}
+function obj(n,body){off[n]=pos;put(n+" 0 obj\n"+body+"\nendobj\n")}
+put("%PDF-1.4\n");obj(1,"<</Type/Catalog/Pages 2 0 R>>");obj(2,"<</Type/Pages/Kids[3 0 R]/Count 1>>");
+obj(3,"<</Type/Page/Parent 2 0 R/MediaBox[0 0 842 595]/Resources<</Font<</F1 5 0 R/F2 6 0 R>>/XObject<</Im0 4 0 R>>>>/Contents 7 0 R>>");
+off[4]=pos;put("4 0 obj\n<</Type/XObject/Subtype/Image/Width "+iw+"/Height "+ih+"/ColorSpace/DeviceRGB/BitsPerComponent 8/Filter/DCTDecode/Length "+jpg.length+">>\nstream\n");put(jpg);put("\nendstream\nendobj\n");
+obj(5,"<</Type/Font/Subtype/Type1/BaseFont/Helvetica/Encoding/WinAnsiEncoding>>");obj(6,"<</Type/Font/Subtype/Type1/BaseFont/Helvetica-Bold/Encoding/WinAnsiEncoding>>");
+var sc=Math.min(802/W,455/H),w=W*sc,h=H*sc,c="BT /F2 16 Tf 40 560 Td ("+lat(lines[0])+") Tj ET\n";
+for(var i=1;i<lines.length;i++)c+="BT /F1 11 Tf 40 "+(560-i*17-6)+" Td ("+lat(lines[i])+") Tj ET\n";
+c+="q "+w.toFixed(1)+" 0 0 "+h.toFixed(1)+" 20 15 cm /Im0 Do Q";
+obj(7,"<</Length "+c.length+">>\nstream\n"+c+"\nendstream");
+var xr=pos;put("xref\n0 8\n0000000000 65535 f \n");for(var i=1;i<8;i++)put(("0000000000"+off[i]).slice(-10)+" 00000 n \n");
+put("trailer\n<</Size 8/Root 1 0 R>>\nstartxref\n"+xr+"\n%%EOF");return new Blob(out,{type:"application/pdf"})}
+function exportPdf(){var name=document.getElementById("nm").value.trim();if(!name){msg("Saisissez le nom de l'étudiant avant d'exporter.","ko");return}
+var svg=sch.querySelector("svg"),W0=+svg.getAttribute("width"),H0=+svg.getAttribute("height"),wr=document.createElement("div");
+wr.style.cssText="position:absolute;left:-99999px;top:0;--line:#2b3445;--fg:#1d2330;--card:#fff;--mut:#6b7385;--acc:#1f6feb;--ok:#18794e;--ko:#b42318;--bd:#d5d9e2";
+var c=svg.cloneNode(true);wr.appendChild(c);document.body.appendChild(wr);
+c.querySelectorAll("*").forEach(function(e){var cs=getComputedStyle(e);e.setAttribute("style","stroke:"+cs.stroke+";fill:"+cs.fill+";stroke-width:"+cs.strokeWidth+";stroke-dasharray:"+cs.strokeDasharray+";opacity:"+cs.opacity+";font-size:"+cs.fontSize+";font-weight:"+cs.fontWeight+";font-family:Arial,sans-serif;stroke-linecap:round");e.removeAttribute("class")});
+c.setAttribute("xmlns","http://www.w3.org/2000/svg");var xml=new XMLSerializer().serializeToString(c);document.body.removeChild(wr);
+var img=new Image();img.onload=function(){var cv=document.createElement("canvas");cv.width=W0*2;cv.height=H0*2;var g=cv.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,cv.width,cv.height);g.drawImage(img,0,0,cv.width,cv.height);
+var b64=atob(cv.toDataURL("image/jpeg",.92).split(",")[1]),jpg=new Uint8Array(b64.length);for(var i=0;i<b64.length;i++)jpg[i]=b64.charCodeAt(i);
+var e=check(),lines=["Démarrage direct - "+EX[ex].t,"Nom : "+name,"Date : "+new Date().toLocaleDateString("fr-FR"),"Vérification : "+(e?"non conforme - "+e:"montage conforme (comportement validé, sans court-circuit)")],
+bl=buildPdf(jpg,cv.width,cv.height,lines,W0,H0),a=document.createElement("a");a.href=URL.createObjectURL(bl);a.download="montage-"+name.replace(/[^\w-]+/g,"_")+".pdf";document.body.appendChild(a);a.click();document.body.removeChild(a);msg("PDF exporté.","ok")};
+img.onerror=function(){msg("Export impossible dans ce navigateur.","ko")};img.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(xml)}
+document.getElementById("pdf").onclick=exportPdf;
+function load(i){ex=i;var e=EX[i];mode="E";pend=null;sel=null;selT=null;seq=0;st={Q:e.pw?1:0,km:0,km2:0,F:0,F2:0,T:0};items=[];W=e.pw?e.pw.slice():[];
+document.getElementById("ex").value=i;document.getElementById("cons").textContent=e.c;msg("");pal();modeUI();sync()}
 var sl=document.getElementById("ex");EX.forEach(function(x,i){var o=document.createElement("option");o.value=i;o.textContent=x.t;sl.appendChild(o)});
 sl.onchange=function(){load(+sl.value)};
 load(0);
