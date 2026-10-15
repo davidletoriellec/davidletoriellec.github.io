@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Démarrage direct 1 sens – câblage et simulation</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f6f7f9;--fg:#1d2330;--card:#fff;--line:#2b3445;--mut:#6b7385;--acc:#1f6feb;--ok:#18794e;--ko:#b42318;--bd:#d5d9e2}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#14171d;--fg:#e8ebf2;--card:#1d222b;--line:#c9d1e0;--mut:#98a1b5;--acc:#5b9bff;--ok:#4cc38a;--ko:#ff7b72;--bd:#364050}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#14171d;--fg:#e8ebf2;--card:#1d222b;--line:#c9d1e0;--mut:#98a1b5;--acc:#5b9bff;--ok:#4cc38a;--ko:#ff7b72;--bd:#364050}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:12px;-webkit-user-select:none;user-select:none}
+h1{font-size:18px;margin:0 0 8px}
+.lv{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+button{font:inherit;border:1px solid var(--bd);background:var(--card);color:var(--fg);border-radius:8px;padding:6px 10px;cursor:pointer}
+button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px;margin-bottom:10px}
+.cons{font-weight:600}.hint{color:var(--mut);font-size:13px}
+.sch{overflow-x:auto;touch-action:manipulation}
+svg{stroke:var(--line);fill:none;stroke-width:2;stroke-linecap:round;display:block;min-width:700px}
+svg text{fill:var(--fg);stroke:none;font-size:11px}
+svg .b{font-weight:700}svg .s{font-size:9px}svg .m{fill:var(--mut)}svg .dk{fill:#111}
+.y{fill:#ffd400}
+.cp{cursor:pointer}
+.td{fill:var(--card);stroke:var(--line)}.pd{fill:var(--acc)}
+.wr{stroke:var(--line);opacity:.75}.hot{stroke:var(--acc);opacity:1}.sh{stroke:var(--ko);opacity:1}
+.msg{margin-top:8px;font-weight:600}.ok{color:var(--ok)}.ko{color:var(--ko)}
+.wsf{stroke:var(--bd);stroke-dasharray:4 3;fill:transparent}.sl{stroke:var(--acc);stroke-dasharray:3 2;fill:none}[data-item]{touch-action:none}
+.pal{display:flex;gap:6px;flex-wrap:wrap}.tile{width:104px;text-align:center;border:1px solid var(--bd);border-radius:8px;padding:2px;background:var(--card);cursor:grab}.tile.sel{outline:2px solid var(--acc)}.tile svg{min-width:0;width:100%;height:auto;display:block}.tile small{display:block;font-size:11px;color:var(--mut);line-height:1.2}
+select{font:inherit;padding:6px;border-radius:8px;border:1px solid var(--bd);background:var(--card);color:var(--fg);max-width:100%}
+#alert{display:none;position:sticky;top:0;z-index:20;background:#c62828;color:#fff;border-radius:10px;padding:10px 14px;margin-bottom:10px;text-align:center;font-weight:800;font-size:26px;animation:bl .7s steps(2) infinite}
+#alert small{display:block;font-size:13px;font-weight:600}
+@keyframes bl{50%{background:#7a0c06}}
+.sch.shorted{outline:4px solid #c62828}
+svg .sh{stroke:#e53935;stroke-width:4}
+</style>
+</head>
+<body>
+<body>
+<h1>⚡ Démarrage direct 1 sens : établi, câblage et simulation</h1>
+<div class="lv"><select id="ex"></select><button id="bE" class="on">✏️ Édition</button><button id="bS">▶ Simulation</button></div>
+<div class="card"><div class="cons" id="cons"></div><div class="hint" id="hint"></div></div>
+<div class="card" id="palc"><b>Établi</b> <span class="hint">: touchez un composant puis la zone de travail (ou glissez-le).</span><div class="pal" id="pal"></div></div>
+<div id="alert"></div>
+<div class="card sch" id="sch"></div>
+<div class="lv"><button id="chk" class="on">Vérifier</button><button id="del">Supprimer la sélection</button><button id="rst">Recommencer</button><button id="sol">Voir la solution</button></div>
+<div class="msg" id="msg"></div>
+<script>
+var PW=[["L1","Q1.1"],["L2","Q1.3"],["L3","Q1.5"],["Q1.2","KM1.1"],["Q1.4","KM1.3"],["Q1.6","KM1.5"],["KM1.2","F2.1"],["KM1.4","F2.3"],["KM1.6","F2.5"],["F2.2","M1.U"],["F2.4","M1.V"],["F2.6","M1.W"]];
+var TY={stop:{nc:1,h:"push",ev:"hold",n:"Arrêt",s:"BP NF"},start:{nc:0,h:"push",ev:"hold",n:"Marche",s:"BP NO"},au:{nc:1,h:"mush",ev:"tog",n:"Arrêt d'urgence",s:"NF"},th:{nc:1,h:"th",ev:"tog",n:"Relais thermique",s:"F1 95-96 NF"},thno:{nc:0,h:"th",ev:"tog",n:"Relais thermique",s:"F1 97-98 NO"},q1no:{nc:0,h:"",n:"Précoupure",s:"Q1 NO"},kmno:{nc:0,h:"",n:"KM1",s:"13-14 NO"},kmnc:{nc:1,h:"",n:"KM1",s:"21-22 NF"},pedal:{nc:0,h:"ped",ev:"hold",n:"Pédale",s:"NO"},coil:{coil:1,n:"Bobine",s:"KM1"},lamp:{lamp:1,n:"Voyant",s:"H1"},lamp2:{lamp:1,n:"Voyant",s:"H2"},lamp3:{lamp:1,n:"Voyant",s:"H3"}};
+var NM={stop:"bouton Arrêt",start:"bouton Marche",au:"arrêt d'urgence",th:"contact du relais thermique",pedal:"pédale",lamp:"voyant H1",coil:"bobine KM1",kmno:"contact KM1 13-14 (NO)"};
+var EX=[
+{t:"1 · Puissance : câblage",c:"Câblez le circuit de puissance : L1-L2-L3 → sectionneur Q1 → contacteur KM1 → relais thermique F2 → moteur M1. Puis passez en Simulation, fermez Q1 et testez avec « Forcer KM1 »."},
+{t:"2 · Commande de base",need:{stop:1,start:1,lamp:1},c:"Prenez sur l'établi ce qu'il faut pour une commande Marche/Arrêt avec auto-maintien de KM1 et un voyant H1 en parallèle sur la bobine. Placez, puis câblez."},
+{t:"3 · Commande avec sécurités",need:{stop:1,start:1,au:1,th:1,lamp:1},c:"Construisez la commande complète : Marche/Arrêt avec auto-maintien, voyant H1, plus l'arrêt d'urgence et le contact NF du relais thermique F1."},
+{t:"4 · Commande avec 2 postes",need:{stop:2,start:2,au:1,th:1,lamp:1},c:"Construisez la commande avec sécurités et un 2e poste de commande (2 Arrêt, 2 Marche)."},
+{t:"5 · Commande avec pédale",need:{stop:2,start:2,au:1,th:1,pedal:1,lamp:1},c:"Construisez la commande complète (sécurités, 2 postes) avec une pédale : le moteur ne doit tourner que tant qu'elle reste appuyée."}];
+function genSol(n){var it=[],w=[],c=[],y=function(i,t,x,yy){it.push({id:i,type:t,x:x,y:yy});return i};
+if(n.th)c.push(y("th1","th",320,95));if(n.au)c.push(y("au1","au",320,155));
+c.push(y("stop1","stop",320,215));if(n.stop>1)c.push(y("stop2","stop",320,275));
+y("start1","start",320,355);y("kmno1","kmno",400,355);if(n.start>1)y("start2","start",480,355);
+if(n.pedal)y("pedal1","pedal",320,425);y("coil1","coil",320,495);if(n.lamp)y("lamp1","lamp",560,495);
+w.push(["P24a",c[0]+".a"]);for(var i=0;i<c.length-1;i++)w.push([c[i]+".b",c[i+1]+".a"]);
+var j=c[c.length-1]+".b";w.push([j,"start1.a"],[j,"kmno1.a"],["start1.b","kmno1.b"]);
+if(n.start>1)w.push([j,"start2.a"],["start2.b","kmno1.b"]);
+if(n.pedal)w.push(["kmno1.b","pedal1.a"],["pedal1.b","coil1.a"]);else w.push(["kmno1.b","coil1.a"]);
+w.push(["coil1.b","P0a"]);if(n.lamp)w.push(["coil1.a","lamp1.a"],["coil1.b","lamp1.b"]);return{items:it,wires:w}}
+var ex=0,mode="E",items=[],W=[],st,res,P,pend=null,sel=null,selT=null,seq=0,drag=null,held={};
+function closed(it,s,km){var id=it.id;switch(it.type){case"stop":case"au":return!s[id];case"th":return!s.T;case"thno":return!!s.T;case"q1no":return!!s.Q;case"start":case"pedal":return!!s[id];case"kmno":return km;case"kmnc":return!km}return false}
+function net(s,W,items,km){var par={};function f(a){if(par[a]===undefined)par[a]=a;while(par[a]!==a){par[a]=par[par[a]];a=par[a]}return a}
+function u(a,b){par[f(a)]=f(b)}
+u("P24a","P24b");u("P24a","P24c");u("P0a","P0b");u("P0a","P0c");W.forEach(function(w){u(w[0],w[1])});
+[1,3,5].forEach(function(i){if(s.Q)u("Q1."+i,"Q1."+(i+1));u("F2."+i,"F2."+(i+1));if(km)u("KM1."+i,"KM1."+(i+1))});
+items.forEach(function(it){if(!TY[it.type].coil&&!TY[it.type].lamp&&closed(it,s,km))u(it.id+".a",it.id+".b")});
+var ph=["L1","L2","L3"],used=[];
+var sp=f("L1")==f("L2")||f("L2")==f("L3")||f("L1")==f("L3"),sc=f("P24a")==f("P0a"),short=sp||sc;
+var motor=!short&&["M1.U","M1.V","M1.W"].every(function(m){var k=ph.findIndex(function(p){return f(p)==f(m)});if(k<0||used[k])return false;used[k]=1;return true});
+var coil={},lamp={},ac=false,al=false;
+items.forEach(function(it){var a=f(it.id+".a"),b=f(it.id+".b"),p=f("P24a"),z=f("P0a");
+if(it.type=="coil"){coil[it.id]=a==p&&b==z;ac=ac||coil[it.id]}
+if(TY[it.type].lamp){lamp[it.id]=a!=b&&(a==p&&b==z||a==z&&b==p);if(it.type=="lamp")al=al||lamp[it.id]}});
+return{f:f,short:short,sp:sp,sc:sc,motor:motor,coil:coil,lamp:lamp,ac:ac,al:al}}
+function solve(s,W,items){var km=!!s.km,r;for(var i=0;i<6;i++){r=net(s,W,items,km);var c=r.ac||!!s.F;if(c==km)break;km=c}r.km=km;return r}
+function reg(i,x,y){P[i]=[x,y]}
+function lab(it){var k=Math.max(0,items.filter(function(x){return x.type==it.type}).indexOf(it)),t=it.type;return t=="stop"?"S"+(2*k+1):t=="start"?"S"+(2*k+2):{au:"AU",th:"F1 95-96",thno:"F1 97-98",q1no:"Q1 "+(k?"23-24":"13-14"),kmno:"KM1",kmnc:"KM1",pedal:"S5",coil:"KM1",lamp:"H1",lamp2:"H2",lamp3:"H3"}[t]}
+function drawItem(it,s,r){var d=TY[it.type],x=it.x,y=it.y,id=it.id,L=lab(it),on,g;reg(id+".a",x,y-22);reg(id+".b",x,y+22);
+if(d.coil){on=r.coil[id];return'<g class="cp" data-item="'+id+'"><rect x="'+(x-18)+'" y="'+(y-15)+'" width="36" height="30" class="'+(on?'y':'')+'"/><path d="M'+x+' '+(y-22)+'V'+(y-15)+'M'+x+' '+(y+15)+'V'+(y+22)+'"/><text x="'+x+'" y="'+(y+4)+'" text-anchor="middle" class="b '+(on?'dk':'')+'">KM1</text><text x="'+(x+22)+'" y="'+(y-10)+'" class="s m">A1</text><text x="'+(x+22)+'" y="'+(y+20)+'" class="s m">A2</text></g>'}
+if(d.lamp){on=r.lamp[id];return'<g class="cp" data-item="'+id+'"><path d="M'+x+' '+(y-22)+'V'+(y-12)+'M'+x+' '+(y+12)+'V'+(y+22)+'"/><circle cx="'+x+'" cy="'+y+'" r="12" class="'+(on?'y':'')+'"/><path d="M'+(x-8)+' '+(y-8)+'L'+(x+8)+' '+(y+8)+'M'+(x+8)+' '+(y-8)+'L'+(x-8)+' '+(y+8)+'"/><text x="'+(x+18)+'" y="'+(y+4)+'" class="b">'+L+'</text></g>'}
+var ky=(it.type=="th"||it.type=="thno")?"T":it.type=="q1no"?"Q":id,cl=closed(it,s,r.km),pr=s[ky],nc=d.nc,hx=x-30+(pr?5:0),t=nc?(cl?[x-9,y-8]:[x-13,y]):(cl?[x,y-8]:[x-9,y-8]),mx=(x+t[0])/2;
+g='<g class="cp" data-item="'+id+'" '+(d.ev=="hold"?'data-hold="'+id+'"':d.ev=="tog"?'data-tog="'+ky+'"':'')+'><rect x="'+(d.h?x-70:x-14)+'" y="'+(y-22)+'" width="'+(d.h?130:60)+'" height="44" fill="transparent" stroke="none"/>';
+g+='<path d="M'+x+' '+(y-22)+'V'+(y-8)+(nc?'H'+(x-13):'')+'M'+x+' '+(y+22)+'V'+(y+8)+'M'+x+' '+(y+8)+'L'+t[0]+' '+t[1]+'"/>';
+if(d.h)g+='<path d="M'+mx+' '+y+'H'+hx+'" stroke-dasharray="3 2"/>';
+if(d.h=="push")g+='<path d="M'+hx+' '+(y-6)+'V'+(y+6)+'"/>';
+if(d.h=="mush")g+='<path fill="currentColor" d="M'+hx+' '+(y-7)+'a7 7 0 0 0 0 14z"/>';
+if(d.h=="th")g+='<path d="M'+(hx-8)+' '+(y-14)+'V'+(y-6)+'H'+hx+'V'+(y+6)+'H'+(hx-8)+'V'+(y+14)+'"'+(pr?' stroke="var(--ko)"':'')+'/>';
+if(d.h=="q")g+='<circle cx="'+(hx-3)+'" cy="'+y+'" r="3" fill="currentColor"/>';
+if(d.h=="ped")g+='<path d="M'+hx+' '+(y-7)+'V'+(y+7)+'L'+(hx-9)+' '+(y+3)+'V'+(y-3)+'z"/>';
+return g+'<text x="'+(x+12)+'" y="'+(y-6)+'" class="b">'+L+'</text><text x="'+(x+12)+'" y="'+(y+6)+'" class="s m">'+d.n+'</text></g>'}
+function cont(x,y,cl,arc,bar){var t=cl?[x,y-8]:[x-9,y-8],s='<path d="M'+x+' '+(y-22)+'V'+(y-8)+'M'+x+' '+(y+22)+'V'+(y+8)+'M'+x+' '+(y+8)+'L'+t[0]+' '+t[1]+'"/>';
+if(arc)s+='<path d="M'+((x+t[0])/2-2)+' '+(y-3)+'a4 4 0 0 0 0 6"/>';
+if(bar)s+='<path d="M'+(t[0]-6)+' '+t[1]+'H'+(t[0]+6)+'"/>';return s}
+function pwr(x,y,cl){return'<path d="M'+x+' '+(y-30)+'V'+(y-8)+'M'+x+' '+(y+15)+'V'+(y+30)+'" stroke-width="3"/><path d="M'+x+' '+(y-17)+'a4.5 4.5 0 0 0 0 9"/><path d="M'+x+' '+(y+15)+'L'+(cl?x:x-15)+' '+(y-8)+'"/>'}
+function sect(x,cl){return'<path d="M'+x+' 78V96M'+(x-8)+' 96H'+(x+8)+'M'+x+' 150V164" stroke-width="3"/><g transform="rotate('+(cl?0:-22)+' '+x+' 150)"><rect x="'+(x-5)+'" y="110" width="10" height="26" fill="var(--card)"/><path d="M'+x+' 150V96M'+x+' 105V141"/></g>'}
+function fus(x,y){return'<path d="M'+x+' '+(y-8)+'V'+y+'M'+x+' '+(y+26)+'V'+(y+34)+'"/><rect x="'+(x-5)+'" y="'+y+'" width="10" height="26"/><path d="M'+x+' '+y+'V'+(y+26)+'"/>'}
+function render(){P={};var o=[],s=st,r=res,ctl=ex>0;
+[["L1",60],["L2",120],["L3",180]].forEach(function(a){reg(a[0],a[1],40);o.push('<text x="'+(a[1]-6)+'" y="28" class="b">'+a[0]+'</text>')});
+o.push('<text x="196" y="44" class="s m">réseau 3~</text>');
+[60,120,180].forEach(function(x,i){var mx=[84,120,156][i];
+reg("Q1."+(2*i+1),x,78);reg("Q1."+(2*i+2),x,164);o.push(sect(x,s.Q));[[78,164,0],[205,265,1],[283,367,0]].forEach(function(a){var t=a[2]?(2*i+1)+"/L"+(i+1):""+(2*i+1),b=a[2]?(2*i+2)+"/T"+(i+1):""+(2*i+2);o.push('<text x="'+(x-8)+'" y="'+(a[0]+4)+'" text-anchor="end" class="s m">'+t+'</text><text x="'+(x-8)+'" y="'+(a[1]+4)+'" text-anchor="end" class="s m">'+b+'</text>')});
+reg("KM1."+(2*i+1),x,205);reg("KM1."+(2*i+2),x,265);o.push(pwr(x,235,r.km));
+reg("F2."+(2*i+1),x,283);reg("F2."+(2*i+2),x,367);
+o.push('<path d="M'+x+' 283V310H'+(x+18)+'V340H'+x+'V367" '+(s.T?'stroke="var(--ko)"':'')+'/>');
+reg(["M1.U","M1.V","M1.W"][i],mx,420);o.push('<path d="M'+mx+' 420V'+(i==1?430:452)+'"/>')});
+o.push('<path d="M32 124H200" stroke-dasharray="3 2"/><path d="M36 238H175" stroke-dasharray="3 2"/><path d="M36 325H205" stroke-dasharray="3 2"/>');
+o.push('<g class="cp" data-tog="Q"><rect x="8" y="114" width="24" height="20" rx="3" fill="'+(s.Q?'#18794e':'var(--card)')+'"/><text x="12" y="128" class="s">Q1</text></g>');
+o.push('<text x="218" y="96" class="b">Q1</text><text x="218" y="108" class="s m">sectionneur</text><text x="218" y="118" class="s m">porte-fusibles</text><text x="218" y="222" class="b">KM1</text><text x="218" y="233" class="s m">contacteur</text>');
+o.push('<g class="cp" data-hold="F"><rect x="218" y="240" width="56" height="18" rx="4" class="'+(s.F?'y':'')+'"/><text x="224" y="253" class="s '+(s.F?'dk':'')+'">Forcer KM1</text></g>');
+o.push('<text x="218" y="322" class="b">F1</text><text x="218" y="333" class="s m">relais thermique</text>');
+o.push('<circle cx="120" cy="470" r="40" class="'+(r.motor?'y':'')+'"/><text x="120" y="466" text-anchor="middle" class="b '+(r.motor?'dk':'')+'">M</text><text x="120" y="483" text-anchor="middle" class="'+(r.motor?'dk':'')+'">3~</text>');
+if(ctl){o.push('<rect data-ws="1" x="290" y="52" width="400" height="476" rx="8" class="wsf"/><text x="298" y="66" class="s m">Zone de travail</text>');
+o.push('<path d="M300 40H680M300 540H680"/><text x="302" y="32" class="b">+24 V</text><text x="302" y="556" class="b">0 V</text>');
+[["P24a",320,40],["P24b",420,40],["P24c",520,40],["P0a",320,540],["P0b",420,540],["P0c",520,540]].forEach(function(a){reg(a[0],a[1],a[2])});
+items.forEach(function(it){o.push(drawItem(it,s,r));if(it.id==sel&&mode=="E")o.push('<rect x="'+(it.x-72)+'" y="'+(it.y-27)+'" width="134" height="54" rx="6" class="sl"/>')})}
+var hotN=[r.f("P24a"),r.f("L1"),r.f("L2"),r.f("L3")];
+W.forEach(function(w,i){var a=P[w[0]],b=P[w[1]];if(!a||!b)return;var m=(a[1]+b[1])/2+((i%5)-2)*6,
+d=a[0]==b[0]||a[1]==b[1]?'M'+a[0]+' '+a[1]+'L'+b[0]+' '+b[1]:'M'+a[0]+' '+a[1]+'V'+m+'H'+b[0]+'V'+b[1],hot=hotN.indexOf(r.f(w[0]))>=0;
+o.push('<g class="cp" data-w="'+i+'"><path d="'+d+'" class="wr '+(hot?(r.short?'sh':'hot'):'')+'"/>'+(mode=="E"?'<path d="'+d+'" stroke="transparent" stroke-width="12"/>':'')+'</g>')});
+for(var k in P)o.push('<g data-t="'+k+'" class="cp"><circle cx="'+P[k][0]+'" cy="'+P[k][1]+'" r="4" class="td '+(pend==k?'pd':'')+'"/>'+(mode=="E"?'<circle cx="'+P[k][0]+'" cy="'+P[k][1]+'" r="11" fill="transparent" stroke="none"/>':'')+'</g>');
+document.getElementById("sch").innerHTML='<svg viewBox="0 0 700 570" width="700" height="570">'+o.join("")+'</svg>'}
+var cause="",lastAct="";
+function actLabel(k){if(k=="F")return"« Forcer KM1 »";if(k=="Q")return st.Q?"fermeture de Q1":"ouverture de Q1";if(k=="T")return st.T?"déclenchement du relais thermique":"réarmement du thermique";var it=items.filter(function(x){return x.id==k})[0];return it?(st[k]?"actionnement de ":"relâchement de ")+lab(it):k}
+function alertUI(){var a=document.getElementById("alert"),r=res,s=document.getElementById("sch");
+if(!r.short){a.style.display="none";s.classList.remove("shorted");return}
+var t=[];if(r.sp)t.push("phases L1 / L2 / L3 reliées entre elles");if(r.sc)t.push("+24 V relié à 0 V");
+a.innerHTML="⚠ COURT-CIRCUIT<small>"+t.join(" · ")+(mode=="S"&&cause?" — provoqué par : "+cause:"")+"</small>";a.style.display="block";s.classList.add("shorted")}
+function sync(){var was=res&&res.short;res=solve(st,W,items);st.km=res.km?1:0;if(res.short&&!was)cause=lastAct;if(!res.short)cause="";alertUI();render()}
+function msg(t,c){var m=document.getElementById("msg");m.textContent=t;m.className="msg "+(c||"")}
+function pal(){var p=document.getElementById("pal");p.innerHTML="";var Q=P;P={};
+for(var k in TY){var e=document.createElement("div");e.className="tile"+(selT==k?" sel":"");e.dataset.k=k;e.draggable=true;
+e.innerHTML='<svg viewBox="0 0 110 60" width="104" height="57">'+drawItem({id:"tmp",type:k,x:60,y:30},{},{km:false,coil:{},lamp:{}})+'</svg><small>'+TY[k].n+' '+TY[k].s+'</small>';p.appendChild(e)}P=Q}
+function modeUI(){document.getElementById("bE").className=mode=="E"?"on":"";document.getElementById("bS").className=mode=="S"?"on":"";
+document.getElementById("palc").style.display=mode=="E"&&ex>0?"":"none";
+document.getElementById("hint").textContent=mode=="E"?"Édition : touchez une borne puis une autre pour tirer un fil (touchez un fil pour le supprimer). Faites glisser un composant pour le déplacer ; touchez-le pour le sélectionner.":"Simulation : maintenez un bouton pour l'actionner ; touchez Q1, AU ou le contact 95-96 du thermique pour les basculer. Jaune = actif."}
+function setMode(m){mode=m;pend=null;if(m=="S")st={Q:st.Q,km:0,F:0,T:0};sel=null;modeUI();sync()}
+var sch=document.getElementById("sch");
+function pt(e){var v=sch.querySelector("svg"),p=v.createSVGPoint();p.x=e.clientX;p.y=e.clientY;var q=p.matrixTransform(v.getScreenCTM().inverse());return[q.x,q.y]}
+function snap(v,a,b){return Math.max(a,Math.min(b,Math.round(v/10)*10))}
+function place(k,p){var id=k+(++seq);items.push({id:id,type:k,x:snap(p[0],330,620),y:snap(p[1],80,500)});selT=null;pal();msg("");sync()}
+sch.addEventListener("pointerdown",function(e){
+if(mode=="S"){var h=e.target.closest("[data-hold]");if(h){held[h.dataset.hold]=1;st[h.dataset.hold]=1;lastAct=actLabel(h.dataset.hold);sync()}return}
+if(e.target.closest("[data-t]"))return;var g=e.target.closest("[data-item]");
+if(g){var it=items.filter(function(x){return x.id==g.dataset.item})[0],p=pt(e);drag={id:it.id,dx:it.x-p[0],dy:it.y-p[1],x0:e.clientX,y0:e.clientY,mv:false}}});
+document.addEventListener("pointermove",function(e){if(!drag)return;
+if(!drag.mv&&Math.abs(e.clientX-drag.x0)+Math.abs(e.clientY-drag.y0)>6)drag.mv=true;
+if(drag.mv){var it=items.filter(function(x){return x.id==drag.id})[0],p=pt(e);it.x=snap(p[0]+drag.dx,330,620);it.y=snap(p[1]+drag.dy,80,500);sel=it.id;sync()}});
+function up(){var ch=0;for(var k in held){st[k]=0;lastAct=actLabel(k);ch=1}held={};
+if(drag){if(!drag.mv)sel=sel==drag.id?null:drag.id;drag=null;ch=1}if(ch)sync()}
+document.addEventListener("pointerup",up);document.addEventListener("pointercancel",up);
+sch.addEventListener("click",function(e){var t=e.target.closest("[data-t],[data-w],[data-tog],[data-ws]");if(!t)return;
+if(mode=="S"){if(t.dataset.tog){var k=t.dataset.tog;st[k]=st[k]?0:1;lastAct=actLabel(k);sync()}return}
+if(t.dataset.w!==undefined){W.splice(+t.dataset.w,1);msg("");sync()}
+else if(t.dataset.t){var id=t.dataset.t;if(!pend)pend=id;else{if(pend!=id&&!W.some(function(w){return w[0]==pend&&w[1]==id||w[0]==id&&w[1]==pend}))W.push([pend,id]);pend=null;msg("")}sync()}
+else if(t.dataset.ws){if(selT)place(selT,pt(e));else{sel=null;sync()}}});
+sch.addEventListener("dragover",function(e){e.preventDefault()});
+sch.addEventListener("drop",function(e){e.preventDefault();var k=e.dataTransfer.getData("text/plain");if(TY[k]&&mode=="E"&&ex>0)place(k,pt(e))});
+var pl=document.getElementById("pal");
+pl.addEventListener("click",function(e){var t=e.target.closest(".tile");if(!t)return;selT=selT==t.dataset.k?null:t.dataset.k;pal()});
+pl.addEventListener("dragstart",function(e){var t=e.target.closest(".tile");if(t)e.dataTransfer.setData("text/plain",t.dataset.k)});
+document.getElementById("bE").onclick=function(){setMode("E")};document.getElementById("bS").onclick=function(){setMode("S")};
+document.getElementById("del").onclick=function(){if(!sel)return;var p=sel+".";items=items.filter(function(x){return x.id!=sel});W=W.filter(function(w){return w[0].indexOf(p)!=0&&w[1].indexOf(p)!=0});sel=null;msg("");sync()};
+function ids(t){return items.filter(function(x){return x.type==t}).map(function(x){return x.id})}
+function stepsFor(need){var sc=[],S=ids("start"),T=ids("stop"),PD=ids("pedal"),AU=ids("au"),pre=need.pedal?[[PD.map(function(i){return[i,1]}),0,"appui sur la pédale"]]:[],L=function(i){return lab(items.filter(function(x){return x.id==i})[0])};
+function run(a){return pre.concat(a)}
+S.forEach(function(a){T.forEach(function(b){sc.push(run([[[[a,1]],1,"appui sur "+L(a)],[[[a,0]],1,"relâchement de "+L(a)+" (auto-maintien)"],[[[b,1]],0,"appui sur "+L(b)],[[[b,0]],0,"relâchement de "+L(b)]]))})});
+var a0=S[0];if(a0){var go=[[[a0,1]],1,"appui sur "+L(a0)],rl=[[[a0,0]],1,"relâchement de "+L(a0)];
+AU.forEach(function(u){sc.push(run([go,rl,[[[u,1]],0,"arrêt d'urgence"],[[[u,0]],0,"déverrouillage de l'arrêt d'urgence"],go,rl]))});
+if(need.th){sc.push(run([go,rl,[[["T",1]],0,"déclenchement du relais thermique"],[[["T",0]],0,"réarmement du thermique"]]));sc.push(run([[[["T",1]],0,"déclenchement du thermique"],[[[a0,1]],0,"appui sur "+L(a0)+" thermique déclenché"],[[[a0,0]],0,"relâchement"]]))}
+if(need.pedal)PD.forEach(function(p){sc.push([[[[a0,1]],0,"Marche sans la pédale"],[[[a0,0]],0,"relâchement de Marche"],[[[p,1]],0,"appui sur la pédale"],[[[a0,1]],1,"Marche pédale appuyée"],[[[a0,0]],1,"relâchement de Marche"],[[[p,0]],0,"relâchement de la pédale"]])})}
+return sc}
+function check(){var need=EX[ex].need;
+if(!need){var sc=[[[["Q",1]],0,"fermeture de Q1"],[[["F",1]],1,"contacteur actionné (Forcer)"],[[["F",0]],0,"contacteur relâché"],[[["Q",0]],0,"ouverture de Q1"],[[["F",1]],0,"Q1 ouvert et contacteur actionné"]],s={Q:0,km:0,F:0,T:0},r=solve(s,W,items);
+if(r.short)return"Court-circuit détecté.";
+for(var j=0;j<sc.length;j++){sc[j][0].forEach(function(c){s[c[0]]=c[1]});r=solve(s,W,items);s.km=r.km?1:0;if(r.short)return"Court-circuit après « "+sc[j][2]+" ».";if(r.motor!=!!sc[j][1])return"Après « "+sc[j][2]+" » : le moteur devrait "+(sc[j][1]?"tourner.":"être à l'arrêt.")}return null}
+for(var k in need){var n=ids(k).length;if(n<need[k])return"Il manque : "+(need[k]-n)+" × "+NM[k]+"."}
+if(!ids("coil").length)return"Il manque : la bobine KM1.";if(!ids("kmno").length)return"Il manque : le contact KM1 13-14 (NO) pour l'auto-maintien.";
+var scs=stepsFor(need);
+for(var i=0;i<scs.length;i++){var s={Q:1,km:0,F:0,T:0},r=solve(s,W,items);if(r.short)return"Court-circuit détecté dès le départ.";
+for(var j=0;j<scs[i].length;j++){scs[i][j][0].forEach(function(c){s[c[0]]=c[1]});r=solve(s,W,items);s.km=r.km?1:0;var e=!!scs[i][j][1],d=scs[i][j][2];
+if(r.short)return"Court-circuit après « "+d+" ».";
+if(r.km!=e)return"Après « "+d+" » : KM1 devrait "+(e?"être collé.":"être retombé.");
+if(need.lamp&&r.al!=e)return"Après « "+d+" » : le voyant H1 devrait être "+(e?"allumé.":"éteint.");
+if(r.motor!=e)return"Après « "+d+" » : le moteur devrait "+(e?"tourner (vérifiez la puissance).":"être à l'arrêt.")}}return null}
+document.getElementById("chk").onclick=function(){var e=check();if(e)msg("✘ "+e,"ko");else msg("✔ Correct : le montage se comporte comme attendu, sans court-circuit.","ok")};
+document.getElementById("rst").onclick=function(){load(ex)};
+document.getElementById("sol").onclick=function(){var n=EX[ex].need,g=n?genSol(n):{items:[],wires:[]};items=g.items;W=PW.concat(g.wires);seq=100;sel=null;msg("");sync()};
+function load(i){ex=i;mode="E";pend=null;sel=null;selT=null;seq=0;st={Q:i>=1?1:0,km:0,F:0,T:0};items=[];W=i>=1?PW.slice():[];
+
+document.getElementById("ex").value=i;document.getElementById("cons").textContent=EX[i].c;msg("");pal();modeUI();sync()}
+var sl=document.getElementById("ex");EX.forEach(function(x,i){var o=document.createElement("option");o.value=i;o.textContent=x.t;sl.appendChild(o)});
+sl.onchange=function(){load(+sl.value)};
+load(0);
+</script>
+</body>
+</html>
