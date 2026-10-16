@@ -1,16 +1,20 @@
-# Schéma électrique : démarrage direct 1 sens
+# SchemaSim
 
-Application web (un seul fichier HTML, sans dépendance) pour apprendre à **construire, câbler et simuler** un démarrage direct un sens de moteur triphasé.
+**SchemaSim** : application web (un seul fichier HTML, sans dépendance) pour apprendre à **construire, câbler et simuler** un démarrage direct (1 ou 2 sens de marche) de moteur triphasé.
 
 ## Utilisation
 
 - **En local** : ouvrir `index.html` dans un navigateur.
 - **En ligne (GitHub Pages)** : *Settings → Pages → Deploy from a branch → `main` / `(root)`*. L'application est alors disponible à l'adresse `https://<utilisateur>.github.io/<depot>/`.
 
+## Espace enseignant
+
+La correction n'est pas affichée aux étudiants. Pour faire apparaître le bouton « Voir la solution », ajoutez `#prof` à l'adresse de la page (par exemple `.../index.html#prof`).
+
 ## Principe
 
 1. Choisir un exercice dans la liste déroulante.
-2. **Édition** : prendre les composants sur l'établi, les placer librement dans la zone de travail, puis les câbler (toucher une borne, puis une autre ; toucher un fil pour le supprimer).
+2. **Édition** : prendre les composants sur l'établi, les placer librement dans la zone de travail, puis les câbler (toucher une borne, puis une autre ; sur les rails +24 V et 0 V, toucher n'importe quel point de la ligne ; toucher un fil pour le supprimer). Les fils sont routés automatiquement, avec des pistes séparées pour que les croisements (inversion de phases) restent lisibles.
 3. **Simulation** : actionner les boutons (maintenir), Q1, l'arrêt d'urgence, le relais thermique. Les éléments actifs (bobine, voyants, moteur) passent en jaune.
 4. **Vérifier** : le montage est contrôlé par scénarios de fonctionnement (pas de câblage imposé).
 
