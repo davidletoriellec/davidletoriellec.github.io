@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Appli Vélo</title>
+<title>HomeTrainDav</title>
 <style>
 :root{--bg:#fff;--fg:#1a1a1a;--card:#f2f3f5;--mut:#666;--acc:#e8590c;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15161a;--fg:#eee;--card:#23252b;--mut:#9a9ca3}}
@@ -14,21 +14,28 @@ h1{font-size:20px;margin:4px 0 10px}
 .k{font-size:12px;color:var(--mut)}.v{font-size:26px;font-weight:700}
 button,label.b{background:var(--acc);color:#fff;border:0;border-radius:10px;padding:9px 12px;font-size:15px;cursor:pointer;display:inline-block;margin:2px 0}
 button.s,label.s{background:var(--bg);color:var(--fg);border:1px solid var(--mut)}
-button.on{background:var(--acc);color:#fff}
+button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
 input,textarea,select{width:100%;padding:6px;border-radius:8px;border:1px solid var(--mut);background:var(--bg);color:var(--fg);font:inherit}
 textarea{height:110px;font:13px monospace}
-.row{display:flex;gap:8px}.row>*{flex:1}
+.row{display:flex;gap:8px;align-items:center}.row>*{flex:1}
 canvas{width:100%;height:110px;display:block}
-.m{display:none}.m.on{display:block}
+.m,.h{display:none}.m.on,.h.on{display:block}
 #msg{font-size:13px;color:var(--mut);margin-top:6px}
+.lg{display:flex;flex-wrap:wrap;gap:5px;font-size:11px;margin-top:6px}.lg span{padding:1px 6px;border-radius:6px;color:#000}
+table{width:100%;border-collapse:collapse;font-size:12px}td,th{padding:4px 2px;text-align:center;border-bottom:1px solid var(--bg)}
+.sr{background:var(--bg);border-radius:8px;padding:8px;margin:6px 0;cursor:pointer}
+.zb{display:flex;align-items:center;gap:6px;font-size:12px;margin:3px 0}.zb i{display:block;height:10px;border-radius:5px}.zb b{width:72px;font-weight:400}
+.pc{text-align:center;font-weight:700;font-size:20px;flex:0 0 80px}
 </style></head><body>
-<h1>🚴 Appli Vélo</h1>
+<h1>🚴 HomeTrainDav</h1>
+<div class="row" id="us" style="margin-bottom:10px"></div>
 <div class="card">
 <button id="bt">🔌 Trainer D100</button> <button id="hrb" class="s">❤ Ceinture Sigma</button>
 <div class="row" style="margin-top:6px"><div><div class="k">FTP (W)</div><input id="ftp" type="number" value="190"></div>
-<div><div class="k">FC max</div><input id="fm" type="number" value="185"></div></div>
-<div id="who" class="k"></div><div id="msg">Connecte le trainer (Chrome, Bluetooth).</div></div>
-<div class="row" style="margin-bottom:10px"><button class="s on" data-m="wk">Séance</button><button class="s" data-m="ftp">Test FTP</button><button class="s" data-m="gpx">GPX</button></div>
+<div><div class="k">FC max</div><input id="fm" type="number" value="185"></div>
+<div><div class="k">km/h à 100 % FTP</div><input id="kh" type="number" value="27"></div></div>
+<div id="msg">Connecte le trainer (Chrome, Bluetooth).</div></div>
+<div class="row" style="margin-bottom:10px"><button class="s on" data-m="wk">Séance</button><button class="s" data-m="ftp">Test FTP</button><button class="s" data-m="gpx">GPX</button><button class="s" data-m="hist">Historique</button></div>
 
 <div class="card m on" id="m-wk">
 <div class="k">Blocs : minutes, % FTP début, % FTP fin (optionnel)</div>
@@ -36,16 +43,19 @@ canvas{width:100%;height:110px;display:block}
 8 120
 8 55</textarea>
 <button id="pre" class="s">Exemple 8×(1' / 1')</button>
-<div class="k" style="margin-top:6px">Importer un .zwo :</div><input id="zf" type="file">
+<div class="k" style="margin-top:6px">Importer un .zwo, .fit ou .tcx :</div><input id="zf" type="file" accept=".zwo,.fit,.tcx,.xml">
 <div class="row" style="margin-top:6px"><select id="sw"></select><input id="nm" placeholder="Nom de la séance"></div><button id="sv" class="s">💾 Sauvegarder</button> <button id="dl" class="s">🗑 Supprimer la sélection</button>
+<div class="k" style="margin-top:8px">Intensité de la séance (100 % = normal)</div>
+<div class="row"><button id="pm" class="s">− 5</button><div class="pc" id="pv">100 %</div><button id="pp" class="s">+ 5</button></div>
 </div>
 <div class="card m" id="m-ftp">
 <b>Test en rampe</b><div class="k">Pédale jusqu'à l'épuisement. FTP = 75 % de la puissance max atteinte (MAP).</div>
 <div class="row"><div><div class="k">Départ (W)</div><input id="p0" type="number" value="100"></div><div><div class="k">Palier +W / min</div><input id="ps" type="number" value="20"></div></div>
 <div id="fr" style="margin-top:8px;font-weight:700"></div><div id="th" class="k" style="margin-top:6px"></div></div>
 <div class="card m" id="m-gpx"><input id="gf" type="file"><textarea id="gt" placeholder="ou colle ici le contenu du fichier GPX" style="height:70px;margin-top:6px"></textarea><button id="gp" class="s">Charger le texte collé</button><div id="gi" class="k"></div><div class="k">Le trainer suit la pente (0 à 6 %).</div></div>
+<div class="card m" id="m-hist"><div id="hl"></div></div>
 
-<div class="card"><canvas id="c"></canvas></div>
+<div class="card"><canvas id="c"></canvas><div class="lg" id="lg"></div></div>
 <div class="grid">
 <div class="card"><div class="k">Cible</div><div class="v" id="tg">– W</div></div>
 <div class="card"><div class="k">Puissance</div><div class="v" id="pw">– W</div></div>
@@ -53,23 +63,32 @@ canvas{width:100%;height:110px;display:block}
 <div class="card"><div class="k">Cadence</div><div class="v" id="cd">– rpm</div></div>
 <div class="card"><div class="k">Temps</div><div class="v" id="tm">00:00</div></div>
 <div class="card"><div class="k" id="ik">Reste</div><div class="v" id="iv">–</div></div>
+<div class="card"><div class="k">Km virtuels</div><div class="v" id="kv">0.00</div></div>
+<div class="card"><div class="k">Intensité</div><div class="v" id="pi">100 %</div></div>
 </div>
-<div style="margin-top:10px"><button id="go">▶ Start</button> <button id="rs" class="s">■ Stop</button></div>
+<div style="margin:10px 0"><button id="go">▶ Start</button> <button id="rs" class="s">■ Stop (enregistre)</button></div>
+<div class="card h" id="rec"></div>
 <script>
 const $=i=>document.getElementById(i);
-let mode='wk',run=false,el=0,cp=null,pw=0,cad=0,spd=0,hr=0,blocks=[],gpx=[],dist=0,low=0,lastT=-1,tgt=0,gr=0;
-let P={ftp:190,fm:185,wt:'',workouts:[],tests:[]},ref=null;
-const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function lst(){$('sw').innerHTML='<option value="">Séances sauvegardées…</option>'+P.workouts.map((w,i)=>'<option value="'+i+'">'+esc(w.n)+'</option>').join('');$('th').textContent=P.tests.length?'Historique : '+P.tests.map(t=>t.d+' → '+t.f+' W').join(' · '):''}
-function apply(){$('ftp').value=P.ftp;$('fm').value=P.fm;if(P.wt)$('wt').value=P.wt;lst();try{draw()}catch(e){}}
-function save(){P.ftp=+$('ftp').value;P.fm=+$('fm').value;P.wt=$('wt').value;try{localStorage.setItem('prof',JSON.stringify(P))}catch(e){}
- if(ref)ref.set(P).catch(()=>{$('msg').textContent='Sauvegarde en ligne refusée : il faut être Contributeur.'})}
-try{const l=JSON.parse(localStorage.getItem('prof')||'null');if(l)P={...P,...l}}catch(e){}
-apply();
-(async()=>{try{const u=await claude.use('user'),db=await claude.use('db');if(!u||!db)return;const id=await u.id();if(!id)return;
- const r=db.doc('data/users/'+id+'/profile'),s=await r.get();if(s.exists)P={...P,...s.data()};ref=r;apply();
- const me=await u.me();$('who').textContent='Profil : '+(me.name||'moi')+' (synchronisé)'}catch(e){}})();
-['ftp','fm'].forEach(k=>$(k).onchange=save);
+const US=['David','Isabelle','Daniel','Raphaël'],ZN=['Recovery','Endurance','Tempo','Threshold','VO2 Max','Anaerobic'],ZC=['#808080','#3b8bd4','#46c06a','#ffc93c','#f4623a','#b04adf'];
+const zi=p=>p<55?0:p<76?1:p<91?2:p<106?3:p<121?4:5;
+const fmt=s=>Math.floor(s/60)+':'+String(Math.round(s)%60).padStart(2,'0');
+let mode='wk',run=false,el=0,cp=null,pw=0,cad=0,spd=0,hr=0,blocks=[],gpx=[],dist=0,low=0,lastT=-1,tgt=0,gr=0,pc=100,rec=[],km=0;
+let U='David',P={};
+try{U=localStorage.getItem('cur')||U}catch(e){}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+$('lg').innerHTML=ZN.map((n,i)=>'<span style="background:'+ZC[i]+'">Z'+(i+1)+' '+n+'</span>').join('');
+function users(){$('us').innerHTML=US.map(n=>'<button class="s'+(n===U?' on':'')+'" data-u="'+n+'">'+n+'</button>').join('')}
+$('us').onclick=e=>{const n=e.target.dataset.u;if(!n||n===U)return;stop();save();U=n;try{localStorage.setItem('cur',U)}catch(x){}$('rec').classList.remove('on');load();users()};
+function load(){P={ftp:190,fm:185,wt:'',workouts:[],tests:[],sess:[],kmh:27,pc:100};
+ try{let l=localStorage.getItem('prof_'+U);if(!l&&U===US[0])l=localStorage.getItem('prof');if(l)P={...P,...JSON.parse(l)}}catch(e){}apply()}
+function lst(){$('sw').innerHTML='<option value="">Séances sauvegardées…</option>'+P.workouts.map((w,i)=>'<option value="'+i+'">'+esc(w.n)+'</option>').join('');$('th').textContent=P.tests.length?'Historique : '+P.tests.map(t=>t.d+' → '+t.f+' W').join(' · '):'';hl()}
+function hl(){const s=P.sess;$('hl').innerHTML=s.length?'<div class="k">'+U+' : '+s.length+' séances · '+s.reduce((a,b)=>a+b.km,0).toFixed(0)+' km virtuels au total</div>'+s.map((q,i)=>'<div class="sr" data-i="'+i+'"><b>'+q.d+'</b> '+esc(q.n)+'<br><span class="k">'+fmt(q.dur)+' · '+q.pm+' W moy · '+q.km+' km · intensité '+q.pc+' %</span></div>').join(''):'Aucune séance enregistrée pour l\'instant.'}
+$('hl').onclick=e=>{const d=e.target.closest('.sr');if(d)show(P.sess[+d.dataset.i])};
+function apply(){pc=P.pc||100;$('ftp').value=P.ftp;$('fm').value=P.fm;$('kh').value=P.kmh||27;$('wt').value=P.wt||$('wt').value;lst();ui()}
+function save(){if(!U)return;P.ftp=+$('ftp').value;P.fm=+$('fm').value;P.kmh=+$('kh').value||27;P.wt=$('wt').value;P.pc=pc;try{localStorage.setItem('prof_'+U,JSON.stringify(P))}catch(e){}}
+['ftp','fm','kh'].forEach(k=>$(k).onchange=save);
+const setPc=d=>{pc=Math.max(30,Math.min(200,pc+d));save();ui()};$('pm').onclick=()=>setPc(-5);$('pp').onclick=()=>setPc(5);
 $('sw').onchange=()=>{const w=P.workouts[$('sw').value];if(w){$('wt').value=w.t;$('nm').value=w.n;draw()}};
 $('sv').onclick=()=>{const n=$('nm').value.trim();if(!n)return;P.workouts=P.workouts.filter(w=>w.n!==n);P.workouts.push({n,t:$('wt').value});save();lst()};
 $('dl').onclick=()=>{const i=$('sw').value;if(i==='')return;P.workouts.splice(+i,1);save();lst()};
@@ -99,16 +118,37 @@ const setG=g=>{if(!cp)return;const x=Math.round(g*100);wr([0x11,0,0,x&255,x>>8&2
 /* Séances */
 const parse=t=>t.split('\n').map(l=>l.trim().split(/\s+/).map(Number)).filter(a=>a.length>=2&&a.every(n=>!isNaN(n))).map(a=>({d:a[0]*60,a:a[1],b:a[2]??a[1]}));
 $('pre').onclick=()=>{let t='10 50 75\n';for(let i=0;i<8;i++)t+='1 120\n1 55\n';$('wt').value=t+'8 50 40';draw()};
-$('zf').onchange=async e=>{const f=e.target.files[0];if(!f)return;
- const x=new DOMParser().parseFromString(await f.text(),'application/xml'),L=[];
- const g=(n,a)=>+n.getAttribute(a);
- [...x.querySelector('workout').children].forEach(n=>{const t=n.tagName;
+const at=(bl,t)=>{let c=0;for(const b of bl){if(t<c+b.d)return b.a+(b.b-b.a)*(t-c)/b.d;c+=b.d}return null};
+const wkAt=t=>at(blocks,t);
+/* Imports .zwo / .tcx / .fit */
+const minL=(a,F)=>{const m={};a.forEach(([s,w])=>{(m[Math.floor(s/60)]??=[]).push(w)});return Object.keys(m).map(k=>[1,Math.round(m[k].reduce((x,y)=>x+y)/m[k].length/F*100)])};
+function xmlL(t,F){const x=new DOMParser().parseFromString(t,'application/xml'),L=[],g=(n,a)=>+n.getAttribute(a);
+ if(x.querySelector('workout')){[...x.querySelector('workout').children].forEach(n=>{const t=n.tagName;
   if(t==='IntervalsT'){for(let i=0;i<g(n,'Repeat');i++){L.push([g(n,'OnDuration')/60,g(n,'OnPower')*100]);L.push([g(n,'OffDuration')/60,g(n,'OffPower')*100])}}
   else if(g(n,'Power')){L.push([g(n,'Duration')/60,g(n,'Power')*100])}
-  else if(n.getAttribute('PowerLow')){L.push([g(n,'Duration')/60,g(n,'PowerLow')*100,g(n,'PowerHigh')*100])}});
- $('wt').value=L.map(a=>a.map(v=>+v.toFixed(2)).join(' ')).join('\n');$('msg').textContent=f.name+' importé.';draw()};
+  else if(n.getAttribute('PowerLow')){L.push([g(n,'Duration')/60,g(n,'PowerLow')*100,g(n,'PowerHigh')*100])}});return L}
+ const S=[...x.getElementsByTagName('Step')].filter(s=>s.getElementsByTagName('Seconds').length&&/Power/.test((s.getElementsByTagName('Target')[0]?.getAttribute('xsi:type'))||''));
+ if(S.length)return S.map(s=>{const v=[...s.getElementsByTagName('Value')].map(n=>+n.textContent),w=v.length?v.reduce((a,b)=>a+b)/v.length:0;return[+s.getElementsByTagName('Seconds')[0].textContent/60,w/F*100]}).filter(a=>a[1]>0);
+ const T=[...x.getElementsByTagName('Trackpoint')].map(p=>({t:Date.parse(p.getElementsByTagName('Time')[0]?.textContent),w:+(p.getElementsByTagNameNS('*','Watts')[0]?.textContent||0)})).filter(a=>a.t);
+ return minL(T.map(a=>[(a.t-T[0].t)/1000,a.w]),F)}
+function fitL(b,F){const v=new DataView(b),hs=v.getUint8(0),end=hs+v.getUint32(4,true),D={},R=[],S=[];let o=hs;
+ while(o<end){const h=v.getUint8(o++);
+  if(h&0x40){o++;const le=!v.getUint8(o++),g=v.getUint16(o,le);o+=2;const n=v.getUint8(o++),f=[];let sz=0;
+   for(let i=0;i<n;i++){f.push([v.getUint8(o),v.getUint8(o+1)]);sz+=v.getUint8(o+1);o+=3}
+   if(h&0x20){const m=v.getUint8(o++);for(let i=0;i<m;i++){sz+=v.getUint8(o+1);o+=3}}D[h&15]={le,g,f,sz}}
+  else{const d=D[h&0x80?(h>>5)&3:h&15];if(!d)break;let p=o;const r={};
+   for(const[n,s]of d.f){r[n]=s==1?v.getUint8(p):s==2?v.getUint16(p,d.le):s==4?v.getUint32(p,d.le):0;p+=s}
+   o+=d.sz;if(d.g==20)R.push(r);if(d.g==27)S.push(r)}}
+ const cv=q=>q>1000?(q-1000)/F*100:q,L=[];
+ S.forEach(r=>{if(r[1]===0&&r[3]===4&&r[2]){const lo=r[5]?cv(r[5]):cv(r[4]||0),hi=r[6]?cv(r[6]):lo;if(lo>0)L.push(lo===hi?[r[2]/60000,lo]:[r[2]/60000,lo,hi])}});
+ if(L.length)return L;
+ const T=R.filter(r=>r[7]!=null&&r[7]<65535&&r[253]);return minL(T.map(r=>[r[253]-T[0][253],r[7]]),F)}
+$('zf').onchange=async e=>{const f=e.target.files[0];if(!f)return;const F=+$('ftp').value||190,ext=f.name.split('.').pop().toLowerCase();
+ try{const L=ext==='fit'?fitL(await f.arrayBuffer(),F):xmlL(await f.text(),F);
+  if(!L.length)throw new Error('aucune séance ni puissance trouvée');
+  $('wt').value=L.map(a=>a.map(v=>+v.toFixed(2)).join(' ')).join('\n');$('nm').value=f.name.replace(/\.\w+$/,'');$('msg').textContent=f.name+' importé.'}
+ catch(err){$('msg').textContent='Import : '+(err.message||err)}draw()};
 $('wt').oninput=draw;$('wt').onchange=save;
-const wkAt=t=>{let c=0;for(const b of blocks){if(t<c+b.d)return b.a+(b.b-b.a)*(t-c)/b.d;c+=b.d}return null};
 /* GPX */
 $('gf').onchange=async e=>{try{await gpxLoad(e)}catch(err){$('gi').textContent=$('msg').textContent='GPX : '+(err.message||err)}};$('gp').onclick=()=>$('gf').onchange({target:{files:[{name:'GPX collé',text:async()=>$('gt').value}]}});async function gpxLoad(e){const f=e.target.files[0];if(!f)return;
  const x=new DOMParser().parseFromString(await f.text(),'application/xml');
@@ -119,41 +159,61 @@ $('gf').onchange=async e=>{try{await gpxLoad(e)}catch(err){$('gi').textContent=$
  n.forEach((p,i)=>{if(i){const q=n[i-1],a=Math.sin((p.lat-q.lat)*r/2)**2+Math.cos(q.lat*r)*Math.cos(p.lat*r)*Math.sin((p.lon-q.lon)*r/2)**2;d+=2*R*Math.asin(Math.sqrt(a))}p.d=d});
  gpx=n;dist=0;$('gi').textContent=$('msg').textContent=f.name+' — '+(d/1000).toFixed(1)+' km, '+n.length+' points';draw()}
 const gAt=m=>{let i=gpx.findIndex(p=>p.d>=m);return i<0?gpx.length-1:i};
+/* Fin de séance */
+const av=(q,k)=>{const a=q.map(x=>x[k]).filter(Boolean);return a.length?Math.round(a.reduce((s,x)=>s+x,0)/a.length):0};
+function fin(){const n=rec.length,F=+$('ftp').value||190,S={d:new Date().toLocaleDateString('fr-FR'),n:$('nm').value.trim()||'Séance',dur:n,pc,F,pm:av(rec,1)||av(rec,0),hm:av(rec,2),km:+km.toFixed(1),z:[0,0,0,0,0,0],r:[],B:[]};
+ rec.forEach((r,i)=>{S.z[zi((r[1]||r[0])/F*100)]++;if(i%5===0)S.r.push(r.map(Math.round))});
+ let c=0;blocks.forEach(b=>{const s=c,e=Math.min(n,c+b.d);c+=b.d;if(e>s){const q=rec.slice(s,e);S.B.push([s,e,av(q,0),av(q,1),av(q,2),av(q,3)])}});
+ P.sess.unshift(S);P.sess=P.sess.slice(0,150);save();hl();show(S);$('msg').textContent='Séance enregistrée.'}
+function show(S){const T=S.z.reduce((a,b)=>a+b,0)||1;
+ let h='<div class="row"><b>'+esc(S.n)+'</b><button class="s" id="rd" style="flex:0">🗑</button></div><div class="k">'+S.d+' · '+fmt(S.dur)+' · '+S.pm+' W moy · '+(S.hm||'–')+' bpm · '+S.km+' km · intensité '+S.pc+' %</div><canvas id="c2" style="height:130px;margin:6px 0"></canvas><table><tr><th>Bloc</th><th>Durée</th><th>P moy</th><th>Cible</th><th>FC</th><th>Cad</th><th>Zone</th></tr>';
+ S.B.forEach((b,i)=>{const d=b[3]&&b[2]?Math.round((b[3]/b[2]-1)*100):0,z=zi(b[2]/S.F*100);h+='<tr><td>'+(i+1)+'<br><span class="k">'+fmt(b[0])+'–'+fmt(b[1])+'</span></td><td>'+fmt(b[1]-b[0])+'</td><td>'+(b[3]?b[3]+' W <span style="color:'+(d<0?'#d22':'#2a2')+'">'+(d<0?'↓':'↑')+Math.abs(d)+'%</span>':'–')+'</td><td>'+b[2]+' W</td><td>'+(b[4]||'–')+'</td><td>'+(b[5]||'–')+'</td><td style="color:'+ZC[z]+'"><b>Z'+(z+1)+'</b></td></tr>'});
+ h+='</table><div style="margin-top:8px">'+ZN.map((n,i)=>'<div class="zb"><b style="color:'+ZC[i]+'">'+n+'</b><i style="width:'+Math.round(S.z[i]/T*55)+'%;background:'+ZC[i]+'"></i>'+Math.round(S.z[i]/T*100)+' % · '+fmt(S.z[i])+'</div>').join('')+'</div>';
+ const R=$('rec');R.innerHTML=h;R.classList.add('on');ch2(S);
+ $('rd').onclick=()=>{P.sess=P.sess.filter(q=>q!==S);save();hl();R.classList.remove('on')};R.scrollIntoView({behavior:'smooth'})}
+function ch2(S){const c=$('c2'),x=c.getContext('2d'),dp=devicePixelRatio,w=c.width=c.clientWidth*dp,h=c.height=c.clientHeight*dp,r=S.r,m=r.length;if(!m)return;
+ const mx=Math.max(...r.map(a=>Math.max(a[0],a[1])))*1.1||1,hh=r.map(a=>a[2]).filter(a=>a>0),hn=Math.min(...hh)-5,hx=Math.max(...hh)+5;
+ r.forEach((a,i)=>{const y=h-a[0]/mx*h;x.fillStyle=ZC[zi(a[0]/S.F*100)];x.fillRect(i*w/m,y,w/m+1,h-y)});
+ const ln=(k,f,col)=>{x.beginPath();x.strokeStyle=col;x.lineWidth=1.5*dp;r.forEach((a,i)=>{if(k==2&&!a[2])return;const X=(i+.5)*w/m,Y=f(a[k]);i?x.lineTo(X,Y):x.moveTo(X,Y)});x.stroke()};
+ ln(1,v=>h-v/mx*h,'#1c3d8f');if(hh.length)ln(2,v=>h-(v-hn)/(hx-hn)*h,'#d22')}
 /* Boucle */
 function ftpEnd(){const s=+$('p0').value,st=+$('ps').value,e=el-low,k=Math.floor(e/60);
  const map=k<1?s:s+st*(k-1)+st*((e%60)/60),f=Math.round(.75*map);
  $('fr').innerHTML='MAP ≈ '+Math.round(map)+' W → FTP ≈ '+f+' W <button id="uf">Utiliser</button>';
  $('uf').onclick=()=>{$('ftp').value=f;save()};P.tests.push({d:new Date().toLocaleDateString('fr-FR'),f});P.tests=P.tests.slice(-10);save();lst();stop(true)}
-function stop(keep){const w=run;run=false;$('go').textContent='▶ Start';if(w){lastT=-1;setW(50)}if(!keep){el=0;low=0;dist=0}ui()}
+function stop(keep){const w=run;run=false;$('go').textContent='▶ Start';if(w){lastT=-1;setW(50)}
+ if(!keep){if(mode==='wk'&&rec.length>=60)fin();el=0;low=0;dist=0;rec=[];km=0}ui()}
 $('rs').onclick=()=>{if(mode==='ftp'&&run&&el>60)ftpEnd();else stop()};
-$('go').onclick=()=>{if(!run){if(mode==='wk'){blocks=parse($('wt').value);if(!blocks.length)return}
+$('go').onclick=()=>{if(mode==='hist')return;if(!run){if(mode==='wk'){blocks=parse($('wt').value);if(!blocks.length)return;if(el===0){rec=[];km=0}}
  if(mode==='gpx'&&!gpx.length){$('msg').textContent='Importe un GPX.';return}
  if(mode==='ftp')$('fr').textContent='';run=true;$('go').textContent='⏸ Pause'}else{run=false;$('go').textContent='▶ Start'}};
 setInterval(()=>{if(run){el++;const F=+$('ftp').value;
- if(mode==='wk'){const p=wkAt(el);if(p===null){stop();return}tgt=p/100*F;setW(tgt)}
+ if(mode==='wk'){const p=wkAt(el);if(p===null){stop();return}tgt=p/100*F*pc/100;setW(tgt);rec.push([tgt,pw,hr,cad]);km+=(+$('kh').value||27)*((pw||tgt)/F)/3600}
  else if(mode==='ftp'){const s=+$('p0').value,st=+$('ps').value;tgt=s+st*Math.floor(el/60);setW(tgt);
   if(el>150&&cp){low=pw<.7*tgt?low+1:0;if(low>=15){ftpEnd();return}}}
- else{dist+=spd/3.6;const i=gAt(dist),j=gAt(dist+50),k=gAt(Math.max(0,dist-50)),dd=gpx[j].d-gpx[k].d;
+ else if(mode==='gpx'){dist+=spd/3.6;const j=gAt(dist+50),k=gAt(Math.max(0,dist-50)),dd=gpx[j].d-gpx[k].d;
   gr=dd>5?Math.max(0,Math.min(6,(gpx[j].ele-gpx[k].ele)/dd*100)):0;if(el%3===0)setG(gr);
   if(dist>=gpx[gpx.length-1].d){stop();return}}}ui()},1000);
-$('rs').addEventListener('dblclick',()=>{});
 function ui(){const m=Math.floor(el/60);
  $('tg').textContent=mode==='gpx'?gr.toFixed(1)+' %':(run||mode==='ftp'&&el?Math.round(tgt)+' W':'– W');
  $('pw').textContent=pw+' W';$('cd').textContent=Math.round(cad)+' rpm';
  const p=hr/(+$('fm').value||185);$('hr').textContent=hr?hr+' · Z'+(p<.6?1:p<.7?2:p<.8?3:p<.9?4:5):'–';
- $('tm').textContent=m+':'+String(el%60).padStart(2,'0');
+ $('tm').textContent=m+':'+String(el%60).padStart(2,'0');$('kv').textContent=km.toFixed(2)+' km';$('pv').textContent=$('pi').textContent=pc+' %';
  if(mode==='wk'){const T=parse($('wt').value).reduce((s,b)=>s+b.d,0);$('ik').textContent='Reste';const r=Math.max(0,T-el);$('iv').textContent=Math.floor(r/60)+':'+String(r%60).padStart(2,'0')}
  else if(mode==='ftp'){$('ik').textContent='Palier';$('iv').textContent=(60-el%60)+' s'}
- else{$('ik').textContent='Distance';$('iv').textContent=(dist/1000).toFixed(2)+' km'}draw()}
-function draw(){const c=$('c'),x=c.getContext('2d'),w=c.width=c.clientWidth*devicePixelRatio,h=c.height=c.clientHeight*devicePixelRatio;
- let P=[],cur=0,X=0;
- if(mode==='wk'){let t=0;parse($('wt').value).forEach(b=>{P.push([t,b.a]);t+=b.d;P.push([t,b.b])});X=t;cur=el}
+ else if(mode==='gpx'){$('ik').textContent='Distance';$('iv').textContent=(dist/1000).toFixed(2)+' km'}draw()}
+function draw(){const c=$('c'),x=c.getContext('2d'),dp=devicePixelRatio,w=c.width=c.clientWidth*dp,h=c.height=c.clientHeight*dp,F=+$('ftp').value||190;
+ let P=[],cur=0,X=0,bl=[];
+ if(mode==='wk'){bl=parse($('wt').value);let t=0;bl.forEach(b=>{P.push([t,b.a*pc/100]);t+=b.d;P.push([t,b.b*pc/100])});X=t;cur=el}
  else if(mode==='gpx'&&gpx.length){P=gpx.map(p=>[p.d,p.ele]);X=gpx[gpx.length-1].d;cur=dist}
  else if(mode==='ftp'){const s=+$('p0').value,st=+$('ps').value;for(let k=0;k<14;k++){P.push([k*60,s+st*k],[k*60+60,s+st*k])}X=840;cur=el}
- if(P.length<2)return;const mn=Math.min(...P.map(a=>a[1])),mx=Math.max(...P.map(a=>a[1])),rg=Math.max(mx-mn,1);
- const fx=t=>t/X*w,fy=v=>h-6-(v-mn)/rg*(h-14);
- x.beginPath();x.moveTo(0,h);P.forEach(a=>x.lineTo(fx(a[0]),fy(a[1])));x.lineTo(fx(P[P.length-1][0]),h);x.closePath();
- x.fillStyle='rgba(232,89,12,.35)';x.fill();x.strokeStyle='#e8590c';x.lineWidth=2*devicePixelRatio;x.stroke();
- x.fillStyle=getComputedStyle(document.body).color;x.fillRect(Math.min(fx(cur),w-2),0,2*devicePixelRatio,h)}
-window.onresize=draw;ui();
+ if(P.length<2||!X)return;let mn=Math.min(...P.map(a=>a[1])),mx=Math.max(...P.map(a=>a[1]));
+ if(mode==='wk'){mn=0;mx=Math.max(mx,...rec.map(r=>r[1]/F*100))*1.05}
+ const rg=Math.max(mx-mn,1),fx=t=>t/X*w,fy=v=>h-6-(v-mn)/rg*(h-14);
+ if(mode==='wk'){for(let px=0;px<w;px+=2*dp){const v=at(bl,px/w*X);if(v==null)continue;const q=v*pc/100,y=fy(q);x.fillStyle=ZC[zi(q)];x.fillRect(px,y,2*dp,h-y)}
+  x.beginPath();x.strokeStyle='#1c3d8f';x.lineWidth=2*dp;rec.forEach((r,i)=>{const a=fx(i),b=fy(r[1]/F*100);i?x.lineTo(a,b):x.moveTo(a,b)});x.stroke()}
+ else{x.beginPath();x.moveTo(0,h);P.forEach(a=>x.lineTo(fx(a[0]),fy(a[1])));x.lineTo(fx(P[P.length-1][0]),h);x.closePath();
+  x.fillStyle='rgba(232,89,12,.35)';x.fill();x.strokeStyle='#e8590c';x.lineWidth=2*dp;x.stroke()}
+ x.fillStyle=getComputedStyle(document.body).color;x.fillRect(Math.min(fx(cur),w-2),0,2*dp,h)}
+window.onresize=draw;users();load();
 </script></body></html>
