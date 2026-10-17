@@ -27,6 +27,7 @@ table{width:100%;border-collapse:collapse;font-size:12px}td,th{padding:4px 2px;t
 .zb{display:flex;align-items:center;gap:6px;font-size:12px;margin:3px 0}.zb i{display:block;height:10px;border-radius:5px}.zb b{width:72px;font-weight:400}
 .pc{text-align:center;font-weight:700;font-size:20px;flex:0 0 80px}
 </style></head><body>
+<div id="lk" style="display:none;position:fixed;inset:0;z-index:9;background:var(--bg);padding:24px"><h1>🚴 HomeTrainDav</h1><div class="k">Mot de passe</div><input id="pwi" type="password" autocomplete="current-password"><button id="pwb" style="margin-top:8px">Entrer</button><div id="pwe" class="k" style="margin-top:6px"></div></div>
 <h1>🚴 HomeTrainDav</h1>
 <div class="row" id="us" style="margin-bottom:10px"></div>
 <div class="card">
@@ -52,7 +53,7 @@ table{width:100%;border-collapse:collapse;font-size:12px}td,th{padding:4px 2px;t
 <b>Test en rampe</b><div class="k">Pédale jusqu'à l'épuisement. FTP = 75 % de la puissance max atteinte (MAP).</div>
 <div class="row"><div><div class="k">Départ (W)</div><input id="p0" type="number" value="100"></div><div><div class="k">Palier +W / min</div><input id="ps" type="number" value="20"></div></div>
 <div id="fr" style="margin-top:8px;font-weight:700"></div><div id="th" class="k" style="margin-top:6px"></div></div>
-<div class="card m" id="m-gpx"><input id="gf" type="file"><textarea id="gt" placeholder="ou colle ici le contenu du fichier GPX" style="height:70px;margin-top:6px"></textarea><button id="gp" class="s">Charger le texte collé</button><div id="gi" class="k"></div><div class="k">Le trainer suit la pente (0 à 6 %).</div></div>
+<div class="card m" id="m-gpx"><input id="gf" type="file"><textarea id="gt" placeholder="ou colle ici le contenu du fichier GPX" style="height:70px;margin-top:6px"></textarea><button id="gp" class="s">Charger le texte collé</button><div id="gi" class="k"></div><div class="row" style="margin-top:6px"><select id="gs"></select><input id="gn" placeholder="Nom du parcours"></div><button id="gv" class="s">💾 Sauvegarder</button> <button id="gx" class="s">🗑 Supprimer la sélection</button><div class="k">Le trainer suit la pente (0 à 12 %).</div></div>
 <div class="card m" id="m-hist"><div id="hl"></div></div>
 
 <div class="card"><canvas id="c"></canvas><div class="lg" id="lg"></div></div>
@@ -74,19 +75,29 @@ const US=['David','Isabelle','Daniel','Raphaël'],ZN=['Recovery','Endurance','Te
 const zi=p=>p<55?0:p<76?1:p<91?2:p<106?3:p<121?4:5;
 const fmt=s=>Math.floor(s/60)+':'+String(Math.round(s)%60).padStart(2,'0');
 let mode='wk',run=false,el=0,cp=null,pw=0,cad=0,spd=0,hr=0,blocks=[],gpx=[],dist=0,low=0,lastT=-1,tgt=0,gr=0,pc=100,rec=[],km=0;
-let U='David',P={};
+let U='David',P={},PW='',online=false,chain=Promise.resolve();
+try{PW=localStorage.getItem('pw')||''}catch(e){}
 try{U=localStorage.getItem('cur')||U}catch(e){}
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-$('lg').innerHTML=ZN.map((n,i)=>'<span style="background:'+ZC[i]+'">Z'+(i+1)+' '+n+'</span>').join('');
+const SC=s=>s<0?'#7aa7d9':s<3?'#46c06a':s<5?'#ffc93c':s<10?'#f4623a':'#b0102a',SL=[['#7aa7d9','Descente'],['#46c06a','0–3 %'],['#ffc93c','3–5 %'],['#f4623a','5–10 %'],['#b0102a','> 10 %']];
+function lgs(){$('lg').innerHTML=(mode==='gpx'?SL:ZN.map((n,i)=>[ZC[i],'Z'+(i+1)+' '+n])).map(a=>'<span style="background:'+a[0]+(a[0]==='#b0102a'?';color:#fff':'')+'">'+a[1]+'</span>').join('')}lgs();
 function users(){$('us').innerHTML=US.map(n=>'<button class="s'+(n===U?' on':'')+'" data-u="'+n+'">'+n+'</button>').join('')}
 $('us').onclick=e=>{const n=e.target.dataset.u;if(!n||n===U)return;stop();save();U=n;try{localStorage.setItem('cur',U)}catch(x){}$('rec').classList.remove('on');load();users()};
-function load(){P={ftp:190,fm:185,wt:'',workouts:[],tests:[],sess:[],kmh:27,pc:100};
- try{let l=localStorage.getItem('prof_'+U);if(!l&&U===US[0])l=localStorage.getItem('prof');if(l)P={...P,...JSON.parse(l)}}catch(e){}apply()}
+function load(){P={ftp:190,fm:185,wt:'',workouts:[],tests:[],sess:[],kmh:27,pc:100,gpxs:[]};
+ try{let l=localStorage.getItem('prof_'+U);if(!l&&U===US[0])l=localStorage.getItem('prof');if(l)P={...P,...JSON.parse(l)}}catch(e){}apply();sync()}
+const api=(u,op,d)=>fetch('/api',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pw:PW,user:u,op,data:d})});
+async function sync(){const u=U;try{const r=await api(u,'get');if(r.status===401){$('pwe').textContent=PW?'Mot de passe incorrect.':'';$('lk').style.display='block';return}
+ if(!r.ok)throw 0;const j=await r.json();if(u!==U)return;online=true;
+ if(j.data){P={...P,...j.data};apply();$('msg').textContent='Synchronisé avec le serveur ('+u+').'}else save()}
+ catch(e){online=false;$('msg').textContent='Mode local : serveur injoignable.'}}
+$('pwb').onclick=()=>{PW=$('pwi').value;try{localStorage.setItem('pw',PW)}catch(e){}$('lk').style.display='none';sync()};
+$('pwi').onkeydown=e=>{if(e.key==='Enter')$('pwb').click()};
 function lst(){$('sw').innerHTML='<option value="">Séances sauvegardées…</option>'+P.workouts.map((w,i)=>'<option value="'+i+'">'+esc(w.n)+'</option>').join('');$('th').textContent=P.tests.length?'Historique : '+P.tests.map(t=>t.d+' → '+t.f+' W').join(' · '):'';hl()}
 function hl(){const s=P.sess;$('hl').innerHTML=s.length?'<div class="k">'+U+' : '+s.length+' séances · '+s.reduce((a,b)=>a+b.km,0).toFixed(0)+' km virtuels au total</div>'+s.map((q,i)=>'<div class="sr" data-i="'+i+'"><b>'+q.d+'</b> '+esc(q.n)+'<br><span class="k">'+fmt(q.dur)+' · '+q.pm+' W moy · '+q.km+' km · intensité '+q.pc+' %</span></div>').join(''):'Aucune séance enregistrée pour l\'instant.'}
 $('hl').onclick=e=>{const d=e.target.closest('.sr');if(d)show(P.sess[+d.dataset.i])};
-function apply(){pc=P.pc||100;$('ftp').value=P.ftp;$('fm').value=P.fm;$('kh').value=P.kmh||27;$('wt').value=P.wt||$('wt').value;lst();ui()}
-function save(){if(!U)return;P.ftp=+$('ftp').value;P.fm=+$('fm').value;P.kmh=+$('kh').value||27;P.wt=$('wt').value;P.pc=pc;try{localStorage.setItem('prof_'+U,JSON.stringify(P))}catch(e){}}
+function apply(){pc=P.pc||100;$('ftp').value=P.ftp;$('fm').value=P.fm;$('kh').value=P.kmh||27;$('wt').value=P.wt||$('wt').value;lst();gls();ui()}
+function save(){if(!U)return;P.ftp=+$('ftp').value;P.fm=+$('fm').value;P.kmh=+$('kh').value||27;P.wt=$('wt').value;P.pc=pc;try{localStorage.setItem('prof_'+U,JSON.stringify(P))}catch(e){}
+ if(online){const u=U,d=structuredClone(P);chain=chain.then(()=>api(u,'set',d)).then(r=>{if(!r.ok)throw 0}).catch(()=>{$('msg').textContent='Sauvegarde en ligne échouée.'})}}
 ['ftp','fm','kh'].forEach(k=>$(k).onchange=save);
 const setPc=d=>{pc=Math.max(30,Math.min(200,pc+d));save();ui()};$('pm').onclick=()=>setPc(-5);$('pp').onclick=()=>setPc(5);
 $('sw').onchange=()=>{const w=P.workouts[$('sw').value];if(w){$('wt').value=w.t;$('nm').value=w.n;draw()}};
@@ -94,7 +105,7 @@ $('sv').onclick=()=>{const n=$('nm').value.trim();if(!n)return;P.workouts=P.work
 $('dl').onclick=()=>{const i=$('sw').value;if(i==='')return;P.workouts.splice(+i,1);save();lst()};
 document.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{stop();mode=b.dataset.m;
  document.querySelectorAll('[data-m]').forEach(x=>x.classList.toggle('on',x===b));
- document.querySelectorAll('.m').forEach(x=>x.classList.toggle('on',x.id==='m-'+mode));draw()});
+ document.querySelectorAll('.m').forEach(x=>x.classList.toggle('on',x.id==='m-'+mode));lgs();draw()});
 /* Bluetooth */
 const wr=a=>{const u=new Uint8Array(a);return (cp.writeValueWithResponse||cp.writeValue).call(cp,u)};
 $('bt').onclick=async()=>{try{
@@ -157,12 +168,26 @@ $('gf').onchange=async e=>{try{await gpxLoad(e)}catch(err){$('gi').textContent=$
  const R=6371000,r=Math.PI/180;let d=0;
  n=n.map((p,i,a)=>{const w=a.slice(Math.max(0,i-2),i+3);return{...p,ele:w.reduce((s,q)=>s+q.ele,0)/w.length}});
  n.forEach((p,i)=>{if(i){const q=n[i-1],a=Math.sin((p.lat-q.lat)*r/2)**2+Math.cos(q.lat*r)*Math.cos(p.lat*r)*Math.sin((p.lon-q.lon)*r/2)**2;d+=2*R*Math.asin(Math.sqrt(a))}p.d=d});
- gpx=n;dist=0;$('gi').textContent=$('msg').textContent=f.name+' — '+(d/1000).toFixed(1)+' km, '+n.length+' points';draw()}
+ gpx=n;dist=0;$('gn').value=f.name.replace(/\.\w+$/,'');ginfo();draw()}
 const gAt=m=>{let i=gpx.findIndex(p=>p.d>=m);return i<0?gpx.length-1:i};
+/* GPX sauvegardés + profil d'altitude */
+const ginfo=()=>{const D=gpx[gpx.length-1].d;let up=0;gpx.forEach((p,i)=>{if(i&&p.ele>gpx[i-1].ele)up+=p.ele-gpx[i-1].ele});$('gi').textContent=(D/1000).toFixed(1)+' km · D+ '+Math.round(up)+' m'};
+function gls(){$('gs').innerHTML='<option value="">GPX sauvegardés…</option>'+P.gpxs.map((g,i)=>'<option value="'+i+'">'+esc(g.n)+'</option>').join('')}
+$('gs').onchange=()=>{const g=P.gpxs[$('gs').value];if(g){gpx=g.p.map(([d,e])=>({d,ele:e}));dist=0;$('gn').value=g.n;ginfo();draw()}};
+$('gv').onclick=()=>{const n=$('gn').value.trim();if(!n||!gpx.length)return;const l=[];let last=-99;gpx.forEach((p,i)=>{if(p.d-last>=10||i===gpx.length-1){l.push([Math.round(p.d),Math.round(p.ele*10)/10]);last=p.d}});
+ P.gpxs=P.gpxs.filter(g=>g.n!==n);P.gpxs.push({n,p:l});save();gls();$('msg').textContent='Parcours enregistré.'};
+$('gx').onclick=()=>{const i=$('gs').value;if(i==='')return;P.gpxs.splice(+i,1);save();gls()};
+function drawG(x,w,h,dp){const L=38*dp,B=16*dp,W=w-L,H=h-B,D=gpx[gpx.length-1].d,es=gpx.map(p=>p.ele),mn=Math.min(...es),mx=Math.max(...es),rg=Math.max(mx-mn,20),
+ fx=d=>L+d/D*W,fy=e=>H-4*dp-(e-mn)/rg*(H-12*dp),col=getComputedStyle(document.body).color;
+ for(let px=L;px<w;px+=2*dp){const d=(px-L)/W*D,j=gAt(d+50),k=gAt(Math.max(0,d-50)),dd=gpx[j].d-gpx[k].d,s=dd>5?(gpx[j].ele-gpx[k].ele)/dd*100:0,y=fy(gpx[gAt(d)].ele);x.fillStyle=SC(s);x.fillRect(px,y,2*dp,H-y)}
+ x.fillStyle=col;x.strokeStyle='rgba(128,128,128,.35)';x.lineWidth=dp;x.font=10*dp+'px system-ui';x.textAlign='right';
+ [mn,(mn+mx)/2,mx].forEach(e=>{const y=fy(e);x.beginPath();x.moveTo(L,y);x.lineTo(w,y);x.stroke();x.fillText(Math.round(e)+' m',L-3*dp,y+3*dp)});
+ x.textAlign='center';const st=Math.max(1,Math.round(D/5000));for(let k=0;k*st*1000<=D;k++)x.fillText(k*st+' km',Math.min(fx(k*st*1000),w-14*dp),h-3*dp);
+ x.fillRect(Math.min(fx(dist),w-2),0,2*dp,H)}
 /* Fin de séance */
 const av=(q,k)=>{const a=q.map(x=>x[k]).filter(Boolean);return a.length?Math.round(a.reduce((s,x)=>s+x,0)/a.length):0};
 function fin(){const n=rec.length,F=+$('ftp').value||190,S={d:new Date().toLocaleDateString('fr-FR'),n:$('nm').value.trim()||'Séance',dur:n,pc,F,pm:av(rec,1)||av(rec,0),hm:av(rec,2),km:+km.toFixed(1),z:[0,0,0,0,0,0],r:[],B:[]};
- rec.forEach((r,i)=>{S.z[zi((r[1]||r[0])/F*100)]++;if(i%5===0)S.r.push(r.map(Math.round))});
+ rec.forEach((r,i)=>{S.z[zi((r[1]||r[0])/F*100)]++;if(i%10===0)S.r.push(r.map(Math.round))});
  let c=0;blocks.forEach(b=>{const s=c,e=Math.min(n,c+b.d);c+=b.d;if(e>s){const q=rec.slice(s,e);S.B.push([s,e,av(q,0),av(q,1),av(q,2),av(q,3)])}});
  P.sess.unshift(S);P.sess=P.sess.slice(0,150);save();hl();show(S);$('msg').textContent='Séance enregistrée.'}
 function show(S){const T=S.z.reduce((a,b)=>a+b,0)||1;
@@ -192,7 +217,7 @@ setInterval(()=>{if(run){el++;const F=+$('ftp').value;
  else if(mode==='ftp'){const s=+$('p0').value,st=+$('ps').value;tgt=s+st*Math.floor(el/60);setW(tgt);
   if(el>150&&cp){low=pw<.7*tgt?low+1:0;if(low>=15){ftpEnd();return}}}
  else if(mode==='gpx'){dist+=spd/3.6;const j=gAt(dist+50),k=gAt(Math.max(0,dist-50)),dd=gpx[j].d-gpx[k].d;
-  gr=dd>5?Math.max(0,Math.min(6,(gpx[j].ele-gpx[k].ele)/dd*100)):0;if(el%3===0)setG(gr);
+  gr=dd>5?Math.max(0,Math.min(12,(gpx[j].ele-gpx[k].ele)/dd*100)):0;if(el%3===0)setG(gr);
   if(dist>=gpx[gpx.length-1].d){stop();return}}}ui()},1000);
 function ui(){const m=Math.floor(el/60);
  $('tg').textContent=mode==='gpx'?gr.toFixed(1)+' %':(run||mode==='ftp'&&el?Math.round(tgt)+' W':'– W');
@@ -204,6 +229,7 @@ function ui(){const m=Math.floor(el/60);
  else if(mode==='gpx'){$('ik').textContent='Distance';$('iv').textContent=(dist/1000).toFixed(2)+' km'}draw()}
 function draw(){const c=$('c'),x=c.getContext('2d'),dp=devicePixelRatio,w=c.width=c.clientWidth*dp,h=c.height=c.clientHeight*dp,F=+$('ftp').value||190;
  let P=[],cur=0,X=0,bl=[];
+ if(mode==='gpx'&&gpx.length){drawG(x,w,h,dp);return}
  if(mode==='wk'){bl=parse($('wt').value);let t=0;bl.forEach(b=>{P.push([t,b.a*pc/100]);t+=b.d;P.push([t,b.b*pc/100])});X=t;cur=el}
  else if(mode==='gpx'&&gpx.length){P=gpx.map(p=>[p.d,p.ele]);X=gpx[gpx.length-1].d;cur=dist}
  else if(mode==='ftp'){const s=+$('p0').value,st=+$('ps').value;for(let k=0;k<14;k++){P.push([k*60,s+st*k],[k*60+60,s+st*k])}X=840;cur=el}
