@@ -14,9 +14,13 @@ La correction n'est pas affichée aux étudiants. Pour faire apparaître le bout
 ## Principe
 
 1. Choisir un exercice dans la liste déroulante.
-2. **Édition** : prendre les composants sur l'établi, les placer librement dans la zone de travail, puis les câbler (toucher une borne, puis une autre ; sur les rails +24 V et 0 V, toucher n'importe quel point de la ligne ; toucher un fil pour le supprimer). Les fils sont routés automatiquement, avec des pistes séparées pour que les croisements (inversion de phases) restent lisibles.
+2. **Édition** : prendre les composants sur l'établi, les placer librement dans la zone de travail, puis les câbler (toucher une borne, puis une autre ; sur les rails +24 V et 0 V, toucher n'importe quel point de la ligne ; toucher un fil pour le supprimer). Les fils sont routés automatiquement (les fils au même potentiel partagent une ligne commune) ; on peut déplacer un fil en le faisant glisser (verticalement ou horizontalement), avec des pistes séparées pour que les croisements (inversion de phases) restent lisibles.
 3. **Simulation** : actionner les boutons (maintenir), Q1, l'arrêt d'urgence, le relais thermique. Les éléments actifs (bobine, voyants, moteur) passent en jaune.
 4. **Vérifier** : le montage est contrôlé par scénarios de fonctionnement (pas de câblage imposé).
+
+Dans les exercices 2 sens, le **blocage mécanique** se prend sur l'établi et se pose entre les deux contacteurs de puissance (symbole ▽ sur la liaison pointillée ; toucher le symbole pour le retirer). Il est exigé à l'exercice 6, et déjà posé aux exercices 7 et 8. La vérification exige quand même le verrouillage électrique.
+
+Les boutons poussoirs sont **momentanés** : contact tant qu'on appuie, retour à l'état repos au relâchement.
 
 La **flèche du moteur** indique le sens de rotation (elle s'inverse si deux phases sont permutées).
 
@@ -37,7 +41,7 @@ Un **court-circuit** (phases entre elles, ou +24 V / 0 V) est signalé en rouge,
 
 ## Établi
 
-Arrêt (NF), Marche (NO), arrêt d'urgence, relais thermique F1 (95-96 NF / 97-98 NO), précoupure Q1 (NO), KM1 13-14 (NO), KM1 21-22 (NF), KM2 13-14 / 21-22 et bobine KM2 (exercices 2 sens), pédale, bobine KM1, voyants H1 / H2 / H3.
+Arrêt (NF), Marche (NO), arrêt d'urgence, relais thermique F1 (95-96 NF / 97-98 NO), précoupure Q1 (NO), KM1 13-14 (NO), KM1 21-22 (NF), KM2 13-14 / 21-22 et bobine KM2 (exercices 2 sens), pédale, bobine KM1, voyants vert / bleu / blanc / orange / rouge (numérotés H1, H2… automatiquement, comme les bobines KM1, KM2…).
 
 ## Personnaliser
 
