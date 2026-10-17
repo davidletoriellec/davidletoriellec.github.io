@@ -54,7 +54,7 @@ table{width:100%;border-collapse:collapse;font-size:12px}td,th{padding:4px 2px;t
 <div class="row"><div><div class="k">Départ (W)</div><input id="p0" type="number" value="100"></div><div><div class="k">Palier +W / min</div><input id="ps" type="number" value="20"></div></div>
 <div id="fr" style="margin-top:8px;font-weight:700"></div><div id="th" class="k" style="margin-top:6px"></div></div>
 <div class="card m" id="m-gpx"><input id="gf" type="file"><textarea id="gt" placeholder="ou colle ici le contenu du fichier GPX" style="height:70px;margin-top:6px"></textarea><button id="gp" class="s">Charger le texte collé</button><div id="gi" class="k"></div><div class="row" style="margin-top:6px"><select id="gs"></select><input id="gn" placeholder="Nom du parcours"></div><button id="gv" class="s">💾 Sauvegarder</button> <button id="gx" class="s">🗑 Supprimer la sélection</button><div class="k">Le trainer suit la pente (0 à 12 %).</div></div>
-<div class="card m" id="m-hist"><div id="hl"></div></div>
+<div class="card m" id="m-hist"><div class="row" style="margin-bottom:8px"><button id="ex1" class="s">⬇ CSV résumé</button><button id="ex2" class="s">⬇ CSV détail par bloc</button></div><div id="hl"></div></div>
 
 <div class="card"><canvas id="c"></canvas><div class="lg" id="lg"></div></div>
 <div class="grid">
@@ -170,6 +170,15 @@ $('gf').onchange=async e=>{try{await gpxLoad(e)}catch(err){$('gi').textContent=$
  n.forEach((p,i)=>{if(i){const q=n[i-1],a=Math.sin((p.lat-q.lat)*r/2)**2+Math.cos(q.lat*r)*Math.cos(p.lat*r)*Math.sin((p.lon-q.lon)*r/2)**2;d+=2*R*Math.asin(Math.sqrt(a))}p.d=d});
  gpx=n;dist=0;$('gn').value=f.name.replace(/\.\w+$/,'');ginfo();draw()}
 const gAt=m=>{let i=gpx.findIndex(p=>p.d>=m);return i<0?gpx.length-1:i};
+/* Export CSV (séparateur virgule) */
+const cq=v=>{v=String(v??'');return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+function dl(name,rows){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+rows.map(r=>r.map(cq).join(',')).join('\r\n')],{type:'text/csv;charset=utf-8'}));a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000)}
+$('ex1').onclick=()=>{if(!P.sess.length){$('msg').textContent='Aucune séance à exporter.';return}
+ dl('seances-'+U+'.csv',[['Utilisateur','Date','Séance','Durée (min)','Puissance moy (W)','FC moy (bpm)','Km virtuels','Intensité (%)','FTP (W)',...ZN.map((n,i)=>'Z'+(i+1)+' '+n+' (min)')],
+  ...P.sess.map(q=>[U,q.d,q.n,(q.dur/60).toFixed(1),q.pm,q.hm,q.km,q.pc,q.F,...q.z.map(v=>(v/60).toFixed(1))])])};
+$('ex2').onclick=()=>{if(!P.sess.length){$('msg').textContent='Aucune séance à exporter.';return}
+ const R=[['Utilisateur','Date','Séance','Bloc','Début (min)','Fin (min)','Cible (W)','Puissance moy (W)','FC moy (bpm)','Cadence moy (rpm)','Zone']];
+ P.sess.forEach(q=>q.B.forEach((b,i)=>R.push([U,q.d,q.n,i+1,(b[0]/60).toFixed(1),(b[1]/60).toFixed(1),b[2],b[3],b[4],b[5],'Z'+(zi(b[2]/q.F*100)+1)])));dl('seances-detail-'+U+'.csv',R)};
 /* GPX sauvegardés + profil d'altitude */
 const ginfo=()=>{const D=gpx[gpx.length-1].d;let up=0;gpx.forEach((p,i)=>{if(i&&p.ele>gpx[i-1].ele)up+=p.ele-gpx[i-1].ele});$('gi').textContent=(D/1000).toFixed(1)+' km · D+ '+Math.round(up)+' m'};
 function gls(){$('gs').innerHTML='<option value="">GPX sauvegardés…</option>'+P.gpxs.map((g,i)=>'<option value="'+i+'">'+esc(g.n)+'</option>').join('')}
@@ -237,12 +246,13 @@ function draw(){const c=$('c'),x=c.getContext('2d'),dp=devicePixelRatio,w=c.widt
  else if(mode==='gpx'&&gpx.length){P=gpx.map(p=>[p.d,p.ele]);X=gpx[gpx.length-1].d;cur=dist}
  else if(mode==='ftp'){const s=+$('p0').value,st=+$('ps').value;for(let k=0;k<14;k++){P.push([k*60,s+st*k],[k*60+60,s+st*k])}X=840;cur=el}
  if(P.length<2||!X)return;let mn=Math.min(...P.map(a=>a[1])),mx=Math.max(...P.map(a=>a[1]));
+ if(mode==='ftp')mn=0;
  if(mode==='wk'){mn=0;mx=Math.max(mx,...rec.map(r=>r[1]/F*100))*1.05}
- const L=mode==='wk'?40*dp:0,B=mode==='wk'?16*dp:0,rg=Math.max(mx-mn,1),fx=t=>L+t/X*(w-L),fy=v=>h-B-6-(v-mn)/rg*(h-B-14);
+ const ax=mode==='wk'||mode==='ftp',L=ax?40*dp:0,B=ax?16*dp:0,rg=Math.max(mx-mn,1),fx=t=>L+t/X*(w-L),fy=v=>h-B-6-(v-mn)/rg*(h-B-14);
  if(mode==='wk'){for(let px=L;px<w;px+=2*dp){const v=at(bl,(px-L)/(w-L)*X);if(v==null)continue;const q=v*pc/100,y=fy(q);x.fillStyle=ZC[zi(q)];x.fillRect(px,y,2*dp,h-B-y)}
   x.beginPath();x.strokeStyle='#1c3d8f';x.lineWidth=2*dp;rec.forEach((r,i)=>{const a=fx(i),b=fy(r[1]/F*100);i?x.lineTo(a,b):x.moveTo(a,b)});x.stroke()}
- else{x.beginPath();x.moveTo(0,h);P.forEach(a=>x.lineTo(fx(a[0]),fy(a[1])));x.lineTo(fx(P[P.length-1][0]),h);x.closePath();
+ else{x.beginPath();x.moveTo(L,h-B);P.forEach(a=>x.lineTo(fx(a[0]),fy(a[1])));x.lineTo(fx(P[P.length-1][0]),h-B);x.closePath();
   x.fillStyle='rgba(232,89,12,.35)';x.fill();x.strokeStyle='#e8590c';x.lineWidth=2*dp;x.stroke()}
- if(mode==='wk')axes(x,w,h,dp,L,B,e=>fy(e/F*100),mx*F/100,X);x.fillStyle=getComputedStyle(document.body).color;x.fillRect(Math.min(fx(cur),w-2),0,2*dp,h-B)}
+ if(mode==='wk')axes(x,w,h,dp,L,B,e=>fy(e/F*100),mx*F/100,X);if(mode==='ftp')axes(x,w,h,dp,L,B,fy,mx,X);x.fillStyle=getComputedStyle(document.body).color;x.fillRect(Math.min(fx(cur),w-2),0,2*dp,h-B)}
 window.onresize=draw;users();load();
 </script></body></html>
