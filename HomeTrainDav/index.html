@@ -73,6 +73,8 @@ table{width:100%;border-collapse:collapse;font-size:12px}td,th{padding:4px 2px;t
 <script>
 const $=i=>document.getElementById(i);
 const US=['David','Isabelle','Daniel','Raphaël'],ZN=['Recovery','Endurance','Tempo','Threshold','VO2 Max','Anaerobic'],ZC=['#808080','#3b8bd4','#46c06a','#ffc93c','#f4623a','#b04adf'];
+/* Poids total en kg (cycliste + vélo + équipement), par personne : à modifier ici. REF = masse que le trainer suppose par défaut (hypothèse). */
+const POIDS={David:112,Isabelle:85,Daniel:85,'Raphaël':85},REF=75;
 const zi=p=>p<55?0:p<76?1:p<91?2:p<106?3:p<121?4:5;
 const fmt=s=>Math.floor(s/60)+':'+String(Math.round(s)%60).padStart(2,'0');
 let mode='wk',run=false,el=0,cp=null,pw=0,cad=0,spd=0,hr=0,blocks=[],gpx=[],dist=0,low=0,lastT=-1,tgt=0,gr=0,pc=100,rec=[],km=0;
@@ -245,7 +247,7 @@ setInterval(()=>{if(run){el++;const F=+$('ftp').value;
  if(mode==='wk'){const t=el+off,p=wkAt(t);if(p===null){stop();return}tgt=p/100*F*pc/100;setW(tgt);blip();rec.push([tgt,pw,hr,cad,(blkAt(t)||{i:0}).i,t]);km+=(+$('kh').value||27)*((pw||tgt)/F)/3600}
  else if(mode==='ftp'){const s=+$('p0').value,st=+$('ps').value;tgt=s+st*Math.floor(el/60);setW(tgt);
   if(el>150&&cp){low=pw<.7*tgt?low+1:0;if(low>=15){ftpEnd();return}}}
- else if(mode==='gpx'){dist+=spd/3.6;const g0=Math.max(-10,Math.min(12,slp(dist)*gd/100));gr+=(g0-gr)*.25;if(Math.abs(gr-lg)>=.2||el%5===0){lg=gr;setG(gr)}
+ else if(mode==='gpx'){dist+=spd/3.6;const s0=slp(dist)*gd/100,k=(POIDS[U]||REF)/REF,g0=Math.max(-10,Math.min(12,((s0/100+.004)*k-.004)*100));gr+=(g0-gr)*.25;if(Math.abs(gr-lg)>=.2||el%5===0){lg=gr;setG(gr)}
   if(dist>=gpx[gpx.length-1].d){stop();return}}}ui()},1000);
 function ui(){const m=Math.floor(el/60);
  $('tg').textContent=mode==='gpx'?gr.toFixed(1)+' %':(run||mode==='ftp'&&el?Math.round(tgt)+' W':'– W');
