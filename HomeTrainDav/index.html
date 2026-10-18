@@ -54,12 +54,12 @@ table{width:100%;border-collapse:collapse;font-size:12px}td,th{padding:4px 2px;t
 <b>Test en rampe</b><div class="k">Pédale jusqu'à l'épuisement. FTP = 75 % de la puissance max atteinte (MAP).</div>
 <div class="row"><div><div class="k">Départ (W)</div><input id="p0" type="number" value="100"></div><div><div class="k">Palier +W / min</div><input id="ps" type="number" value="20"></div></div>
 <div id="fr" style="margin-top:8px;font-weight:700"></div><div id="th" class="k" style="margin-top:6px"></div></div>
-<div class="card m" id="m-gpx"><input id="gf" type="file"><textarea id="gt" placeholder="ou colle ici le contenu du fichier GPX" style="height:70px;margin-top:6px"></textarea><button id="gp" class="s">Charger le texte collé</button><div id="gi" class="k"></div><div class="row" style="margin-top:6px"><select id="gs"></select><input id="gn" placeholder="Nom du parcours"></div><button id="gv" class="s">💾 Sauvegarder</button> <button id="gx" class="s">🗑 Supprimer la sélection</button><div class="k">Le trainer suit la pente (0 à 12 %).</div></div>
+<div class="card m" id="m-gpx"><input id="gf" type="file"><textarea id="gt" placeholder="ou colle ici le contenu du fichier GPX" style="height:70px;margin-top:6px"></textarea><button id="gp" class="s">Charger le texte collé</button><div id="gi" class="k"></div><div class="row" style="margin-top:6px"><select id="gs"></select><input id="gn" placeholder="Nom du parcours"></div><button id="gv" class="s">💾 Sauvegarder</button> <button id="gx" class="s">🗑 Supprimer la sélection</button><div class="k" style="margin-top:8px">Difficulté (100 % = pente réelle du parcours)</div><div class="row"><button id="dfm" class="s">− 5</button><div class="pc" id="dfv">100 %</div><button id="dfp" class="s">+ 5</button></div><div class="k" style="margin-top:6px">Le trainer suit la pente, de −10 % à +12 %, multipliée par la difficulté.</div></div>
 <div class="card m" id="m-hist"><div class="row" style="margin-bottom:8px"><button id="ex1" class="s">⬇ CSV résumé</button><button id="ex2" class="s">⬇ CSV détail par bloc</button></div><div id="hl"></div></div>
 
 <div class="card"><canvas id="c"></canvas><div class="lg" id="lg"></div></div>
 <div class="grid">
-<div class="card"><div class="k">Cible</div><div class="v" id="tg">– W</div></div>
+<div class="card"><div class="k" id="tgk">Cible</div><div class="v" id="tg">– W</div></div>
 <div class="card"><div class="k">Puissance</div><div class="v" id="pw">– W</div></div>
 <div class="card" id="hc"><div class="k">Cardio</div><div class="v" id="hr">–</div></div>
 <div class="card"><div class="k">Cadence</div><div class="v" id="cd">– rpm</div></div>
@@ -96,10 +96,11 @@ $('pwi').onkeydown=e=>{if(e.key==='Enter')$('pwb').click()};
 function lst(){$('sw').innerHTML='<option value="">Séances sauvegardées…</option>'+P.workouts.map((w,i)=>'<option value="'+i+'">'+esc(w.n)+'</option>').join('');$('th').textContent=P.tests.length?'Historique : '+P.tests.map(t=>t.d+' → '+t.f+' W').join(' · '):'';hl()}
 function hl(){const s=P.sess;$('hl').innerHTML=s.length?'<div class="k">'+U+' : '+s.length+' séances · '+s.reduce((a,b)=>a+b.km,0).toFixed(0)+' km virtuels au total</div>'+s.map((q,i)=>'<div class="sr" data-i="'+i+'"><b>'+q.d+'</b> '+esc(q.n)+'<br><span class="k">'+fmt(q.dur)+' · '+q.pm+' W moy · '+q.km+' km · intensité '+q.pc+' %</span></div>').join(''):'Aucune séance enregistrée pour l\'instant.'}
 $('hl').onclick=e=>{const d=e.target.closest('.sr');if(d)show(P.sess[+d.dataset.i])};
-function apply(){pc=P.pc||100;$('ftp').value=P.ftp;$('fm').value=P.fm;$('kh').value=P.kmh||27;$('wt').value=P.wt||$('wt').value;lst();gls();ui()}
-function save(){if(!U)return;P.ftp=+$('ftp').value;P.fm=+$('fm').value;P.kmh=+$('kh').value||27;P.wt=$('wt').value;P.pc=pc;try{localStorage.setItem('prof_'+U,JSON.stringify(P))}catch(e){}
+function apply(){pc=P.pc||100;gd=P.gd||100;$('ftp').value=P.ftp;$('fm').value=P.fm;$('kh').value=P.kmh||27;$('wt').value=P.wt||$('wt').value;lst();gls();ui()}
+function save(){if(!U)return;P.ftp=+$('ftp').value;P.fm=+$('fm').value;P.kmh=+$('kh').value||27;P.wt=$('wt').value;P.pc=pc;P.gd=gd;try{localStorage.setItem('prof_'+U,JSON.stringify(P))}catch(e){}
  if(online){const u=U,d=structuredClone(P);chain=chain.then(()=>api(u,'set',d)).then(r=>{if(!r.ok)throw 0}).catch(()=>{$('msg').textContent='Sauvegarde en ligne échouée.'})}}
 ['ftp','fm','kh'].forEach(k=>$(k).onchange=save);
+const setGd=d=>{gd=Math.max(10,Math.min(200,gd+d));save();ui()};$('dfm').onclick=()=>setGd(-5);$('dfp').onclick=()=>setGd(5);
 const setPc=d=>{pc=Math.max(30,Math.min(200,pc+d));save();ui()};$('pm').onclick=()=>setPc(-5);$('pp').onclick=()=>setPc(5);
 $('sw').onchange=()=>{const w=P.workouts[$('sw').value];if(w){$('wt').value=w.t;$('nm').value=w.n;draw()}};
 $('sv').onclick=()=>{const n=$('nm').value.trim();if(!n)return;P.workouts=P.workouts.filter(w=>w.n!==n);P.workouts.push({n,t:$('wt').value});save();lst()};
@@ -107,7 +108,7 @@ $('dl').onclick=()=>{const i=$('sw').value;if(i==='')return;P.workouts.splice(+i
 document.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{stop();mode=b.dataset.m;
  document.querySelectorAll('[data-m]').forEach(x=>x.classList.toggle('on',x===b));
  document.querySelectorAll('.m').forEach(x=>x.classList.toggle('on',x.id==='m-'+mode));lgs();draw()});
-let lg=0,lastI=-1,wl=null,ac=null,off=0;
+let lg=0,lastI=-1,wl=null,ac=null,off=0,gd=100;
 async function wake(on){try{if(on&&navigator.wakeLock&&!wl){wl=await navigator.wakeLock.request('screen');wl.addEventListener('release',()=>{wl=null})}else if(!on&&wl){await wl.release();wl=null}}catch(e){}}
 document.addEventListener('visibilitychange',()=>{if(run&&document.visibilityState==='visible')wake(true)});
 function beep(f,d){if(!$('bp').checked||!ac)return;try{const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;g.gain.value=.3;o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch(e){}}
@@ -244,13 +245,13 @@ setInterval(()=>{if(run){el++;const F=+$('ftp').value;
  if(mode==='wk'){const t=el+off,p=wkAt(t);if(p===null){stop();return}tgt=p/100*F*pc/100;setW(tgt);blip();rec.push([tgt,pw,hr,cad,(blkAt(t)||{i:0}).i,t]);km+=(+$('kh').value||27)*((pw||tgt)/F)/3600}
  else if(mode==='ftp'){const s=+$('p0').value,st=+$('ps').value;tgt=s+st*Math.floor(el/60);setW(tgt);
   if(el>150&&cp){low=pw<.7*tgt?low+1:0;if(low>=15){ftpEnd();return}}}
- else if(mode==='gpx'){dist+=spd/3.6;const g0=Math.max(-10,Math.min(12,slp(dist)));gr+=(g0-gr)*.25;if(Math.abs(gr-lg)>=.2||el%5===0){lg=gr;setG(gr)}
+ else if(mode==='gpx'){dist+=spd/3.6;const g0=Math.max(-10,Math.min(12,slp(dist)*gd/100));gr+=(g0-gr)*.25;if(Math.abs(gr-lg)>=.2||el%5===0){lg=gr;setG(gr)}
   if(dist>=gpx[gpx.length-1].d){stop();return}}}ui()},1000);
 function ui(){const m=Math.floor(el/60);
  $('tg').textContent=mode==='gpx'?gr.toFixed(1)+' %':(run||mode==='ftp'&&el?Math.round(tgt)+' W':'– W');
  $('pw').textContent=pw+' W';$('cd').textContent=Math.round(cad)+' rpm';
  const p=hr/(+$('fm').value||185),hz=p<.6?0:p<.7?1:p<.8?2:p<.9?3:4;$('hr').textContent=hr||'–';$('hc').style.background=hr?HZ[hz]:'';$('hc').classList.toggle('hz',!!hr);
- $('tm').textContent=m+':'+String(el%60).padStart(2,'0');$('kv').textContent=km.toFixed(2)+' km';$('pv').textContent=pc+' %';blk();
+ $('tm').textContent=m+':'+String(el%60).padStart(2,'0');$('kv').textContent=km.toFixed(2)+' km';$('pv').textContent=pc+' %';$('dfv').textContent=gd+' %';$('tgk').textContent=mode==='gpx'?'Pente':'Cible';blk();
  if(mode==='wk'){const T=parse($('wt').value).reduce((s,b)=>s+b.d,0);$('ik').textContent='Reste';const r=Math.max(0,T-el-off);$('iv').textContent=Math.floor(r/60)+':'+String(r%60).padStart(2,'0')}
  else if(mode==='ftp'){$('ik').textContent='Palier';$('iv').textContent=(60-el%60)+' s'}
  else if(mode==='gpx'){$('ik').textContent='Distance';$('iv').textContent=(dist/1000).toFixed(2)+' km'}draw()}
