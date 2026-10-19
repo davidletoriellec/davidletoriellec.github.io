@@ -33,6 +33,9 @@ Un **court-circuit** (phases entre elles, ou +24 V / 0 V) est signalé en rouge,
 - **Suppr** (ou Retour arrière) : supprime l'élément ou le fil sélectionné.
 - **Ctrl+Z** : annule le dernier ajout, déplacement ou suppression ; **Ctrl+Maj+Z** ou **Ctrl+Y** : rétablit. Le bouton « Annuler » fait la même chose.
 - **Simulation** : maintenir un bouton pour l'actionner (plusieurs doigts possibles) ; double appui rapide ou Maj+clic pour le maintenir enfoncé ; un appui le relâche.
+- **Pivoter** : sélectionner un élément puis « ⟳ Pivoter » (ou la touche **R**) tourne l'élément de 90°.
+- **Taille** : la liste « Taille normale / réduite / petite » réduit les composants du schéma.
+- **Composants** : le bouton « 📖 Composants » ouvre une page avec le symbole, une description et, si présente, la photo de chaque appareil (fichiers `images/<identifiant>.jpg`, voir `images/LISEZMOI.txt`).
 - **Surcharge F1** : bouton à côté du relais thermique pour simuler une surcharge.
 
 ## Exercices
@@ -48,7 +51,7 @@ Un **court-circuit** (phases entre elles, ou +24 V / 0 V) est signalé en rouge,
 
 ## Établi
 
-Arrêt (NC), Marche (NO), interrupteur à bascule, arrêt d'urgence, relais thermique F1 (95-96 NC / 97-98 NO), précoupure Q1 (NO), contacts KM1, KM2 et KM3 (13-14, 23-24… en NO ; 21-22, 31-32… en NC, numérotés automatiquement), pédale, bobines KM (numérotées KM1, KM2, KM3… dans l'ordre d'ajout), voyants vert / bleu / blanc / orange / rouge (numérotés H1, H2…).
+Arrêt (NC), Marche (NO), interrupteur à bascule, fins de course NO et NC, arrêt d'urgence, relais thermique F1 (95-96 NC / 97-98 NO), précoupure Q1 (NO), contacts KM1, KM2 et KM3 (13-14, 23-24… en NO ; 21-22, 31-32… en NC, numérotés automatiquement), pédale, bobines KM (KM1, KM2, KM3…) et bobines de relais auxiliaires KA (KA1, KA2…), numérotées dans l'ordre d'ajout, contacts KA1 et KA2 (NO et NC), voyants vert / bleu / blanc / orange / rouge (numérotés H1, H2…).
 
 ## Personnaliser
 

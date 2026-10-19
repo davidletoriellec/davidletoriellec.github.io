@@ -1,0 +1,6 @@
+Déposez ici les photos ou dessins des appareils, au format JPG, nommés comme ci-dessous.
+Elles apparaissent automatiquement dans la page « Composants ».
+
+stop.jpg  start.jpg  au.jpg  th.jpg  thno.jpg  q1no.jpg  kmno.jpg  kmnc.jpg
+pedal.jpg  sw.jpg  fcno.jpg  fcnc.jpg  coil.jpg  coilA.jpg  lamp.jpg
+sect.jpg  cont.jpg  relth.jpg  mot.jpg  mech.jpg
