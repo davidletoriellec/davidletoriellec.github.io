@@ -28,6 +28,13 @@ Le bouton **Exporter en PDF** produit une page A4 paysage avec le nom de l'étud
 
 Un **court-circuit** (phases entre elles, ou +24 V / 0 V) est signalé en rouge, en grand, au moment où il se produit.
 
+## Raccourcis et commandes
+
+- **Suppr** (ou Retour arrière) : supprime l'élément ou le fil sélectionné.
+- **Ctrl+Z** : annule le dernier ajout, déplacement ou suppression ; **Ctrl+Maj+Z** ou **Ctrl+Y** : rétablit. Le bouton « Annuler » fait la même chose.
+- **Simulation** : maintenir un bouton pour l'actionner (plusieurs doigts possibles) ; double appui rapide ou Maj+clic pour le maintenir enfoncé ; un appui le relâche.
+- **Surcharge F1** : bouton à côté du relais thermique pour simuler une surcharge.
+
 ## Exercices
 
 1. Puissance : câblage seul (L1-L2-L3, Q1, KM1, F1, M1)
@@ -41,7 +48,7 @@ Un **court-circuit** (phases entre elles, ou +24 V / 0 V) est signalé en rouge,
 
 ## Établi
 
-Arrêt (NF), Marche (NO), arrêt d'urgence, relais thermique F1 (95-96 NF / 97-98 NO), précoupure Q1 (NO), KM1 13-14 (NO), KM1 21-22 (NF), KM2 13-14 / 21-22 et bobine KM2 (exercices 2 sens), pédale, bobine KM1, voyants vert / bleu / blanc / orange / rouge (numérotés H1, H2… automatiquement, comme les bobines KM1, KM2…).
+Arrêt (NC), Marche (NO), interrupteur à bascule, arrêt d'urgence, relais thermique F1 (95-96 NC / 97-98 NO), précoupure Q1 (NO), contacts KM1, KM2 et KM3 (13-14, 23-24… en NO ; 21-22, 31-32… en NC, numérotés automatiquement), pédale, bobines KM (numérotées KM1, KM2, KM3… dans l'ordre d'ajout), voyants vert / bleu / blanc / orange / rouge (numérotés H1, H2…).
 
 ## Personnaliser
 

@@ -198,14 +198,14 @@ function modeUI(){["bE","mE"].forEach(function(i){document.getElementById(i).cla
 document.getElementById("palc").style.display=mode=="E"&&(EX[ex].need||EX[ex].two)?"":"none";
 document.getElementById("hint").textContent=mode=="E"?"Édition : touchez une borne (ou un point quelconque des rails +24 V / 0 V) puis une autre pour tirer un fil ; touchez un fil pour le sélectionner (puis « Supprimer la sélection »), glissez-le pour le déplacer. Faites glisser un composant pour le déplacer ; touchez-le pour le sélectionner.":"Simulation : maintenez un bouton pour l'actionner (plusieurs doigts possibles) ; double appui rapide ou Maj+clic pour le maintenir enfoncé, un appui le relâche. Touchez Q1, AU, un interrupteur ou « Surcharge F1 » pour les basculer. Jaune = actif."}
 function setMode(m){mode=m;pend=null;if(m=="S"){st={Q:st.Q,km:0,km2:0,F:0,F2:0,T:0,M:st.M};lock={}}sel=null;modeUI();sync()}
-function snap(){hist.push(JSON.stringify({items:items,W:W,M:st.M,seq:seq}));if(hist.length>80)hist.shift();redoS=[]}
+function hsnap(){hist.push(JSON.stringify({items:items,W:W,M:st.M,seq:seq}));if(hist.length>80)hist.shift();redoS=[]}
 function restore(x){var o=JSON.parse(x);items=o.items;W=o.W;st.M=o.M;seq=Math.max(seq,o.seq);sel=null;selW=null;pend=null;msg("");pal();sync()}
 function undo(){if(mode!="E"||!hist.length)return;redoS.push(JSON.stringify({items:items,W:W,M:st.M,seq:seq}));restore(hist.pop())}
 function redo(){if(mode!="E"||!redoS.length)return;hist.push(JSON.stringify({items:items,W:W,M:st.M,seq:seq}));restore(redoS.pop())}
 var sch=document.getElementById("sch");
 function pt(e){var v=sch.querySelector("svg"),p=v.createSVGPoint();p.x=e.clientX;p.y=e.clientY;var q=p.matrixTransform(v.getScreenCTM().inverse());return[q.x,q.y]}
 function snap(v,a,b){return Math.max(a,Math.min(b,Math.round(v/10)*10))}
-function place(k,p){if(k=="mech"){msg("Posez le blocage mécanique entre les deux contacteurs de puissance (zone en pointillés).");return}var z=zx(),id=k+(++seq);snap();items.push({id:id,type:k,x:snap(p[0],z+30,z+760),y:snap(p[1],80,640)});selT=null;pal();msg("");sync()}
+function place(k,p){if(k=="mech"){msg("Posez le blocage mécanique entre les deux contacteurs de puissance (zone en pointillés).");return}var z=zx(),id=k+(++seq);hsnap();items.push({id:id,type:k,x:snap(p[0],z+30,z+760),y:snap(p[1],80,640)});selT=null;pal();msg("");sync()}
 sch.addEventListener("pointerdown",function(e){
 if(mode=="S"){var h=e.target.closest("[data-hold]");if(h){var hk=h.dataset.hold,now=Date.now();
 if(lock[hk]){lock[hk]=false;st[hk]=0;lastAct=actLabel(hk);sync();return}
@@ -213,28 +213,28 @@ if(e.shiftKey||(tdown[hk]&&now-tdown[hk]<350)){tdown[hk]=0;lock[hk]=true;st[hk]=
 tdown[hk]=now;try{sch.setPointerCapture(e.pointerId)}catch(_){}tp[h.dataset.hold]=Date.now();held[h.dataset.hold]=1;st[h.dataset.hold]=1;lastAct=actLabel(h.dataset.hold);sync()}return}
 if(e.target.closest("[data-t]"))return;var wg=e.target.closest("[data-w]");if(wg){try{sch.setPointerCapture(e.pointerId)}catch(_){}wdrag={i:+wg.dataset.w,x0:e.clientX,y0:e.clientY,mv:false};return}var g=e.target.closest("[data-item]");
 if(g){try{sch.setPointerCapture(e.pointerId)}catch(_){}selW=null;var it=items.filter(function(x){return x.id==g.dataset.item})[0],p=pt(e);drag={id:it.id,dx:it.x-p[0],dy:it.y-p[1],x0:e.clientX,y0:e.clientY,mv:false}}});
-document.addEventListener("pointermove",function(e){if(wdrag){var dx=e.clientX-wdrag.x0,dy=e.clientY-wdrag.y0;if(!wdrag.mv&&Math.abs(dx)+Math.abs(dy)>6){wdrag.mv=true;snap();wdrag.ax=Math.abs(dx)>Math.abs(dy)?"h":"v"}if(wdrag.mv){var p=pt(e),w=W[wdrag.i];if(w){w[2]={o:wdrag.ax,t:Math.round((wdrag.ax=="v"?p[1]:p[0])/5)*5};selW=wdrag.i;sel=null;sync()}}return}if(!drag)return;
-if(!drag.mv&&Math.abs(e.clientX-drag.x0)+Math.abs(e.clientY-drag.y0)>6){drag.mv=true;snap()}
+document.addEventListener("pointermove",function(e){if(wdrag){var dx=e.clientX-wdrag.x0,dy=e.clientY-wdrag.y0;if(!wdrag.mv&&Math.abs(dx)+Math.abs(dy)>6){wdrag.mv=true;hsnap();wdrag.ax=Math.abs(dx)>Math.abs(dy)?"h":"v"}if(wdrag.mv){var p=pt(e),w=W[wdrag.i];if(w){w[2]={o:wdrag.ax,t:Math.round((wdrag.ax=="v"?p[1]:p[0])/5)*5};selW=wdrag.i;sel=null;sync()}}return}if(!drag)return;
+if(!drag.mv&&Math.abs(e.clientX-drag.x0)+Math.abs(e.clientY-drag.y0)>6){drag.mv=true;hsnap()}
 if(drag.mv){var z=zx(),it=items.filter(function(x){return x.id==drag.id})[0],p=pt(e);it.x=snap(p[0]+drag.dx,z+30,z+760);it.y=snap(p[1]+drag.dy,80,640);sel=it.id;sync()}});
 function up(){var ch=0;if(wdrag){if(!wdrag.mv){selW=selW===wdrag.i?null:wdrag.i;sel=null}wdrag=null;ch=1}for(var k in held){(function(k){if(lock[k])return;var dl=Math.max(0,220-(Date.now()-(tp[k]||0)));if(dl)setTimeout(function(){if(held[k]||lock[k])return;st[k]=0;lastAct=actLabel(k);sync()},dl);else{st[k]=0;lastAct=actLabel(k);ch=1}})(k)}held={};
 if(drag){if(!drag.mv)sel=sel==drag.id?null:drag.id;drag=null;ch=1}if(ch)sync()}
 document.addEventListener("pointerup",up);document.addEventListener("pointercancel",up);sch.addEventListener("lostpointercapture",up);
-function link(id){if(!pend)pend=id;else{if(pend!=id&&!W.some(function(w){return w[0]==pend&&w[1]==id||w[0]==id&&w[1]==pend})){snap();W.push([pend,id])}pend=null;msg("")}sync()}
+function link(id){if(!pend)pend=id;else{if(pend!=id&&!W.some(function(w){return w[0]==pend&&w[1]==id||w[0]==id&&w[1]==pend})){hsnap();W.push([pend,id])}pend=null;msg("")}sync()}
 sch.addEventListener("click",function(e){var t=e.target.closest("[data-t],[data-w],[data-tog],[data-ws],[data-rail],[data-mech],[data-mechrm]");if(!t)return;
 if(mode=="S"){if(t.dataset.tog){var k=t.dataset.tog;st[k]=st[k]?0:1;lastAct=actLabel(k);sync()}return}
-if(t.dataset.mech!==undefined){if(selT=="mech"){snap();st.M=1;selT=null;pal();msg("");sync()}else msg("Sélectionnez d'abord « Blocage mécanique » sur l'établi, puis touchez la zone en pointillés.");return}
-if(t.dataset.mechrm!==undefined){snap();st.M=0;msg("");sync();return}
+if(t.dataset.mech!==undefined){if(selT=="mech"){hsnap();st.M=1;selT=null;pal();msg("");sync()}else msg("Sélectionnez d'abord « Blocage mécanique » sur l'établi, puis touchez la zone en pointillés.");return}
+if(t.dataset.mechrm!==undefined){hsnap();st.M=0;msg("");sync();return}
 if(t.dataset.w!==undefined){return}
 else if(t.dataset.t)link(t.dataset.t);
 else if(t.dataset.rail){var z=zx(),p=pt(e),x=Math.max(z,Math.min(z+790,Math.round(p[0]/10)*10));if(pend&&P[pend]&&Math.abs(P[pend][0]-p[0])<=25)x=P[pend][0];link(t.dataset.rail+":"+x)}
 else if(t.dataset.ws){if(selT)place(selT,pt(e));else{sel=null;sync()}}});
 sch.addEventListener("dragover",function(e){e.preventDefault()});
-sch.addEventListener("drop",function(e){e.preventDefault();var k=e.dataTransfer.getData("text/plain");if(k=="mech"){if(mode=="E"&&e.target.closest("[data-mech]")){snap();st.M=1;selT=null;pal();sync()}return}if(TY[k]&&mode=="E"&&EX[ex].need)place(k,pt(e))});
+sch.addEventListener("drop",function(e){e.preventDefault();var k=e.dataTransfer.getData("text/plain");if(k=="mech"){if(mode=="E"&&e.target.closest("[data-mech]")){hsnap();st.M=1;selT=null;pal();sync()}return}if(TY[k]&&mode=="E"&&EX[ex].need)place(k,pt(e))});
 var pl=document.getElementById("pal");
 pl.addEventListener("click",function(e){var t=e.target.closest(".tile");if(!t)return;selT=selT==t.dataset.k?null:t.dataset.k;pal()});
 pl.addEventListener("dragstart",function(e){var t=e.target.closest(".tile");if(t)e.dataTransfer.setData("text/plain",t.dataset.k)});
 ["bE","mE"].forEach(function(i){document.getElementById(i).onclick=function(){setMode("E")}});["bS","mS"].forEach(function(i){document.getElementById(i).onclick=function(){setMode("S")}});
-function delSel(){if(mode!="E")return;if(selW!==null&&W[selW]){snap();W.splice(selW,1);selW=null;msg("");sync();return}if(!sel)return;snap();var p=sel+".";items=items.filter(function(x){return x.id!=sel});W=W.filter(function(w){return w[0].indexOf(p)!=0&&w[1].indexOf(p)!=0});sel=null;msg("");sync()}
+function delSel(){if(mode!="E")return;if(selW!==null&&W[selW]){hsnap();W.splice(selW,1);selW=null;msg("");sync();return}if(!sel)return;hsnap();var p=sel+".";items=items.filter(function(x){return x.id!=sel});W=W.filter(function(w){return w[0].indexOf(p)!=0&&w[1].indexOf(p)!=0});sel=null;msg("");sync()}
 document.getElementById("del").onclick=delSel;document.getElementById("undo").onclick=undo;
 document.addEventListener("keydown",function(e){var t=e.target&&e.target.tagName;if(/INPUT|SELECT|TEXTAREA/.test(t))return;var k=(e.key||"").toLowerCase();if((e.ctrlKey||e.metaKey)&&k=="z"){e.preventDefault();if(e.shiftKey)redo();else undo()}else if((e.ctrlKey||e.metaKey)&&k=="y"){e.preventDefault();redo()}else if((k=="delete"||k=="backspace")&&mode=="E"){e.preventDefault();delSel()}});
 function ids(t){return items.filter(function(x){return t=="lamp"?TY[x.type].lamp:x.type==t}).map(function(x){return x.id})}
