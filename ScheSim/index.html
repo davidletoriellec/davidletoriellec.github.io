@@ -45,7 +45,7 @@ svg{stroke-linejoin:round}
 <body>
 <body>
 <body>
-<h1>⚡ SchemaSim <span class="hint">démarrage direct : établi, câblage, simulation · version 17</span></h1>
+<h1>⚡ SchemaSim <span class="hint">démarrage direct : établi, câblage, simulation · version 18</span></h1>
 <div id="app"><div class="lv"><select id="ex"></select><button id="bL">📖 Composants</button><button id="bE" class="on">✏️ Édition</button><button id="bS">▶ Simulation</button></div>
 <div class="card"><div class="cons" id="cons"></div><div class="hint" id="hint"></div></div>
 <div class="card" id="palc"><b>Établi</b> <span class="hint">: touchez un composant puis la zone de travail (ou glissez-le).</span><div class="pal" id="pal"></div></div>
@@ -58,7 +58,7 @@ svg{stroke-linejoin:round}
 <script>
 var PW1=[["L1","Q1.1"],["L2","Q1.3"],["L3","Q1.5"],["Q1.2","KM1.1"],["Q1.4","KM1.3"],["Q1.6","KM1.5"],["KM1.2","F2.1"],["KM1.4","F2.3"],["KM1.6","F2.5"],["F2.2","M1.U"],["F2.4","M1.V"],["F2.6","M1.W"]];
 var PW2=PW1.concat([["Q1.2","KM2.1"],["Q1.4","KM2.3"],["Q1.6","KM2.5"],["KM2.2","F2.1"],["KM2.4","F2.5"],["KM2.6","F2.3"]]);
-var TY={stop:{nc:1,h:"push",ev:"hold",n:"Arrêt",s:"BP NC"},start:{nc:0,h:"push",ev:"hold",n:"Marche",s:"BP NO"},au:{nc:1,h:"mush",ev:"tog",n:"Arrêt d'urgence",s:"NC"},th:{nc:1,h:"th",ev:"tog",n:"Relais thermique",s:"F1 95-96 NC"},thno:{nc:0,h:"th",ev:"tog",n:"Relais thermique",s:"F1 97-98 NO"},q1no:{nc:0,h:"",n:"Précoupure",s:"Q1 NO"},kmno:{nc:0,h:"",n:"KM1",s:"13-14 NO"},kmnc:{nc:1,h:"",n:"KM1",s:"21-22 NC"},km2no:{nc:0,h:"",n:"KM2",s:"13-14 NO"},km2nc:{nc:1,h:"",n:"KM2",s:"21-22 NC"},km3no:{nc:0,h:"",n:"KM3",s:"13-14 NO"},km3nc:{nc:1,h:"",n:"KM3",s:"21-22 NC"},sw:{nc:0,h:"",ev:"tog",n:"Interrupteur",s:"à bascule"},fcno:{nc:0,h:"fc",ev:"tog",n:"Fin de course",s:"NO"},fcnc:{nc:1,h:"fc",ev:"tog",n:"Fin de course",s:"NC"},ka1no:{nc:0,h:"",n:"KA1",s:"13-14 NO"},ka1nc:{nc:1,h:"",n:"KA1",s:"21-22 NC"},ka2no:{nc:0,h:"",n:"KA2",s:"13-14 NO"},ka2nc:{nc:1,h:"",n:"KA2",s:"21-22 NC"},coilA:{coil:1,n:"Bobine",s:"KA"},pedal:{nc:0,h:"ped",ev:"hold",n:"Pédale",s:"NO"},coil:{coil:1,n:"Bobine",s:"KM"},lampV:{lamp:1,col:"#2ea043",n:"Voyant",s:"vert"},lampB:{lamp:1,col:"#1f6feb",n:"Voyant",s:"bleu"},lampW:{lamp:1,col:"#f5f5f5",n:"Voyant",s:"blanc"},lampO:{lamp:1,col:"#f0883e",n:"Voyant",s:"orange"},lampR:{lamp:1,col:"#e5484d",n:"Voyant",s:"rouge"}};
+var TY={stop:{nc:1,h:"push",ev:"hold",n:"Arrêt",s:"BP NC"},start:{nc:0,h:"push",ev:"hold",n:"Marche",s:"BP NO"},au:{nc:1,h:"mush",ev:"tog",n:"Arrêt d'urgence",s:"NC"},th:{nc:1,h:"th",ev:"tog",n:"Relais thermique",s:"F1 95-96 NC"},thno:{nc:0,h:"th",ev:"tog",n:"Relais thermique",s:"F1 97-98 NO"},q1no:{nc:0,h:"",n:"Précoupure",s:"Q1 NO"},kmno:{nc:0,h:"",n:"KM1",s:"13-14 NO"},kmnc:{nc:1,h:"",n:"KM1",s:"21-22 NC"},km2no:{nc:0,h:"",n:"KM2",s:"13-14 NO"},km2nc:{nc:1,h:"",n:"KM2",s:"21-22 NC"},km3no:{nc:0,h:"",n:"KM3",s:"13-14 NO"},km3nc:{nc:1,h:"",n:"KM3",s:"21-22 NC"},sw:{nc:0,h:"",ev:"tog",n:"Interrupteur",s:"à bascule"},fcno:{nc:0,h:"",fc:1,ev:"tog",n:"Fin de course",s:"NO"},fcnc:{nc:1,h:"",fc:1,ev:"tog",n:"Fin de course",s:"NC"},comm:{comm:1,ev:"tog",n:"Commutateur",s:"2 positions"},ka1no:{nc:0,h:"",n:"KA1",s:"13-14 NO"},ka1nc:{nc:1,h:"",n:"KA1",s:"21-22 NC"},ka2no:{nc:0,h:"",n:"KA2",s:"13-14 NO"},ka2nc:{nc:1,h:"",n:"KA2",s:"21-22 NC"},coilA:{coil:1,n:"Bobine",s:"KA"},pedal:{nc:0,h:"ped",ev:"hold",n:"Pédale",s:"NO"},coil:{coil:1,n:"Bobine",s:"KM"},lampV:{lamp:1,col:"#2ea043",n:"Voyant",s:"vert"},lampB:{lamp:1,col:"#1f6feb",n:"Voyant",s:"bleu"},lampW:{lamp:1,col:"#f5f5f5",n:"Voyant",s:"blanc"},lampO:{lamp:1,col:"#f0883e",n:"Voyant",s:"orange"},lampR:{lamp:1,col:"#e5484d",n:"Voyant",s:"rouge"}};
 var NM={stop:"bouton Arrêt",start:"bouton Marche",au:"arrêt d'urgence",th:"contact du relais thermique",pedal:"pédale",lamp:"voyant",coil:"bobine KM",kmno:"contact KM1 13-14 (NO)",km2no:"contact KM2 13-14 (NO)",kmnc:"contact KM1 21-22 (NC)",km2nc:"contact KM2 21-22 (NC)"};
 var EX=[
 {t:"1 · Puissance : câblage",need:null,pw:null,c:"Câblez le circuit de puissance : L1-L2-L3 → sectionneur Q1 → contacteur KM1 → relais thermique F1 → moteur M1. Puis passez en Simulation, fermez Q1 et testez avec « Forcer KM1 »."},
@@ -90,7 +90,7 @@ function net(s,W,items,km,km2,km3,ka1,ka2){var par={};function f(a){if(par[a]===
 function u(a,b){par[f(a)]=f(b)}
 ["a","b","c","d","e"].forEach(function(c){u("P24a","P24"+c);u("P0a","P0"+c)});W.forEach(function(w){u(w[0],w[1]);w.slice(0,2).forEach(function(e){if(/^P24/.test(e))u(e,"P24a");else if(/^P0/.test(e))u(e,"P0a")})});
 [1,3,5].forEach(function(i){if(s.Q)u("Q1."+i,"Q1."+(i+1));u("F2."+i,"F2."+(i+1));if(km)u("KM1."+i,"KM1."+(i+1));if(km2)u("KM2."+i,"KM2."+(i+1))});
-items.forEach(function(it){var d=TY[it.type];if(!d.coil&&!d.lamp&&closed(it,s,km,km2,km3,ka1,ka2))u(it.id+".a",it.id+".b")});
+items.forEach(function(it){var d=TY[it.type];if(!d.coil&&!d.lamp&&closed(it,s,km,km2,km3,ka1,ka2))u(it.id+".a",it.id+".b");if(it.type=="comm")u(it.id+".c",it.id+(s[it.id]?".b":".a"))});
 var ph=["L1","L2","L3"],used=[],ks=[];
 var sp=f("L1")==f("L2")||f("L2")==f("L3")||f("L1")==f("L3"),sc=f("P24a")==f("P0a"),short=sp||sc;
 var motor=!short&&["M1.U","M1.V","M1.W"].every(function(m,j){var k=ph.findIndex(function(p){return f(p)==f(m)});if(k<0||used[k])return false;used[k]=1;ks[j]=k;return true});
@@ -105,15 +105,19 @@ function solve(s,W,items){var km=!!s.km,km2=!!s.km2,km3=!!s.km3,ka1=!!s.ka1,ka2=
 function reg(i,x,y){P[i]=[x,y]}
 function lab(it){var t=it.type,k;if(TY[t].lamp){k=items.filter(function(x){return TY[x.type].lamp}).indexOf(it);return"H"+(Math.max(0,k)+1)}
 if(t=="coil"){k=items.filter(function(x){return x.type=="coil"}).indexOf(it);return"KM"+(Math.max(0,k)+1)}
-if(t=="coilA"){k=items.filter(function(x){return x.type=="coilA"}).indexOf(it);return"KA"+(Math.max(0,k)+1)}if(t=="fcno"||t=="fcnc"){k=items.filter(function(x){return x.type=="fcno"||x.type=="fcnc"}).indexOf(it);return"SQ"+(Math.max(0,k)+1)}
+if(t=="coilA"){k=items.filter(function(x){return x.type=="coilA"}).indexOf(it);return"KA"+(Math.max(0,k)+1)}if(t=="fcno"||t=="fcnc"){k=items.filter(function(x){return x.type=="fcno"||x.type=="fcnc"}).indexOf(it);return"FDC"+(Math.max(0,k)+1)}if(t=="sw"||t=="comm"){k=items.filter(function(x){return x.type=="sw"||x.type=="comm"}).indexOf(it);return"SA"+(Math.max(0,k)+1)}
 k=Math.max(0,items.filter(function(x){return x.type==t}).indexOf(it));return t=="stop"?"S"+(2*k+1):t=="start"?"S"+(2*k+2):{au:"AU",th:"F1 95-96",thno:"F1 97-98",q1no:"Q1 "+(k?"23-24":"13-14"),kmno:"KM1",kmnc:"KM1",km2no:"KM2",km2nc:"KM2",km3no:"KM3",km3nc:"KM3",ka1no:"KA1",ka1nc:"KA1",ka2no:"KA2",ka2nc:"KA2",pedal:"S5",sw:"SA"+(k+1)}[t]}
 function PN(it){var m=/^k[ma](\d?)(no|nc)$/.exec(it.type);if(!m)return"";var k=Math.max(0,items.filter(function(x){return x.type==it.type}).indexOf(it));return m[2]=="no"?((k+1)*10+3)+"-"+((k+1)*10+4)+" NO":((k+2)*10+1)+"-"+((k+2)*10+2)+" NC"}
 function drawItem(it,s,r){var d=TY[it.type],x=it.x,y=it.y,id=it.id,L=lab(it),on,g;reg(id+".a",x,y-22);reg(id+".b",x,y+22);
 if(d.coil){on=r.coil[id];return'<g class="cp" data-item="'+id+'"><rect x="'+(x-18)+'" y="'+(y-15)+'" width="36" height="30" class="'+(on?'y':'')+'"/><path d="M'+x+' '+(y-22)+'V'+(y-15)+'M'+x+' '+(y+15)+'V'+(y+22)+'"/><text x="'+x+'" y="'+(y+4)+'" text-anchor="middle" class="b '+(on?'dk':'')+'">'+L+'</text><text x="'+(x+22)+'" y="'+(y-10)+'" class="s m">A1</text><text x="'+(x+22)+'" y="'+(y+20)+'" class="s m">A2</text></g>'}
 if(d.lamp){on=r.lamp[id];return'<g class="cp" data-item="'+id+'"><path d="M'+x+' '+(y-22)+'V'+(y-12)+'M'+x+' '+(y+12)+'V'+(y+22)+'"/><circle cx="'+x+'" cy="'+y+'" r="12" fill="'+(on?d.col:'none')+'" stroke="'+(d.col=="#f5f5f5"?"#999":d.col)+'" stroke-width="3"/><path d="M'+(x-8)+' '+(y-8)+'L'+(x+8)+' '+(y+8)+'M'+(x+8)+' '+(y-8)+'L'+(x-8)+' '+(y+8)+'"/><text x="'+(x+18)+'" y="'+(y+4)+'" class="b">'+L+'</text><text x="'+(x+18)+'" y="'+(y+14)+'" class="s m">'+d.s+'</text></g>'}
+if(d.comm){var ps=s[id]?2:1,sg=ps==1?-1:1,ex=x-8.05,ey=y+sg*9.84,sx=x+6.05,sy=y+sg*2.16;
+reg(id+".a",x-30,y-12);reg(id+".b",x-30,y+12);reg(id+".c",x+30,y);
+return'<g class="cp" data-item="'+id+'" data-tog="'+id+'"><rect x="'+(x-36)+'" y="'+(y-20)+'" width="80" height="40" fill="transparent" stroke="none"/><path d="M'+(x-30)+' '+(y-12)+'H'+(x-16.5)+'M'+(x-30)+' '+(y+12)+'H'+(x-16.5)+'M'+(x+14.5)+' '+y+'H'+(x+30)+'M'+sx+' '+sy+'L'+ex+' '+ey+'"/><circle cx="'+(x-12)+'" cy="'+(y-12)+'" r="4.5"/><circle cx="'+(x-12)+'" cy="'+(y+12)+'" r="4.5"/><circle cx="'+(x+10)+'" cy="'+y+'" r="4.5"/><text x="'+(x+4)+'" y="'+(y-16)+'" class="b">'+L+'</text><text x="'+(x+4)+'" y="'+(y+22)+'" class="s m">'+d.n+'</text></g>'}
 var ky=(it.type=="th"||it.type=="thno")?"T":it.type=="q1no"?"Q":id,cl=closed(it,s,r.km,r.km2,r.km3,r.ka1,r.ka2),pr=s[ky],nc=d.nc,hx=x-30+(pr?5:0),t=nc?(cl?[x-9,y-8]:[x-13,y]):(cl?[x,y-8]:[x-9,y-8]),mx=(x+t[0])/2;
 g='<g class="cp" data-item="'+id+'" '+(d.ev=="hold"?'data-hold="'+id+'"':d.ev=="tog"?'data-tog="'+ky+'"':'')+'><rect x="'+(d.h?x-70:x-14)+'" y="'+(y-22)+'" width="'+(d.h?130:60)+'" height="44" fill="transparent" stroke="none"/>';
 g+='<path d="M'+x+' '+(y-22)+'V'+(it.type=="sw"?y-14:y-8)+(nc?'H'+(x-13):'')+'M'+x+' '+(y+22)+'V'+(y+8)+'M'+x+' '+(y+8)+'L'+t[0]+' '+t[1]+'"/>';
+if(d.fc){var uu=.75,bx=x+uu*(t[0]-x),by=(y+8)+uu*(t[1]-(y+8));g+='<path d="M'+x+' '+(y+8)+'V'+by+'H'+bx+'Z"/>'}
 if(it.type=="sw")g+='<circle cx="'+x+'" cy="'+(y-11)+'" r="3"/>';
 if(d.h)g+='<path d="M'+mx+' '+y+'H'+hx+'" stroke-dasharray="3 2"/>';
 if(d.h=="push")g+='<path d="M'+hx+' '+(y-6)+'V'+(y+6)+'"/>';
@@ -130,8 +134,8 @@ function pwr(x,y,cl){return'<path d="M'+x+' '+(y-30)+'V'+(y-8)+'M'+x+' '+(y+15)+
 function sect(x,cl){return'<path d="M'+x+' 78V96M'+(x-8)+' 96H'+(x+8)+'M'+x+' 150V164" stroke-width="3"/><g transform="rotate('+(cl?0:-22)+' '+x+' 150)"><rect x="'+(x-5)+'" y="110" width="10" height="26" fill="var(--card)"/><path d="M'+x+' 150V96M'+x+' 105V141"/></g>'}
 function fus(x,y){return'<path d="M'+x+' '+(y-8)+'V'+y+'M'+x+' '+(y+26)+'V'+(y+34)+'"/><rect x="'+(x-5)+'" y="'+y+'" width="10" height="26"/><path d="M'+x+' '+y+'V'+(y+26)+'"/>'}
 
-function drawItemR(it,s,r){var g=drawItem(it,s,r),R=it.rot||0,k=SZ;if(!R&&k==1)return g;var x=it.x,y=it.y,a=R*Math.PI/180,rt=function(dy){return[Math.round(x-dy*k*Math.sin(a)),Math.round(y+dy*k*Math.cos(a))]};
-P[it.id+".a"]=rt(-22);P[it.id+".b"]=rt(22);
+function drawItemR(it,s,r){var g=drawItem(it,s,r),R=it.rot||0,k=SZ;if(!R&&k==1)return g;var x=it.x,y=it.y,a=R*Math.PI/180,rt=function(dx,dy){return[Math.round(x+k*(dx*Math.cos(a)-dy*Math.sin(a))),Math.round(y+k*(dx*Math.sin(a)+dy*Math.cos(a)))]};
+var O=TY[it.type].comm?{a:[-30,-12],b:[-30,12],c:[30,0]}:{a:[0,-22],b:[0,22]};for(var q in O)P[it.id+"."+q]=rt(O[q][0],O[q][1]);
 if(R)g=g.replace(/<text x="([\d.-]+)" y="([\d.-]+)"/g,function(m,tx,ty){return'<text transform="rotate('+(-R)+' '+tx+' '+ty+')" x="'+tx+'" y="'+ty+'"'});
 return'<g transform="rotate('+R+' '+x+' '+y+') translate('+x+' '+y+') scale('+k+') translate('+(-x)+' '+(-y)+')">'+g+'</g>'}
 function arrow(d){var c=[120,530],R=54,a0=d>0?-160:-20,a1=d>0?-40:-140,p=function(a){var t=a*Math.PI/180;return[c[0]+R*Math.cos(t),c[1]+R*Math.sin(t)]},e=p(a1),t1=a1*Math.PI/180,tx=-d*Math.sin(t1),ty=d*Math.cos(t1),nx=Math.cos(t1),ny=Math.sin(t1),h1=[e[0]-9*tx+5*nx,e[1]-9*ty+5*ny],h2=[e[0]-9*tx-5*nx,e[1]-9*ty-5*ny],s=p(a0);
@@ -338,7 +342,8 @@ var LX=[
 ["kmnc","kmnc","Contact auxiliaire NC d'un contacteur (KM) ou relais (KA)","Il s'ouvre quand la bobine est alimentée : verrouillage électrique. Repères 21-22, 31-32, 41-42…"],
 ["pedal","pedal","Pédale de sécurité","Contact NO qui doit rester appuyé pour que la machine fonctionne : un relâchement coupe la commande."],
 ["sw","sw","Interrupteur à bascule","Contact maintenu en position ouverte ou fermée (type domestique)."],
-["fcno","fcno","Fin de course NO","Interrupteur de position actionné par une pièce mobile de la machine : il ferme son contact quand il est actionné."],
+["comm","comm","Commutateur à 2 positions (inverseur)","Une borne commune (COM) reliée au choix à L1 ou L2 : il aiguille un circuit d'une voie vers l'autre. On le touche pour le faire basculer."],
+["fcno","fcno","Fin de course NO","Interrupteur de position (FDC), reconnaissable au petit triangle sur le couteau : actionné par une pièce mobile de la machine, il ferme son contact."],
 ["fcnc","fcnc","Fin de course NC","Même appareil, mais le contact s'ouvre quand il est actionné."],
 ["coil","coil","Bobine de contacteur (KM)","Alimentée en 24 V, elle ferme les contacts de puissance et les contacts auxiliaires NO, et ouvre les NC."],
 ["coilA","coilA","Bobine de relais auxiliaire (KA)","Elle ne commande que des contacts de commande (pas de puissance) : relais, mémoire, adaptation de signaux."],
