@@ -51,7 +51,7 @@ Un **court-circuit** (phases entre elles, ou +24 V / 0 V) est signalé en rouge,
 
 ## Établi
 
-Arrêt (NC), Marche (NO), interrupteur à bascule, fins de course NO et NC, arrêt d'urgence, relais thermique F1 (95-96 NC / 97-98 NO), précoupure Q1 (NO), contacts KM1, KM2 et KM3 (13-14, 23-24… en NO ; 21-22, 31-32… en NC, numérotés automatiquement), pédale, bobines KM (KM1, KM2, KM3…) et bobines de relais auxiliaires KA (KA1, KA2…), numérotées dans l'ordre d'ajout, contacts KA1 et KA2 (NO et NC), voyants vert / bleu / blanc / orange / rouge (numérotés H1, H2…).
+Arrêt (NC), Marche (NO), interrupteur à bascule, commutateur à 2 positions, fins de course FDC NO et NC (triangle sur le couteau), arrêt d'urgence, relais thermique F1 (95-96 NC / 97-98 NO), précoupure Q1 (NO), contacts KM1, KM2 et KM3 (13-14, 23-24… en NO ; 21-22, 31-32… en NC, numérotés automatiquement), pédale, bobines KM (KM1, KM2, KM3…) et bobines de relais auxiliaires KA (KA1, KA2…), numérotées dans l'ordre d'ajout, contacts KA1 et KA2 (NO et NC), voyants vert / bleu / blanc / orange / rouge (numérotés H1, H2…).
 
 ## Personnaliser
 
