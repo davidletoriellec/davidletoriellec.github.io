@@ -35,10 +35,14 @@ Un **court-circuit** (phases entre elles, ou +24 V / 0 V) est signalé en rouge,
 - **Simulation** : maintenir un bouton pour l'actionner (plusieurs doigts possibles) ; double appui rapide ou Maj+clic pour le maintenir enfoncé ; un appui le relâche.
 - **Pivoter** : sélectionner un élément puis « ⟳ Pivoter » (ou la touche **R**) tourne l'élément de 90°.
 - **Taille** : la liste « Taille normale / réduite / petite » réduit les composants du schéma.
-- **Composants** : le bouton « 📖 Composants » ouvre une page avec le symbole, une description et, si présente, la photo de chaque appareil (fichiers `images/<identifiant>.jpg`, voir `images/LISEZMOI.txt`).
+- **Composants** : un bouton « Retour aux exercices » ramène à l'exercice ; un clic sur une photo l'affiche en grand.  le bouton « 📖 Composants » ouvre une page avec le symbole, une description et, si présente, la photo de chaque appareil (fichiers `images/<identifiant>.jpg`, voir `images/LISEZMOI.txt`).
 - **Surcharge F1** : bouton à côté du relais thermique pour simuler une surcharge.
 
 ## Exercices
+
+**Domestique (230 V)** : A1 simple allumage, A2 double allumage, A3 va-et-vient, A4 télérupteur, A5 minuterie (5 s en simulation), A6 relais heures creuses. Les rails sont alors L (phase) et N (neutre) ; il n'y a pas de circuit de puissance.
+
+**Industriel** :
 
 1. Puissance : câblage seul (L1-L2-L3, Q1, KM1, F1, M1)
 2. Commande de base (Marche/Arrêt, auto-maintien, voyant H1)
