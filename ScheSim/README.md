@@ -53,6 +53,10 @@ Un **court-circuit** (phases entre elles, ou +24 V / 0 V) est signalé en rouge,
 7. 2 sens : commande avec verrouillage électrique
 8. 2 sens : commande avec sécurités
 
+**Étoile-triangle** : exercice 9 (câblage de la puissance : moteur à 6 bornes, KM2 étoile, KM3 triangle) et exercice 10 (commande avec temporisateur KT au travail et verrouillage KM2/KM3). Le couplage s'affiche sous le moteur.
+
+**Variateur ATV11** : page de câblage à part (alimentation monophasée, moteur U/V/W, marche avant LI1, marche arrière LI2, potentiomètre +5V / AI1 / COM). En simulation, un curseur règle le potentiomètre et la vitesse s'affiche. Le bornier est à vérifier sur la documentation de l'appareil utilisé.
+
 ## Établi
 
 Arrêt (NC), Marche (NO), interrupteur à bascule, commutateur à 2 positions, fins de course FDC NO et NC (triangle sur le couteau), arrêt d'urgence, relais thermique F1 (95-96 NC / 97-98 NO), précoupure Q1 (NO), contacts KM1, KM2 et KM3 (13-14, 23-24… en NO ; 21-22, 31-32… en NC, numérotés automatiquement), pédale, bobines KM (KM1, KM2, KM3…) et bobines de relais auxiliaires KA (KA1, KA2…), numérotées dans l'ordre d'ajout, contacts KA1 et KA2 (NO et NC), voyants vert / bleu / blanc / orange / rouge (numérotés H1, H2…).

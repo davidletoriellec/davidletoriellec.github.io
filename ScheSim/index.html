@@ -45,12 +45,13 @@ svg{stroke-linejoin:round}
 <body>
 <body>
 <body>
-<h1>⚡ SchemaSim <span class="hint">démarrage direct : établi, câblage, simulation · version 19</span></h1>
+<h1>⚡ SchemaSim <span class="hint">démarrage direct : établi, câblage, simulation · version 20</span></h1>
 <div id="app"><div class="lv"><select id="ex"></select><button id="bL">📖 Composants</button><button id="bE" class="on">✏️ Édition</button><button id="bS">▶ Simulation</button></div>
 <div class="card"><div class="cons" id="cons"></div><div class="hint" id="hint"></div></div>
 <div class="card" id="palc"><b>Établi</b> <span class="hint">: touchez un composant puis la zone de travail (ou glissez-le).</span><div class="pal" id="pal"></div></div>
 <div id="alert"></div>
 <div class="card"><div class="mini"><button id="mE" class="on">✏️ Édition</button><button id="mS">▶ Simulation</button><select id="sz" title="Taille des composants"><option value="1">Taille normale</option><option value=".8">Taille réduite</option><option value=".65">Taille petite</option></select></div><div class="sch" id="sch"></div></div>
+<div class="card" id="potw" style="display:none">Potentiomètre (consigne de vitesse) : <input type="range" id="potr" min="0" max="100" value="50" style="min-width:0;width:60%"> <b id="potv">50 %</b></div>
 <div class="lv"><button id="chk" class="on">Vérifier</button><button id="undo">↶ Annuler</button><button id="rot">⟳ Pivoter</button><button id="del">Supprimer la sélection</button><button id="rst">Recommencer</button><button id="sol">Voir la solution</button></div>
 <div class="lv"><input id="nm" placeholder="Nom de l'étudiant"><button id="pdf">📄 Exporter en PDF</button></div>
 <div class="msg" id="msg"></div></div>
@@ -59,8 +60,11 @@ svg{stroke-linejoin:round}
 <script>
 var PW1=[["L1","Q1.1"],["L2","Q1.3"],["L3","Q1.5"],["Q1.2","KM1.1"],["Q1.4","KM1.3"],["Q1.6","KM1.5"],["KM1.2","F2.1"],["KM1.4","F2.3"],["KM1.6","F2.5"],["F2.2","M1.U"],["F2.4","M1.V"],["F2.6","M1.W"]];
 var PW2=PW1.concat([["Q1.2","KM2.1"],["Q1.4","KM2.3"],["Q1.6","KM2.5"],["KM2.2","F2.1"],["KM2.4","F2.5"],["KM2.6","F2.3"]]);
-var TY={stop:{nc:1,h:"push",ev:"hold",n:"Arrêt",s:"BP NC"},start:{nc:0,h:"push",ev:"hold",n:"Marche",s:"BP NO"},au:{nc:1,h:"mush",ev:"tog",n:"Arrêt d'urgence",s:"NC"},th:{nc:1,h:"th",ev:"tog",n:"Relais thermique",s:"F1 95-96 NC"},thno:{nc:0,h:"th",ev:"tog",n:"Relais thermique",s:"F1 97-98 NO"},q1no:{nc:0,h:"",n:"Précoupure",s:"Q1 NO"},kmno:{nc:0,h:"",n:"KM1",s:"13-14 NO"},kmnc:{nc:1,h:"",n:"KM1",s:"21-22 NC"},km2no:{nc:0,h:"",n:"KM2",s:"13-14 NO"},km2nc:{nc:1,h:"",n:"KM2",s:"21-22 NC"},km3no:{nc:0,h:"",n:"KM3",s:"13-14 NO"},km3nc:{nc:1,h:"",n:"KM3",s:"21-22 NC"},sw:{nc:0,h:"",ev:"tog",n:"Interrupteur",s:"à bascule"},fcno:{nc:0,h:"",fc:1,ev:"tog",n:"Fin de course",s:"NO"},fcnc:{nc:1,h:"",fc:1,ev:"tog",n:"Fin de course",s:"NC"},comm:{comm:1,ev:"tog",n:"Commutateur",s:"2 positions"},coilR:{coil:1,dom:1,n:"Télérupteur",s:"bobine"},krno:{nc:0,h:"",dom:1,n:"Télérupteur",s:"contact NO"},krnc:{nc:1,h:"",dom:1,n:"Télérupteur",s:"contact NC"},coilT:{coil:1,dom:1,n:"Minuterie",s:"bobine"},ktno:{nc:0,h:"",dom:1,n:"Minuterie",s:"contact NO"},ktnc:{nc:1,h:"",dom:1,n:"Minuterie",s:"contact NC"},hc:{nc:0,h:"",dom:1,n:"Relais heures creuses",s:"contact NO"},ka1no:{nc:0,h:"",n:"KA1",s:"13-14 NO"},ka1nc:{nc:1,h:"",n:"KA1",s:"21-22 NC"},ka2no:{nc:0,h:"",n:"KA2",s:"13-14 NO"},ka2nc:{nc:1,h:"",n:"KA2",s:"21-22 NC"},coilA:{coil:1,n:"Bobine",s:"KA"},pedal:{nc:0,h:"ped",ev:"hold",n:"Pédale",s:"NO"},coil:{coil:1,n:"Bobine",s:"KM"},lampV:{lamp:1,col:"#2ea043",n:"Voyant",s:"vert"},lampB:{lamp:1,col:"#1f6feb",n:"Voyant",s:"bleu"},lampW:{lamp:1,col:"#f5f5f5",n:"Voyant",s:"blanc"},lampO:{lamp:1,col:"#f0883e",n:"Voyant",s:"orange"},lampR:{lamp:1,col:"#e5484d",n:"Voyant",s:"rouge"}};
-var DOMT=["sw","comm","start","lampV","lampB","lampW","lampO","lampR","coilR","krno","krnc","coilT","ktno","ktnc","hc"];
+var PW_SD0=PW1.slice(0,9);
+var PW_SD=PW_SD0.concat([["F2.2","M1.U1"],["F2.4","M1.V1"],["F2.6","M1.W1"],["F2.2","KM3.1"],["F2.4","KM3.3"],["F2.6","KM3.5"],["KM3.2","M1.W2"],["KM3.4","M1.U2"],["KM3.6","M1.V2"],["KM2.1","M1.W2"],["KM2.3","M1.U2"],["KM2.5","M1.V2"],["KM2.2","KM2.4"],["KM2.4","KM2.6"]]);
+var ATVT=["sw","comm3","start","stop","pot"];
+var TY={stop:{nc:1,h:"push",ev:"hold",n:"Arrêt",s:"BP NC"},start:{nc:0,h:"push",ev:"hold",n:"Marche",s:"BP NO"},au:{nc:1,h:"mush",ev:"tog",n:"Arrêt d'urgence",s:"NC"},th:{nc:1,h:"th",ev:"tog",n:"Relais thermique",s:"F1 95-96 NC"},thno:{nc:0,h:"th",ev:"tog",n:"Relais thermique",s:"F1 97-98 NO"},q1no:{nc:0,h:"",n:"Précoupure",s:"Q1 NO"},kmno:{nc:0,h:"",n:"KM1",s:"13-14 NO"},kmnc:{nc:1,h:"",n:"KM1",s:"21-22 NC"},km2no:{nc:0,h:"",n:"KM2",s:"13-14 NO"},km2nc:{nc:1,h:"",n:"KM2",s:"21-22 NC"},km3no:{nc:0,h:"",n:"KM3",s:"13-14 NO"},km3nc:{nc:1,h:"",n:"KM3",s:"21-22 NC"},sw:{nc:0,h:"",ev:"tog",n:"Interrupteur",s:"à bascule"},fcno:{nc:0,h:"",fc:1,ev:"tog",n:"Fin de course",s:"NO"},fcnc:{nc:1,h:"",fc:1,ev:"tog",n:"Fin de course",s:"NC"},comm:{comm:1,ev:"tog",n:"Commutateur",s:"2 positions"},coilR:{coil:1,dom:1,n:"Télérupteur",s:"bobine"},krno:{nc:0,h:"",dom:1,n:"Télérupteur",s:"contact NO"},krnc:{nc:1,h:"",dom:1,n:"Télérupteur",s:"contact NC"},coilT:{coil:1,dom:1,n:"Minuterie",s:"bobine"},ktno:{nc:0,h:"",td:1,dom:1,n:"Minuterie",s:"contact NO"},ktnc:{nc:1,h:"",td:1,dom:1,n:"Minuterie",s:"contact NC"},hc:{nc:0,h:"",dom:1,n:"Relais heures creuses",s:"contact NO"},coilD:{coil:1,sd:1,n:"Temporisé",s:"bobine KT"},kdno:{nc:0,h:"",td:1,sd:1,n:"KT temporisé",s:"contact NO"},kdnc:{nc:1,h:"",td:1,sd:1,n:"KT temporisé",s:"contact NC"},pot:{pot:1,atv:1,n:"Potentiomètre",s:"consigne vitesse"},comm3:{comm:1,three:1,atv:1,ev:"tog",n:"Commutateur",s:"AV-0-AR"},ka1no:{nc:0,h:"",n:"KA1",s:"13-14 NO"},ka1nc:{nc:1,h:"",n:"KA1",s:"21-22 NC"},ka2no:{nc:0,h:"",n:"KA2",s:"13-14 NO"},ka2nc:{nc:1,h:"",n:"KA2",s:"21-22 NC"},coilA:{coil:1,n:"Bobine",s:"KA"},pedal:{nc:0,h:"ped",ev:"hold",n:"Pédale",s:"NO"},coil:{coil:1,n:"Bobine",s:"KM"},lampV:{lamp:1,col:"#2ea043",n:"Voyant",s:"vert"},lampB:{lamp:1,col:"#1f6feb",n:"Voyant",s:"bleu"},lampW:{lamp:1,col:"#f5f5f5",n:"Voyant",s:"blanc"},lampO:{lamp:1,col:"#f0883e",n:"Voyant",s:"orange"},lampR:{lamp:1,col:"#e5484d",n:"Voyant",s:"rouge"}};
+var DOMT=["sw","comm","start","lampV","lampB","lampW","lampO","lampR","coilR","krno","krnc","coilT","ktno","ktnc","hc","coil","kmno","kmnc"];
 var NM={sw:"interrupteur",comm:"commutateur",coilR:"bobine de télérupteur",krno:"contact de télérupteur",coilT:"bobine de minuterie",ktno:"contact de minuterie",hc:"contact de relais heures creuses",stop:"bouton Arrêt",start:"bouton Marche",au:"arrêt d'urgence",th:"contact du relais thermique",pedal:"pédale",lamp:"voyant",coil:"bobine KM",kmno:"contact KM1 13-14 (NO)",km2no:"contact KM2 13-14 (NO)",kmnc:"contact KM1 21-22 (NC)",km2nc:"contact KM2 21-22 (NC)"};
 var EX=[
 {t:"A1 · Domestique : simple allumage",dom:1,k:"d1",need:{sw:1,lamp:1},c:"Réseau 230 V (phase L et neutre N). Câblez un simple allumage : un interrupteur commande une lampe."},
@@ -68,7 +72,7 @@ var EX=[
 {t:"A3 · Domestique : va-et-vient",dom:1,k:"d3",need:{comm:2,lamp:1},c:"Va-et-vient : deux commutateurs commandent la même lampe, depuis deux endroits différents."},
 {t:"A4 · Domestique : télérupteur",dom:1,k:"d4",need:{start:2,coilR:1,krno:1,lamp:1},c:"Télérupteur : deux boutons poussoirs commandent une lampe par impulsion (un appui allume, l'appui suivant éteint). Utilisez la bobine et le contact du télérupteur."},
 {t:"A5 · Domestique : minuterie",dom:1,k:"d5",need:{start:1,coilT:1,ktno:1,lamp:1},c:"Minuterie : un appui sur le bouton poussoir allume la lampe pour 5 secondes (en simulation), puis elle s'éteint. Utilisez la bobine et le contact de la minuterie."},
-{t:"A6 · Domestique : relais heures creuses",dom:1,k:"d6",need:{hc:1,lamp:1},c:"Relais heures creuses : son contact se ferme pendant les heures creuses. Alimentez un voyant (le chauffe-eau) par ce contact, puis testez avec le bouton « Heures creuses »."},
+{t:"A6 · Domestique : relais heures creuses",dom:1,k:"d6",need:{hc:1,coil:1,kmno:1,lamp:1},c:"Relais heures creuses : l'horloge ferme son contact pendant les heures creuses. Ce contact alimente la bobine d'un contacteur KM, dont le contact alimente le chauffe-eau (voyant). Testez avec le bouton « Heures creuses »."},
 {t:"1 · Puissance : câblage",need:null,pw:null,c:"Câblez le circuit de puissance : L1-L2-L3 → sectionneur Q1 → contacteur KM1 → relais thermique F1 → moteur M1. Puis passez en Simulation, fermez Q1 et testez avec « Forcer KM1 »."},
 {t:"2 · Commande de base",need:{stop:1,start:1,lamp:1},pw:PW1,c:"Prenez sur l'établi ce qu'il faut pour une commande Marche/Arrêt avec auto-maintien de KM1 et un voyant H1 en parallèle sur la bobine. Placez, puis câblez."},
 {t:"3 · Commande avec sécurités",need:{stop:1,start:1,au:1,th:1,lamp:1},pw:PW1,c:"Construisez la commande complète : Marche/Arrêt avec auto-maintien, voyant H1, plus l'arrêt d'urgence et le contact NC du relais thermique F1."},
@@ -76,7 +80,10 @@ var EX=[
 {t:"5 · Commande avec pédale",need:{stop:2,start:2,au:1,th:1,pedal:1,lamp:1},pw:PW1,c:"Construisez la commande complète (sécurités, 2 postes) avec une pédale : le moteur ne doit tourner que tant qu'elle reste appuyée."},
 {t:"6 · 2 sens : puissance",two:1,need:null,pw:PW1,c:"Ajoutez KM2 au circuit de puissance pour inverser le sens : KM2 doit permuter deux phases. Posez aussi le blocage mécanique entre les deux contacteurs (à prendre sur l'établi). Testez avec « Forcer KM1 » puis « Forcer KM2 » : la flèche du moteur doit s'inverser."},
 {t:"7 · 2 sens : commande avec verrouillage",two:1,need:{stop:1,start:2,kmno:1,km2no:1,kmnc:1,km2nc:1,coil:2},pw:PW2,c:"Construisez la commande 2 sens : un Arrêt, une Marche par sens, auto-maintien de chaque contacteur et verrouillage électrique (contacts NC croisés). On passe par l'arrêt pour changer de sens."},
-{t:"8 · 2 sens : avec sécurités",two:1,need:{stop:1,start:2,au:1,th:1,kmno:1,km2no:1,kmnc:1,km2nc:1,coil:2},pw:PW2,c:"Même commande 2 sens, avec en plus l'arrêt d'urgence et le contact NC du relais thermique F1."}];
+{t:"8 · 2 sens : avec sécurités",two:1,need:{stop:1,start:2,au:1,th:1,kmno:1,km2no:1,kmnc:1,km2nc:1,coil:2},pw:PW2,c:"Même commande 2 sens, avec en plus l'arrêt d'urgence et le contact NC du relais thermique F1."},
+{t:"9 · Étoile-triangle : puissance",sd:1,sdp:1,need:null,pw:PW_SD0,c:"Câblez le démarrage étoile-triangle : le relais thermique alimente les bornes U1, V1, W1 du moteur ; KM3 (triangle) relie U1-W2, V1-U2, W1-V2 ; KM2 (étoile) relie W2, U2, V2 entre elles. Testez avec « Forcer KM2 » (étoile) puis « Forcer KM3 » (triangle) : le couplage s'affiche sous le moteur."},
+{t:"10 · Étoile-triangle : commande",sd:1,sdc:1,need:{stop:1,start:1,th:1,kmno:1,km2nc:1,km3nc:1,kdno:1,kdnc:1,coil:3,coilD:1},pw:PW_SD,c:"Construisez la commande : Marche/Arrêt, auto-maintien de KM1, démarrage en étoile (KM1 + KM2) puis, après la temporisation KT, passage en triangle (KM1 + KM3) avec verrouillage des contacteurs KM2 et KM3. Le temporisateur est au travail (3 s en simulation). Ajoutez les bobines dans l'ordre KM1, KM2, KM3."},
+{t:"ATV · Variateur ATV11",atv:1,need:{pot:1},c:"Câblez le variateur ATV11 : alimentation monophasée L et N sur R/L1 et S/L2, moteur sur U, V, W, marche avant sur LI1, marche arrière sur LI2 (reliées au +24 pour les activer, arrêt = aucune entrée), et potentiomètre de vitesse sur +5V, AI1 (curseur) et COM. Passez en simulation et réglez la vitesse avec le curseur."}];
 function gs(e){var n={};for(var k in e.need)n[k]=e.need[k];n.two=e.two;return genSol(n)}
 function genSol(n){var it=[],w=[],c=[],z=n.two?520:300,y=function(i,t,x,yy){it.push({id:i,type:t,x:z+x,y:yy});return i};
 if(n.th)c.push(y("th1","th",20,95));if(n.au)c.push(y("au1","au",20,155));c.push(y("stop1","stop",20,215));
@@ -92,40 +99,59 @@ if(n.start>1)w.push([j,"start2.a"],["start2.b","kmno1.b"]);
 if(n.pedal)w.push(["kmno1.b","pedal1.a"],["pedal1.b","coil1.a"]);else w.push(["kmno1.b","coil1.a"]);
 w.push(["coil1.b","P0a"]);if(n.lamp)w.push(["coil1.a","lamp1.a"],["coil1.b","lamp1.b"]);return{items:it,wires:w}}
 var ex=0,mode="E",items=[],W=[],st,res,P,pend=null,sel=null,selT=null,seq=0,drag=null,held={},tp={},tdown={},lock={},hist=[],redoS=[],selW=null,wdrag=null,SZ=1,PH={},lexOn=false;
-function zx(){return EX[ex].dom?60:(EX[ex].two?520:300)}
-function closed(it,s,km,km2,km3,ka1,ka2){var id=it.id;switch(it.type){case"stop":case"au":return!s[id];case"th":return!s.T;case"thno":return!!s.T;case"q1no":return!!s.Q;case"start":case"pedal":return!!s[id];case"kmno":return km;case"kmnc":return!km;case"km2no":return km2;case"km2nc":return!km2;case"km3no":return km3;case"km3nc":return!km3;case"sw":return!!s[id];case"fcno":return!!s[id];case"fcnc":return!s[id];case"ka1no":return ka1;case"ka1nc":return!ka1;case"ka2no":return ka2;case"ka2nc":return!ka2;case"krno":return!!s.kr;case"krnc":return!s.kr;case"ktno":return!!s.ktOn;case"ktnc":return!s.ktOn;case"hc":return!!s.HC}return false}
+function zx(){var e=EX[ex];return e.dom?60:e.atv?420:e.sd?720:(e.two?520:300)}
+function closed(it,s,km,km2,km3,ka1,ka2){var id=it.id;switch(it.type){case"stop":case"au":return!s[id];case"th":return!s.T;case"thno":return!!s.T;case"q1no":return!!s.Q;case"start":case"pedal":return!!s[id];case"kmno":return km;case"kmnc":return!km;case"km2no":return km2;case"km2nc":return!km2;case"km3no":return km3;case"km3nc":return!km3;case"sw":return!!s[id];case"fcno":return!!s[id];case"fcnc":return!s[id];case"ka1no":return ka1;case"ka1nc":return!ka1;case"ka2no":return ka2;case"ka2nc":return!ka2;case"krno":return!!s.kr;case"krnc":return!s.kr;case"ktno":return!!s.ktOn;case"ktnc":return!s.ktOn;case"hc":return!!s.HC;case"kdno":return!!s.kdOn;case"kdnc":return!s.kdOn}return false}
 function net(s,W,items,km,km2,km3,ka1,ka2){var par={};function f(a){if(par[a]===undefined)par[a]=a;while(par[a]!==a){par[a]=par[par[a]];a=par[a]}return a}
 function u(a,b){par[f(a)]=f(b)}
 ["a","b","c","d","e"].forEach(function(c){u("P24a","P24"+c);u("P0a","P0"+c)});W.forEach(function(w){u(w[0],w[1]);w.slice(0,2).forEach(function(e){if(/^P24/.test(e))u(e,"P24a");else if(/^P0/.test(e))u(e,"P0a")})});
-[1,3,5].forEach(function(i){if(s.Q)u("Q1."+i,"Q1."+(i+1));u("F2."+i,"F2."+(i+1));if(km)u("KM1."+i,"KM1."+(i+1));if(km2)u("KM2."+i,"KM2."+(i+1))});
-items.forEach(function(it){var d=TY[it.type];if(!d.coil&&!d.lamp&&closed(it,s,km,km2,km3,ka1,ka2))u(it.id+".a",it.id+".b");if(it.type=="comm")u(it.id+".c",it.id+(s[it.id]?".b":".a"))});
+[1,3,5].forEach(function(i){if(s.Q)u("Q1."+i,"Q1."+(i+1));u("F2."+i,"F2."+(i+1));if(km)u("KM1."+i,"KM1."+(i+1));if(km2)u("KM2."+i,"KM2."+(i+1));if(km3)u("KM3."+i,"KM3."+(i+1))});
+items.forEach(function(it){var d=TY[it.type];if(!d.coil&&!d.lamp&&closed(it,s,km,km2,km3,ka1,ka2))u(it.id+".a",it.id+".b");if(it.type=="comm")u(it.id+".c",it.id+(s[it.id]?".b":".a"));if(it.type=="comm3"){var v3=s[it.id]||0;if(v3==1)u(it.id+".c",it.id+".a");else if(v3==2)u(it.id+".c",it.id+".b")}});
 var ph=["L1","L2","L3"],used=[],ks=[];
 var sp=f("L1")==f("L2")||f("L2")==f("L3")||f("L1")==f("L3"),sc=f("P24a")==f("P0a"),short=sp||sc;
 var motor=!short&&["M1.U","M1.V","M1.W"].every(function(m,j){var k=ph.findIndex(function(p){return f(p)==f(m)});if(k<0||used[k])return false;used[k]=1;ks[j]=k;return true});
 var dir=motor?(((ks[1]-ks[0]+3)%3==1)?1:-1):0;
-var coil={},lamp={},ac=false,ac2=false,ac3=false,ac4=false,ac5=false,acR=false,acT=false,al=false,ci=0,cj=0;
+var sdm={on:false,dir:0,mode:null};
+(function(){var q=function(t){var rr=f(t);for(var k=0;k<3;k++)if(f(ph[k])==rr)return k;return null};
+var a=[q("M1.U1"),q("M1.V1"),q("M1.W1")],b=[q("M1.U2"),q("M1.V2"),q("M1.W2")];
+if(short||a.some(function(x){return x===null})||a[0]==a[1]||a[1]==a[2]||a[0]==a[2])return;
+var star=b.every(function(x){return x===null})&&f("M1.U2")==f("M1.V2")&&f("M1.V2")==f("M1.W2");
+var cnt=[0,0,0];a.concat(b).forEach(function(x){if(x!==null)cnt[x]++});
+var delta=b.every(function(x){return x!==null})&&cnt[0]==2&&cnt[1]==2&&cnt[2]==2&&a[0]!=b[0]&&a[1]!=b[1]&&a[2]!=b[2];
+if(star||delta){sdm.on=true;sdm.mode=star?"étoile":"triangle";sdm.dir=((a[1]-a[0]+3)%3==1)?1:-1}})();
+var atv={pow:false,mot:false,potOk:false,on:false,speed:0,dir:0};
+(function(){var pw=(f("ATV.L1")==f("SRC.L")&&f("ATV.L2")==f("SRC.N"))||(f("ATV.L1")==f("SRC.N")&&f("ATV.L2")==f("SRC.L"));atv.pow=pw&&f("SRC.L")!=f("SRC.N");if(!atv.pow)return;
+var mk=["ATV.U","ATV.V","ATV.W"].map(function(t){var rr=f(t);return["M1.U","M1.V","M1.W"].findIndex(function(m){return f(m)==rr})});
+if(mk.some(function(k){return k<0})||mk[0]==mk[1]||mk[1]==mk[2]||mk[0]==mk[2])return;atv.mot=true;
+var par=((mk[1]-mk[0]+3)%3==1)?1:-1,ref=null;
+items.forEach(function(it){if(it.type!="pot")return;var c=f(it.id+".c"),a=f(it.id+".a"),b=f(it.id+".b");if(c==f("ATV.AI1")){if(a==f("ATV.P5")&&b==f("ATV.COM"))ref=POT;else if(a==f("ATV.COM")&&b==f("ATV.P5"))ref=1-POT}});
+atv.potOk=ref!==null;if(ref===null)return;
+var li1=f("ATV.LI1")==f("ATV.P24"),li2=f("ATV.LI2")==f("ATV.P24");if(li1==li2)return;
+atv.speed=Math.round(ref*100);atv.on=atv.speed>0;atv.dir=(li1?1:-1)*par})();
+var coil={},lamp={},ac=false,ac2=false,ac3=false,ac4=false,ac5=false,acR=false,acT=false,acD=false,al=false,ci=0,cj=0;
 items.forEach(function(it){var a=f(it.id+".a"),b=f(it.id+".b"),p=f("P24a"),z=f("P0a");
-if(it.type=="coil"){coil[it.id]=a==p&&b==z;if(ci==0)ac=ac||coil[it.id];else if(ci==1)ac2=ac2||coil[it.id];else if(ci==2)ac3=ac3||coil[it.id];ci++}
+if(it.type=="coil"){coil[it.id]=(a==p&&b==z)||(EX[ex].dom&&a!=b&&a==z&&b==p);if(ci==0)ac=ac||coil[it.id];else if(ci==1)ac2=ac2||coil[it.id];else if(ci==2)ac3=ac3||coil[it.id];ci++}
 if(it.type=="coilA"){coil[it.id]=a==p&&b==z;if(cj==0)ac4=ac4||coil[it.id];else if(cj==1)ac5=ac5||coil[it.id];cj++}
-if(it.type=="coilR"||it.type=="coilT"){var on2=a!=b&&((a==p&&b==z)||(a==z&&b==p));coil[it.id]=on2;if(it.type=="coilR")acR=acR||on2;else acT=acT||on2}
+if(it.type=="coilR"||it.type=="coilT"||it.type=="coilD"){var on2=a!=b&&((a==p&&b==z)||(a==z&&b==p));coil[it.id]=on2;if(it.type=="coilR")acR=acR||on2;else if(it.type=="coilT")acT=acT||on2;else acD=acD||on2}
 if(TY[it.type].lamp){lamp[it.id]=a!=b&&(a==p&&b==z||a==z&&b==p);al=al||lamp[it.id]}});
-return{f:f,short:short,sp:sp,sc:sc,motor:motor,dir:dir,coil:coil,lamp:lamp,ac:ac,ac2:ac2,ac3:ac3,ac4:ac4,ac5:ac5,acR:acR,acT:acT,al:al}}
-function solve(s,W,items){var km=!!s.km,km2=!!s.km2,km3=!!s.km3,ka1=!!s.ka1,ka2=!!s.ka2,r;for(var i=0;i<8;i++){r=net(s,W,items,km,km2,km3,ka1,ka2);var c=r.ac||!!s.F,c2=r.ac2||!!s.F2,c3=r.ac3,c4=r.ac4,c5=r.ac5;if(s.M&&c&&c2){if(km)c2=false;else if(km2)c=false;else{c=false;c2=false}}if(c==km&&c2==km2&&c3==km3&&c4==ka1&&c5==ka2)break;km=c;km2=c2;km3=c3;ka1=c4;ka2=c5}r.km=km;r.km2=km2;r.km3=km3;r.ka1=ka1;r.ka2=ka2;return r}
+return{f:f,short:short,sp:sp,sc:sc,motor:motor||sdm.on,dir:motor?dir:sdm.dir,mode:sdm.mode,atv:atv,coil:coil,lamp:lamp,ac:ac,ac2:ac2,ac3:ac3,ac4:ac4,ac5:ac5,acR:acR,acT:acT,acD:acD,al:al}}
+function solve(s,W,items){var km=!!s.km,km2=!!s.km2,km3=!!s.km3,ka1=!!s.ka1,ka2=!!s.ka2,r;for(var i=0;i<8;i++){r=net(s,W,items,km,km2,km3,ka1,ka2);var c=r.ac||!!s.F,c2=r.ac2||!!s.F2,c3=r.ac3||!!s.F3,c4=r.ac4,c5=r.ac5;if(s.M&&c&&c2){if(km)c2=false;else if(km2)c=false;else{c=false;c2=false}}if(c==km&&c2==km2&&c3==km3&&c4==ka1&&c5==ka2)break;km=c;km2=c2;km3=c3;ka1=c4;ka2=c5}r.km=km;r.km2=km2;r.km3=km3;r.ka1=ka1;r.ka2=ka2;return r}
 function reg(i,x,y){P[i]=[x,y]}
 function lab(it){var t=it.type,k;if(TY[t].lamp){k=items.filter(function(x){return TY[x.type].lamp}).indexOf(it);return"H"+(Math.max(0,k)+1)}
 if(t=="coil"){k=items.filter(function(x){return x.type=="coil"}).indexOf(it);return"KM"+(Math.max(0,k)+1)}
-if(t=="coilR"||t=="coilT"){k=items.filter(function(x){return x.type==t}).indexOf(it);return(t=="coilR"?"KR":"KT")+(Math.max(0,k)+1)}if(t=="coilA"){k=items.filter(function(x){return x.type=="coilA"}).indexOf(it);return"KA"+(Math.max(0,k)+1)}if(t=="fcno"||t=="fcnc"){k=items.filter(function(x){return x.type=="fcno"||x.type=="fcnc"}).indexOf(it);return"FDC"+(Math.max(0,k)+1)}if(t=="sw"||t=="comm"){k=items.filter(function(x){return x.type=="sw"||x.type=="comm"}).indexOf(it);return"SA"+(Math.max(0,k)+1)}
-k=Math.max(0,items.filter(function(x){return x.type==t}).indexOf(it));return t=="stop"?"S"+(2*k+1):t=="start"?"S"+(2*k+2):{au:"AU",th:"F1 95-96",thno:"F1 97-98",q1no:"Q1 "+(k?"23-24":"13-14"),kmno:"KM1",kmnc:"KM1",km2no:"KM2",km2nc:"KM2",km3no:"KM3",km3nc:"KM3",ka1no:"KA1",ka1nc:"KA1",ka2no:"KA2",ka2nc:"KA2",pedal:"S5",krno:"KR",krnc:"KR",ktno:"KT",ktnc:"KT",hc:"HC",sw:"SA"+(k+1)}[t]}
+if(t=="coilR"||t=="coilT"||t=="coilD"){k=items.filter(function(x){return x.type==t}).indexOf(it);return(t=="coilR"?"KR":"KT")+(Math.max(0,k)+1)}if(t=="coilA"){k=items.filter(function(x){return x.type=="coilA"}).indexOf(it);return"KA"+(Math.max(0,k)+1)}if(t=="fcno"||t=="fcnc"){k=items.filter(function(x){return x.type=="fcno"||x.type=="fcnc"}).indexOf(it);return"FDC"+(Math.max(0,k)+1)}if(t=="sw"||t=="comm"||t=="comm3"){k=items.filter(function(x){return x.type=="sw"||x.type=="comm"||x.type=="comm3"}).indexOf(it);return"SA"+(Math.max(0,k)+1)}if(t=="pot"){k=items.filter(function(x){return x.type=="pot"}).indexOf(it);return"RV"+(Math.max(0,k)+1)}
+k=Math.max(0,items.filter(function(x){return x.type==t}).indexOf(it));return t=="stop"?"S"+(2*k+1):t=="start"?"S"+(2*k+2):{au:"AU",th:"F1 95-96",thno:"F1 97-98",q1no:"Q1 "+(k?"23-24":"13-14"),kmno:"KM1",kmnc:"KM1",km2no:"KM2",km2nc:"KM2",km3no:"KM3",km3nc:"KM3",ka1no:"KA1",ka1nc:"KA1",ka2no:"KA2",ka2nc:"KA2",pedal:"S5",krno:"KR",krnc:"KR",ktno:"KT",ktnc:"KT",kdno:"KT",kdnc:"KT",hc:"HC",sw:"SA"+(k+1)}[t]}
 function PN(it){var m=/^k[ma](\d?)(no|nc)$/.exec(it.type);if(!m)return"";var k=Math.max(0,items.filter(function(x){return x.type==it.type}).indexOf(it));return m[2]=="no"?((k+1)*10+3)+"-"+((k+1)*10+4)+" NO":((k+2)*10+1)+"-"+((k+2)*10+2)+" NC"}
 function drawItem(it,s,r){var d=TY[it.type],x=it.x,y=it.y,id=it.id,L=lab(it),on,g;reg(id+".a",x,y-22);reg(id+".b",x,y+22);
 if(d.coil){on=r.coil[id];return'<g class="cp" data-item="'+id+'"><rect x="'+(x-18)+'" y="'+(y-15)+'" width="36" height="30" class="'+(on?'y':'')+'"/><path d="M'+x+' '+(y-22)+'V'+(y-15)+'M'+x+' '+(y+15)+'V'+(y+22)+'"/><text x="'+x+'" y="'+(y+4)+'" text-anchor="middle" class="b '+(on?'dk':'')+'">'+L+'</text><text x="'+(x+22)+'" y="'+(y-10)+'" class="s m">A1</text><text x="'+(x+22)+'" y="'+(y+20)+'" class="s m">A2</text></g>'}
 if(d.lamp){on=r.lamp[id];return'<g class="cp" data-item="'+id+'"><path d="M'+x+' '+(y-22)+'V'+(y-12)+'M'+x+' '+(y+12)+'V'+(y+22)+'"/><circle cx="'+x+'" cy="'+y+'" r="12" fill="'+(on?d.col:'none')+'" stroke="'+(d.col=="#f5f5f5"?"#999":d.col)+'" stroke-width="3"/><path d="M'+(x-8)+' '+(y-8)+'L'+(x+8)+' '+(y+8)+'M'+(x+8)+' '+(y-8)+'L'+(x-8)+' '+(y+8)+'"/><text x="'+(x+18)+'" y="'+(y+4)+'" class="b">'+L+'</text><text x="'+(x+18)+'" y="'+(y+14)+'" class="s m">'+d.s+'</text></g>'}
-if(d.comm){var ps=s[id]?2:1,sg=ps==1?-1:1,ex=x-8.05,ey=y+sg*9.84,sx=x+6.05,sy=y+sg*2.16;
+if(d.comm){var ps=d.three?(s[id]||0):(s[id]?2:1),sg=ps==1?-1:(ps==2?1:0),ex=ps?x-8.05:x-7,ey=y+sg*9.84,sx=x+6.05,sy=y+sg*2.16;
 reg(id+".a",x-30,y-12);reg(id+".b",x-30,y+12);reg(id+".c",x+30,y);
-return'<g class="cp" data-item="'+id+'" data-tog="'+id+'"><rect x="'+(x-36)+'" y="'+(y-20)+'" width="80" height="40" fill="transparent" stroke="none"/><path d="M'+(x-30)+' '+(y-12)+'H'+(x-16.5)+'M'+(x-30)+' '+(y+12)+'H'+(x-16.5)+'M'+(x+14.5)+' '+y+'H'+(x+30)+'M'+sx+' '+sy+'L'+ex+' '+ey+'"/><circle cx="'+(x-12)+'" cy="'+(y-12)+'" r="4.5"/><circle cx="'+(x-12)+'" cy="'+(y+12)+'" r="4.5"/><circle cx="'+(x+10)+'" cy="'+y+'" r="4.5"/><text x="'+(x+4)+'" y="'+(y-16)+'" class="b">'+L+'</text><text x="'+(x+4)+'" y="'+(y+22)+'" class="s m">'+d.n+'</text></g>'}
+return'<g class="cp" data-item="'+id+'" data-tog="'+id+'"><rect x="'+(x-36)+'" y="'+(y-20)+'" width="80" height="40" fill="transparent" stroke="none"/><path d="M'+(x-30)+' '+(y-12)+'H'+(x-16.5)+'M'+(x-30)+' '+(y+12)+'H'+(x-16.5)+'M'+(x+14.5)+' '+y+'H'+(x+30)+'M'+sx+' '+sy+'L'+ex+' '+ey+'"/><circle cx="'+(x-12)+'" cy="'+(y-12)+'" r="4.5"/><circle cx="'+(x-12)+'" cy="'+(y+12)+'" r="4.5"/><circle cx="'+(x+10)+'" cy="'+y+'" r="4.5"/><text x="'+(x+4)+'" y="'+(y-16)+'" class="b">'+L+'</text><text x="'+(x+4)+'" y="'+(y+22)+'" class="s m">'+d.n+'</text>'+(d.three?'<text x="'+(x-46)+'" y="'+(y-9)+'" class="s m">AV</text><text x="'+(x-46)+'" y="'+(y+19)+'" class="s m">AR</text>':'')+'</g>'}
+if(d.pot){reg(id+".a",x,y-22);reg(id+".b",x,y+22);reg(id+".c",x+26,y);return'<g class="cp" data-item="'+id+'"><rect x="'+(x-14)+'" y="'+(y-22)+'" width="86" height="44" fill="transparent" stroke="none"/><path d="M'+x+' '+(y-22)+'V'+(y-14)+'M'+x+' '+(y+14)+'V'+(y+22)+'M'+(x+26)+' '+y+'H'+(x+5)+'M'+(x+5)+' '+y+'L'+(x+11)+' '+(y-3)+'M'+(x+5)+' '+y+'L'+(x+11)+' '+(y+3)+'"/><rect x="'+(x-5)+'" y="'+(y-14)+'" width="10" height="28"/><text x="'+(x+12)+'" y="'+(y-12)+'" class="b">'+L+'</text><text x="'+(x+12)+'" y="'+(y+18)+'" class="s m">'+d.n+'</text></g>'}
 var ky=(it.type=="th"||it.type=="thno")?"T":it.type=="q1no"?"Q":id,cl=closed(it,s,r.km,r.km2,r.km3,r.ka1,r.ka2),pr=s[ky],nc=d.nc,hx=x-30+(pr?5:0),t=nc?(cl?[x-9,y-8]:[x-13,y]):(cl?[x,y-8]:[x-9,y-8]),mx=(x+t[0])/2;
-g='<g class="cp" data-item="'+id+'" '+(d.ev=="hold"?'data-hold="'+id+'"':d.ev=="tog"?'data-tog="'+ky+'"':'')+'><rect x="'+(d.h?x-70:x-14)+'" y="'+(y-22)+'" width="'+(d.h?130:60)+'" height="44" fill="transparent" stroke="none"/>';
+g='<g class="cp" data-item="'+id+'" '+(d.ev=="hold"?'data-hold="'+id+'"':d.ev=="tog"?'data-tog="'+ky+'"':'')+'><rect x="'+(d.h?x-70:(d.td?x-28:x-14))+'" y="'+(y-22)+'" width="'+(d.h?130:(d.td?74:60))+'" height="44" fill="transparent" stroke="none"/>';
 g+='<path d="M'+x+' '+(y-22)+'V'+(it.type=="sw"?y-14:y-8)+(nc?'H'+(x-13):'')+'M'+x+' '+(y+22)+'V'+(y+8)+'M'+x+' '+(y+8)+'L'+t[0]+' '+t[1]+'"/>';
+if(d.td)g+='<path d="M'+mx+' '+y+'H'+(x-16)+'M'+(x-16)+' '+(y-8)+'a8 8 0 0 0 0 16"/>';
 if(d.fc){var uu=.75,bx=x+uu*(t[0]-x),by=(y+8)+uu*(t[1]-(y+8));g+='<path d="M'+x+' '+(y+8)+'V'+by+'H'+bx+'Z"/>'}
 if(it.type=="sw")g+='<circle cx="'+x+'" cy="'+(y-11)+'" r="3"/>';
 if(d.h)g+='<path d="M'+mx+' '+y+'H'+hx+'" stroke-dasharray="3 2"/>';
@@ -144,13 +170,32 @@ function sect(x,cl){return'<path d="M'+x+' 78V96M'+(x-8)+' 96H'+(x+8)+'M'+x+' 15
 function fus(x,y){return'<path d="M'+x+' '+(y-8)+'V'+y+'M'+x+' '+(y+26)+'V'+(y+34)+'"/><rect x="'+(x-5)+'" y="'+y+'" width="10" height="26"/><path d="M'+x+' '+y+'V'+(y+26)+'"/>'}
 
 function drawItemR(it,s,r){var g=drawItem(it,s,r),R=it.rot||0,k=SZ;if(!R&&k==1)return g;var x=it.x,y=it.y,a=R*Math.PI/180,rt=function(dx,dy){return[Math.round(x+k*(dx*Math.cos(a)-dy*Math.sin(a))),Math.round(y+k*(dx*Math.sin(a)+dy*Math.cos(a)))]};
-var O=TY[it.type].comm?{a:[-30,-12],b:[-30,12],c:[30,0]}:{a:[0,-22],b:[0,22]};for(var q in O)P[it.id+"."+q]=rt(O[q][0],O[q][1]);
+var O=TY[it.type].comm?{a:[-30,-12],b:[-30,12],c:[30,0]}:(TY[it.type].pot?{a:[0,-22],b:[0,22],c:[26,0]}:{a:[0,-22],b:[0,22]});for(var q in O)P[it.id+"."+q]=rt(O[q][0],O[q][1]);
 if(R)g=g.replace(/<text x="([\d.-]+)" y="([\d.-]+)"/g,function(m,tx,ty){return'<text transform="rotate('+(-R)+' '+tx+' '+ty+')" x="'+tx+'" y="'+ty+'"'});
 return'<g transform="rotate('+R+' '+x+' '+y+') translate('+x+' '+y+') scale('+k+') translate('+(-x)+' '+(-y)+')">'+g+'</g>'}
-function arrow(d){var c=[120,530],R=54,a0=d>0?-160:-20,a1=d>0?-40:-140,p=function(a){var t=a*Math.PI/180;return[c[0]+R*Math.cos(t),c[1]+R*Math.sin(t)]},e=p(a1),t1=a1*Math.PI/180,tx=-d*Math.sin(t1),ty=d*Math.cos(t1),nx=Math.cos(t1),ny=Math.sin(t1),h1=[e[0]-9*tx+5*nx,e[1]-9*ty+5*ny],h2=[e[0]-9*tx-5*nx,e[1]-9*ty-5*ny],s=p(a0);
-return'<g class="sp'+(d<0?' rev':'')+'" stroke="#e08a00" stroke-width="3"><path d="M'+s+'A54 54 0 0 '+(d>0?1:0)+' '+e+'"/><path d="M'+h1+'L'+e+'L'+h2+'"/></g><text x="120" y="592" text-anchor="middle" class="s b">sens '+(d>0?'horaire':'anti-horaire')+'</text>'}
-function render(){P={};var o=[],s=st,r=res,e=EX[ex],ctl=!!e.need,z=zx(),Wd=z+810,two=!!e.two,dom=!!e.dom;
-if(!dom){[["L1",60],["L2",120],["L3",180]].forEach(function(a){reg(a[0],a[1],40);o.push('<text x="'+(a[1]-6)+'" y="28" class="b">'+a[0]+'</text>')});
+
+function drawSD(o,s,r){var cy=537;
+[["M1.U1",84],["M1.V1",120],["M1.W1",156]].forEach(function(a,i){reg(a[0],a[1],485);o.push('<path d="M'+a[1]+' 485V'+(i==1?499:525)+'"/><text x="'+a[1]+'" y="478" text-anchor="middle" class="s m">'+a[0].slice(3)+'</text>')});
+[["M1.W2",84],["M1.U2",120],["M1.V2",156]].forEach(function(a,i){reg(a[0],a[1],592);o.push('<path d="M'+a[1]+' 592V'+(i==1?575:549)+'"/><text x="'+a[1]+'" y="608" text-anchor="middle" class="s m">'+a[0].slice(3)+'</text>')});
+o.push('<circle cx="120" cy="'+cy+'" r="38" class="'+(r.motor?'y':'')+'"/><text x="120" y="'+(cy-4)+'" text-anchor="middle" class="b '+(r.motor?'dk':'')+'">M</text><text x="120" y="'+(cy+13)+'" text-anchor="middle" class="'+(r.motor?'dk':'')+'">3~</text>');
+if(r.motor){o.push(arrow(r.dir,cy));o.push('<text x="120" y="630" text-anchor="middle" class="s b">couplage '+r.mode+'</text>')}
+[[320,3,"triangle",r.km3,"F3"],[540,2,"étoile",r.km2,"F2"]].forEach(function(b){var x0=b[0];
+for(var i=0;i<3;i++){var x=x0+60*i;reg("KM"+b[1]+"."+(2*i+1),x,490);reg("KM"+b[1]+"."+(2*i+2),x,550);o.push(pwr(x,520,b[3]));o.push('<text x="'+(x-8)+'" y="494" text-anchor="end" class="s m">'+(2*i+1)+'</text><text x="'+(x-8)+'" y="554" text-anchor="end" class="s m">'+(2*i+2)+'</text>')}
+o.push('<path d="M'+(x0-24)+' 523H'+(x0+140)+'" stroke-dasharray="3 2"/><text x="'+x0+'" y="468" class="b">KM'+b[1]+'</text><text x="'+(x0+34)+'" y="468" class="s m">contacteur '+b[2]+'</text><g class="cp" data-hold="'+b[4]+'"><rect x="'+x0+'" y="574" width="66" height="18" rx="4" class="'+(s[b[4]]?'y':'')+'"/><text x="'+(x0+6)+'" y="587" class="s '+(s[b[4]]?'dk':'')+'">Forcer KM'+b[1]+'</text></g>')})}
+function drawATV(o,s,r){var A=r.atv||{};
+reg("SRC.L",60,50);reg("SRC.N",120,50);o.push('<text x="60" y="36" text-anchor="middle" class="b">L</text><text x="120" y="36" text-anchor="middle" class="b">N</text><text x="190" y="54" class="s m">réseau 230 V monophasé</text>');
+o.push('<rect x="30" y="130" width="300" height="200" rx="8"/><text x="150" y="230" text-anchor="middle" class="b" style="font-size:18px">ATV11</text><text x="150" y="248" text-anchor="middle" class="s m">Altivar 11</text>');
+[["ATV.L1",60,"R/L1"],["ATV.L2",120,"S/L2"]].forEach(function(t){reg(t[0],t[1],130);o.push('<text x="'+t[1]+'" y="150" text-anchor="middle" class="s">'+t[2]+'</text>')});
+[["ATV.U",60,"U/T1"],["ATV.V",120,"V/T2"],["ATV.W",180,"W/T3"]].forEach(function(t){reg(t[0],t[1],330);o.push('<text x="'+t[1]+'" y="318" text-anchor="middle" class="s">'+t[2]+'</text>')});
+[["ATV.P24",150,"+24"],["ATV.LI1",172,"LI1 (AV)"],["ATV.LI2",194,"LI2 (AR)"],["ATV.LI3",216,"LI3"],["ATV.LI4",238,"LI4"],["ATV.COM",260,"COM"],["ATV.AI1",282,"AI1"],["ATV.P5",304,"+5V"]].forEach(function(t){reg(t[0],330,t[1]);o.push('<text x="320" y="'+(t[1]+3)+'" text-anchor="end" class="s">'+t[2]+'</text>')});
+[["M1.U",84],["M1.V",120],["M1.W",156]].forEach(function(a,i){reg(a[0],a[1],410);o.push('<path d="M'+a[1]+' 410V'+(i==1?426:462)+'"/><text x="'+a[1]+'" y="402" text-anchor="middle" class="s m">'+a[0].slice(3)+'</text>')});
+o.push('<circle cx="120" cy="462" r="36" class="'+(A.on?'y':'')+'"/><text x="120" y="459" text-anchor="middle" class="b '+(A.on?'dk':'')+'">M</text><text x="120" y="475" text-anchor="middle" class="'+(A.on?'dk':'')+'">3~</text>');
+if(A.on)o.push(arrow(A.dir,462));
+o.push('<text x="120" y="'+(A.on?532:515)+'" text-anchor="middle" class="s b">'+(A.on?'vitesse : '+A.speed+' %':'moteur à l\'arrêt')+'</text>')}
+function arrow(d,cyy){var c=[120,cyy||530],R=54,a0=d>0?-160:-20,a1=d>0?-40:-140,p=function(a){var t=a*Math.PI/180;return[c[0]+R*Math.cos(t),c[1]+R*Math.sin(t)]},e=p(a1),t1=a1*Math.PI/180,tx=-d*Math.sin(t1),ty=d*Math.cos(t1),nx=Math.cos(t1),ny=Math.sin(t1),h1=[e[0]-9*tx+5*nx,e[1]-9*ty+5*ny],h2=[e[0]-9*tx-5*nx,e[1]-9*ty-5*ny],s=p(a0);
+return'<g class="sp'+(d<0?' rev':'')+'" style="transform-origin:120px '+c[1]+'px" stroke="#e08a00" stroke-width="3"><path d="M'+s+'A54 54 0 0 '+(d>0?1:0)+' '+e+'"/><path d="M'+h1+'L'+e+'L'+h2+'"/></g><text x="120" y="'+(c[1]+62)+'" text-anchor="middle" class="s b">sens '+(d>0?'horaire':'anti-horaire')+'</text>'}
+function render(){P={};var o=[],s=st,r=res,e=EX[ex],ctl=!!e.need,z=zx(),Wd=(ctl||!e.sd)?z+810:720,two=!!e.two,dom=!!e.dom,atv=!!e.atv,sd=!!e.sd;
+if(!dom&&!atv){[["L1",60],["L2",120],["L3",180]].forEach(function(a){reg(a[0],a[1],40);o.push('<text x="'+(a[1]-6)+'" y="28" class="b">'+a[0]+'</text>')});
 o.push('<text x="196" y="44" class="s m">réseau 3~</text>');
 [60,120,180].forEach(function(x,i){var mx=[84,120,156][i];
 reg("Q1."+(2*i+1),x,78);reg("Q1."+(2*i+2),x,164);o.push(sect(x,s.Q));
@@ -158,7 +203,7 @@ reg("Q1."+(2*i+1),x,78);reg("Q1."+(2*i+2),x,164);o.push(sect(x,s.Q));
 reg("KM1."+(2*i+1),x,205);reg("KM1."+(2*i+2),x,265);o.push(pwr(x,235,r.km));
 reg("F2."+(2*i+1),x,343);reg("F2."+(2*i+2),x,427);
 o.push('<path d="M'+x+' 343V370H'+(x+18)+'V400H'+x+'V427" '+(s.T?'stroke="var(--ko)"':'')+'/>');
-reg(["M1.U","M1.V","M1.W"][i],mx,480);o.push('<path d="M'+mx+' 480V'+(i==1?490:512)+'"/>');
+if(!sd){reg(["M1.U","M1.V","M1.W"][i],mx,480);o.push('<path d="M'+mx+' 480V'+(i==1?490:512)+'"/>')}
 if(two){var x2=320+60*i;reg("KM2."+(2*i+1),x2,205);reg("KM2."+(2*i+2),x2,265);o.push(pwr(x2,235,r.km2));
 o.push('<text x="'+(x2-8)+'" y="209" text-anchor="end" class="s m">'+(2*i+1)+'/L'+(i+1)+'</text><text x="'+(x2-8)+'" y="269" text-anchor="end" class="s m">'+(2*i+2)+'/T'+(i+1)+'</text>')}});
 var lx=two?205:218;
@@ -172,16 +217,17 @@ o.push('<g class="cp" data-hold="F"><rect x="'+lx+'" y="'+(two?250:246)+'" width
 if(two){o.push('<text x="462" y="212" class="b">KM2</text><text x="462" y="222" class="s m">contacteur</text><g class="cp" data-hold="F2"><rect x="462" y="250" width="56" height="18" rx="4" class="'+(s.F2?'y':'')+'"/><text x="468" y="263" class="s '+(s.F2?'dk':'')+'">Forcer KM2</text></g>')}
 o.push('<text x="218" y="382" class="b">F1</text><text x="218" y="393" class="s m">relais thermique</text>');
 o.push('<g class="cp" data-tog="T"><rect x="218" y="402" width="96" height="22" rx="5" fill="'+(s.T?'#c62828':'var(--card)')+'"/><text x="226" y="417" class="s" style="'+(s.T?'fill:#fff':'')+'">⚡ Surcharge F1</text></g>');
-o.push('<circle cx="120" cy="530" r="40" class="'+(r.motor?'y':'')+'"/><text x="120" y="526" text-anchor="middle" class="b '+(r.motor?'dk':'')+'">M</text><text x="120" y="543" text-anchor="middle" class="'+(r.motor?'dk':'')+'">3~</text>');
-if(r.motor)o.push(arrow(r.dir));
+if(!sd){o.push('<circle cx="120" cy="530" r="40" class="'+(r.motor?'y':'')+'"/><text x="120" y="526" text-anchor="middle" class="b '+(r.motor?'dk':'')+'">M</text><text x="120" y="543" text-anchor="middle" class="'+(r.motor?'dk':'')+'">3~</text>');
+if(r.motor)o.push(arrow(r.dir));}
 }
+if(atv)drawATV(o,s,r);if(sd)drawSD(o,s,r);
 if(ctl){o.push('<rect data-ws="1" x="'+(z-10)+'" y="52" width="800" height="610" rx="8" class="wsf"/><text x="'+(z-2)+'" y="66" class="s m">Zone de travail</text>');
-o.push('<path d="M'+z+' 40H'+(z+790)+'M'+z+' 680H'+(z+790)+'"/><text x="'+(z+2)+'" y="32" class="b">'+(dom?"L (phase 230 V)":"+24 V")+'</text><text x="'+(z+2)+'" y="696" class="b">'+(dom?"N (neutre)":"0 V")+'</text>');
-reg("P24a",z+20,40);reg("P0a",z+20,680);reg("P0b",z+260,680);o.push('<path data-rail="P24" class="cp" d="M'+z+' 40H'+(z+790)+'" stroke="transparent" stroke-width="18"/><path data-rail="P0" class="cp" d="M'+z+' 680H'+(z+790)+'" stroke="transparent" stroke-width="18"/>');
+if(!atv){o.push('<path d="M'+z+' 40H'+(z+790)+'M'+z+' 680H'+(z+790)+'"/><text x="'+(z+2)+'" y="32" class="b">'+(dom?"L (phase 230 V)":"+24 V")+'</text><text x="'+(z+2)+'" y="696" class="b">'+(dom?"N (neutre)":"0 V")+'</text>');
+reg("P24a",z+20,40);reg("P0a",z+20,680);reg("P0b",z+260,680);o.push('<path data-rail="P24" class="cp" d="M'+z+' 40H'+(z+790)+'" stroke="transparent" stroke-width="18"/><path data-rail="P0" class="cp" d="M'+z+' 680H'+(z+790)+'" stroke="transparent" stroke-width="18"/>');}
 if(dom&&e.k=="d6")o.push('<g class="cp" data-tog="HC"><rect x="'+(z+400)+'" y="6" width="150" height="24" rx="5" fill="'+(s.HC?'#f0883e':'var(--card)')+'"/><text x="'+(z+410)+'" y="22" class="s">🕙 Heures creuses</text></g>');
 items.forEach(function(it){o.push(drawItemR(it,s,r));if(it.id==sel&&mode=="E")o.push('<rect x="'+(it.x-72*SZ)+'" y="'+(it.y-27*SZ)+'" width="'+(134*SZ)+'" height="'+(54*SZ)+'" rx="6" class="sl" transform="rotate('+(it.rot||0)+' '+it.x+' '+it.y+')"/>')})}
 var hotN=[r.f("P24a"),r.f("L1"),r.f("L2"),r.f("L3")],hs=[],vs=[],pd=[],ntr={},wp={};
-function isTop(id){var m=/^(Q1|KM1|KM2|F2)\.(\d+)$/.exec(id);if(m)return m[2]%2==1;if(/^M1\./.test(id))return true;if(/\.a$/.test(id))return true;if(/\.b$/.test(id))return false;if(/^P0/.test(id))return true;return false}
+function isTop(id){var m=/^(Q1|KM1|KM2|KM3|F2)\.(\d+)$/.exec(id);if(m)return m[2]%2==1;if(/^M1\.[UVW]2$/.test(id))return false;if(/^M1\./.test(id))return true;if(/\.a$/.test(id))return true;if(/\.b$/.test(id))return false;if(/^P0/.test(id))return true;return false}
 function rr(id){var m=/^P(24|0):(\d+)$/.exec(id||"");if(m)reg(id,+m[2],m[1]=="24"?40:680)}
 W.forEach(function(w){rr(w[0]);rr(w[1])});rr(pend);
 function nf(a){if(wp[a]===undefined)wp[a]=a;while(wp[a]!==a){wp[a]=wp[wp[a]];a=wp[a]}return a}
@@ -207,24 +253,26 @@ if(p.ty!==null)[[p.a[0],p.ty],[p.b[0],p.ty]].forEach(function(q){if(vs.some(func
 for(var k in P)o.push('<g data-t="'+k+'" class="cp"><circle cx="'+P[k][0]+'" cy="'+P[k][1]+'" r="4" class="td '+(pend==k?'pd':'')+'"/>'+(mode=="E"?'<circle cx="'+P[k][0]+'" cy="'+P[k][1]+'" r="11" fill="transparent" stroke="none"/>':'')+'</g>');
 document.getElementById("sch").innerHTML='<svg viewBox="0 0 '+Wd+' 710" width="'+Wd+'" height="710">'+o.join("")+'</svg>'}
 var cause="",lastAct="";
-function actLabel(k){if(k=="F")return"« Forcer KM1 »";if(k=="F2")return"« Forcer KM2 »";if(k=="Q")return st.Q?"fermeture de Q1":"ouverture de Q1";if(k=="T")return st.T?"déclenchement du relais thermique":"réarmement du thermique";var it=items.filter(function(x){return x.id==k})[0];return it?(st[k]?"actionnement de ":"relâchement de ")+lab(it):k}
+function actLabel(k){if(k=="F")return"« Forcer KM1 »";if(k=="F2")return"« Forcer KM2 »";if(k=="F3")return"« Forcer KM3 »";if(k=="Q")return st.Q?"fermeture de Q1":"ouverture de Q1";if(k=="T")return st.T?"déclenchement du relais thermique":"réarmement du thermique";var it=items.filter(function(x){return x.id==k})[0];return it?(st[k]?"actionnement de ":"relâchement de ")+lab(it):k}
 function alertUI(){var a=document.getElementById("alert"),r=res,s=document.getElementById("sch");
 if(!r.short){a.style.display="none";s.classList.remove("shorted");return}
 var t=[];if(r.sp)t.push("phases L1 / L2 / L3 reliées entre elles");if(r.sc)t.push(EX[ex].dom?"phase reliée au neutre":"+24 V relié à 0 V");
 a.innerHTML="⚠ COURT-CIRCUIT<small>"+t.join(" · ")+(mode=="S"&&cause?" — provoqué par : "+cause:"")+"</small>";a.style.display="block";s.classList.add("shorted")}
-var ktTimer=null,KT=5;
-function dyn(){var r0=solve(st,W,items);if(r0.acR&&!st.krc)st.kr=st.kr?0:1;st.krc=r0.acR?1:0;if(r0.acT){st.ktOn=1;if(ktTimer){clearTimeout(ktTimer);ktTimer=null}}else if(st.ktOn&&!ktTimer){ktTimer=setTimeout(function(){ktTimer=null;st.ktOn=0;sync()},KT*1000)}}
-function sync(){var was=res&&res.short;if(mode=="S"&&EX[ex].dom)dyn();res=solve(st,W,items);st.km=res.km?1:0;st.km2=res.km2?1:0;st.km3=res.km3?1:0;st.ka1=res.ka1?1:0;st.ka2=res.ka2?1:0;if(res.short&&!was)cause=lastAct;if(!res.short)cause="";alertUI();render()}
+var ktTimer=null,KT=5,kdTimer=null,KD=3,POT=.5;
+function dyn(){var r0=solve(st,W,items);if(r0.acR&&!st.krc)st.kr=st.kr?0:1;st.krc=r0.acR?1:0;
+if(r0.acT){st.ktOn=1;if(ktTimer){clearTimeout(ktTimer);ktTimer=null}if(kdTimer){clearTimeout(kdTimer);kdTimer=null}}else if(st.ktOn&&!ktTimer){ktTimer=setTimeout(function(){ktTimer=null;st.ktOn=0;sync()},KT*1000)}
+if(r0.acD){if(!st.kdOn&&!kdTimer)kdTimer=setTimeout(function(){kdTimer=null;st.kdOn=1;sync()},KD*1000)}else{if(kdTimer){clearTimeout(kdTimer);kdTimer=null}st.kdOn=0}}
+function sync(){var was=res&&res.short;if(mode=="S"&&(EX[ex].dom||EX[ex].sd))dyn();res=solve(st,W,items);st.km=res.km?1:0;st.km2=res.km2?1:0;st.km3=res.km3?1:0;st.ka1=res.ka1?1:0;st.ka2=res.ka2?1:0;if(res.short&&!was)cause=lastAct;if(!res.short)cause="";alertUI();render()}
 
 function msg(t,c){var m=document.getElementById("msg");m.textContent=t;m.className="msg "+(c||"")}
 function pal(){var p=document.getElementById("pal");p.innerHTML="";var Q=P;P={};
-var KL=EX[ex].dom?DOMT:Object.keys(TY).filter(function(q){return!TY[q].dom});for(var kk=0;kk<KL.length;kk++){var k=KL[kk];if(!EX[ex].need)break;if(TY[k].k2&&!EX[ex].two)continue;var e=document.createElement("div");e.className="tile"+(selT==k?" sel":"");e.dataset.k=k;e.draggable=true;
+var KL=EX[ex].dom?DOMT:EX[ex].atv?ATVT:Object.keys(TY).filter(function(q){return!TY[q].dom&&(!TY[q].sd||EX[ex].sd)&&(!TY[q].atv||EX[ex].atv)});for(var kk=0;kk<KL.length;kk++){var k=KL[kk];if(!EX[ex].need)break;if(TY[k].k2&&!EX[ex].two)continue;var e=document.createElement("div");e.className="tile"+(selT==k?" sel":"");e.dataset.k=k;e.draggable=true;
 e.innerHTML='<svg viewBox="0 0 110 60" width="104" height="57">'+drawItem({id:"tmp",type:k,x:60,y:30},{},{km:false,coil:{},lamp:{}})+'</svg><small>'+TY[k].n+' '+TY[k].s+'</small>';p.appendChild(e)}
 if(EX[ex].two){var mt=document.createElement("div");mt.className="tile"+(selT=="mech"?" sel":"");mt.dataset.k="mech";mt.draggable=true;mt.innerHTML='<svg viewBox="0 0 110 60" width="104" height="57"><path d="M10 30H100" stroke-dasharray="3 2"/><path d="M48 22H62L55 36Z"/></svg><small>Blocage mécanique</small>';p.appendChild(mt)}P=Q}
-function modeUI(){["bE","mE"].forEach(function(i){document.getElementById(i).className=mode=="E"?"on":""});["bS","mS"].forEach(function(i){document.getElementById(i).className=mode=="S"?"on":""});
+function modeUI(){document.getElementById("potw").style.display=(mode=="S"&&EX[ex].atv)?"":"none";["bE","mE"].forEach(function(i){document.getElementById(i).className=mode=="E"?"on":""});["bS","mS"].forEach(function(i){document.getElementById(i).className=mode=="S"?"on":""});
 document.getElementById("palc").style.display=mode=="E"&&(EX[ex].need||EX[ex].two)?"":"none";
 document.getElementById("hint").textContent=mode=="E"?"Édition : touchez une borne (ou un point quelconque des rails +24 V / 0 V) puis une autre pour tirer un fil ; touchez un fil pour le sélectionner (puis « Supprimer la sélection »), glissez-le pour le déplacer. Faites glisser un composant pour le déplacer ; touchez-le pour le sélectionner.":"Simulation : maintenez un bouton pour l'actionner (plusieurs doigts possibles) ; double appui rapide ou Maj+clic pour le maintenir enfoncé, un appui le relâche. Touchez Q1, AU, un interrupteur ou « Surcharge F1 » pour les basculer. Jaune = actif."}
-function setMode(m){mode=m;pend=null;if(m=="S"){st={Q:st.Q,km:0,km2:0,F:0,F2:0,T:0,M:st.M};lock={};if(ktTimer){clearTimeout(ktTimer);ktTimer=null}}sel=null;modeUI();sync()}
+function setMode(m){mode=m;pend=null;if(m=="S"){st={Q:st.Q,km:0,km2:0,F:0,F2:0,T:0,M:st.M};lock={};if(ktTimer){clearTimeout(ktTimer);ktTimer=null}if(kdTimer){clearTimeout(kdTimer);kdTimer=null}}sel=null;modeUI();sync()}
 function hsnap(){hist.push(JSON.stringify({items:items,W:W,M:st.M,seq:seq}));if(hist.length>80)hist.shift();redoS=[]}
 function restore(x){var o=JSON.parse(x);items=o.items;W=o.W;st.M=o.M;seq=Math.max(seq,o.seq);sel=null;selW=null;pend=null;msg("");pal();sync()}
 function undo(){if(mode!="E"||!hist.length)return;redoS.push(JSON.stringify({items:items,W:W,M:st.M,seq:seq}));restore(hist.pop())}
@@ -248,7 +296,7 @@ if(drag){if(!drag.mv)sel=sel==drag.id?null:drag.id;drag=null;ch=1}if(ch)sync()}
 document.addEventListener("pointerup",up);document.addEventListener("pointercancel",up);sch.addEventListener("lostpointercapture",up);
 function link(id){if(!pend)pend=id;else{if(pend!=id&&!W.some(function(w){return w[0]==pend&&w[1]==id||w[0]==id&&w[1]==pend})){hsnap();W.push([pend,id])}pend=null;msg("")}sync()}
 sch.addEventListener("click",function(e){var t=e.target.closest("[data-t],[data-w],[data-tog],[data-ws],[data-rail],[data-mech],[data-mechrm]");if(!t)return;
-if(mode=="S"){if(t.dataset.tog){var k=t.dataset.tog;st[k]=st[k]?0:1;lastAct=actLabel(k);sync()}return}
+if(mode=="S"){if(t.dataset.tog){var k=t.dataset.tog,i3=items.filter(function(x){return x.id==k})[0];if(i3&&i3.type=="comm3")st[k]=((st[k]||0)+1)%3;else st[k]=st[k]?0:1;lastAct=actLabel(k);sync()}return}
 if(t.dataset.mech!==undefined){if(selT=="mech"){hsnap();st.M=1;selT=null;pal();msg("");sync()}else msg("Sélectionnez d'abord « Blocage mécanique » sur l'établi, puis touchez la zone en pointillés.");return}
 if(t.dataset.mechrm!==undefined){hsnap();st.M=0;msg("");sync();return}
 if(t.dataset.w!==undefined){return}
@@ -312,7 +360,7 @@ else if(e=="a"){if(c!=A)bad="le contacteur devrait rester collé"}
 else if(e=="b"){if(c!=B)bad="le contacteur devrait rester collé (auto-maintien / verrouillage)"}
 if(bad)return"Après « "+x[3]+" » : "+bad+"."}
 return null}
-function ds(s,ch){for(var k in ch)s[k]=ch[k];var r=solve(s,W,items);if(r.acR&&!s.krc)s.kr=s.kr?0:1;s.krc=r.acR?1:0;if(r.acT)s.ktOn=1;r=solve(s,W,items);return r}
+function ds(s,ch){for(var k in ch)s[k]=ch[k];var r=solve(s,W,items);if(r.acR&&!s.krc)s.kr=s.kr?0:1;s.krc=r.acR?1:0;if(r.acT)s.ktOn=1;r=solve(s,W,items);s.km=r.km?1:0;return r}
 function checkDom(e){var need=e.need;for(var k in need){var n=ids(k).length;if(n<need[k])return"Il manque : "+(need[k]-n)+" × "+(NM[k]||k)+"."}
 var L=ids("lamp"),s={},obs={},exp=[],err=null;L.forEach(function(i){obs[i]=[]});
 function step(ch,ex){var r=ds(s,ch);if(r.sc){err="Court-circuit : la phase est reliée au neutre.";return}L.forEach(function(i){obs[i].push(!!r.lamp[i])});exp.push(ex?1:0)}
@@ -325,11 +373,47 @@ else if(k=="d4"){var cur=0;bp.forEach(function(b){[0,1].forEach(function(){ch={}
 else if(k=="d5"){var b=bp[0];[1,2].forEach(function(){ch={};ch[b]=1;step(ch,1);ch={};ch[b]=0;step(ch,1);ch={ktOn:0};step(ch,0)});if(err)return err;if(!follow(exp).length)return"Minuterie : la lampe doit s'allumer à l'appui, rester allumée pendant la temporisation, puis s'éteindre."}
 else if(k=="d6"){[0,1,0].forEach(function(v){step({HC:v},v)});if(err)return err;if(!follow(exp).length)return"La lampe doit être alimentée uniquement pendant les heures creuses."}
 return null}
-function check(){var e=EX[ex];if(e.dom)return checkDom(e);if(e.two)return e.need?check2(e.need):checkP2();return check1()}
+function genSolSD(){var z=720,it=[],w=[],y=function(i,t,x,yy){it.push({id:i,type:t,x:z+x,y:yy})};
+y("th1","th",20,95);y("stop1","stop",20,155);y("start1","start",20,235);y("kmno1","kmno",110,235);y("coil1","coil",20,330);
+y("km3nc1","km3nc",210,300);y("kdnc1","kdnc",210,380);y("coil2","coil",210,480);y("coilD1","coilD",330,480);y("km2nc1","km2nc",450,300);y("kdno1","kdno",450,380);y("coil3","coil",450,480);
+w=[["P24a","th1.a"],["th1.b","stop1.a"],["stop1.b","start1.a"],["stop1.b","kmno1.a"],["start1.b","kmno1.b"],["kmno1.b","coil1.a"],["coil1.b","P0a"],["kmno1.b","km3nc1.a"],["km3nc1.b","kdnc1.a"],["kdnc1.b","coil2.a"],["coil2.b","P0a"],["kmno1.b","coilD1.a"],["coilD1.b","P0a"],["kmno1.b","km2nc1.a"],["km2nc1.b","kdno1.a"],["kdno1.b","coil3.a"],["coil3.b","P0a"]];
+return{items:it,wires:w}}
+function checkSDP(){var s={Q:1},r=solve(s,W,items);if(r.short)return"Court-circuit détecté.";
+s={Q:1,F:1,F2:1};r=solve(s,W,items);if(r.short)return"Court-circuit avec KM1 + KM2.";if(!r.motor||r.mode!="étoile")return"Avec KM1 et KM2 (étoile), le moteur doit tourner en couplage étoile : vérifiez KM2 et les bornes W2, U2, V2.";
+s={Q:1,F:1,F3:1};r=solve(s,W,items);if(r.short)return"Court-circuit avec KM1 + KM3.";if(!r.motor||r.mode!="triangle")return"Avec KM1 et KM3 (triangle), le moteur doit tourner en couplage triangle : U1-W2, V1-U2, W1-V2.";
+return null}
+function checkSDC(e){for(var k in e.need){var n=ids(k).length;if(n<e.need[k])return"Il manque : "+(e.need[k]-n)+" × "+(NM[k]||k)+"."}
+var a0=ids("start")[0],b0=ids("stop")[0],s={Q:1},r,err=null;
+function stp(ch,d){for(var k in ch)s[k]=ch[k];r=solve(s,W,items);if(!r.acD)s.kdOn=0;r=solve(s,W,items);s.km=r.km?1:0;s.km2=r.km2?1:0;s.km3=r.km3?1:0;if(r.short)err="Court-circuit après « "+d+" ».";return r}
+function ex(c1,c2,c3,mode,d,msg){if(err)return;if(r.km!=c1||r.km2!=c2||r.km3!=c3||r.motor!=!!mode||(mode&&r.mode!=mode))err="Après « "+d+" » : "+msg}
+r=solve(s,W,items);if(r.short)return"Court-circuit détecté dès le départ.";
+var c={};c[a0]=1;stp(c,"appui sur Marche");ex(true,true,false,"étoile","appui sur Marche","KM1 et KM2 doivent coller (démarrage en étoile).");
+c={};c[a0]=0;stp(c,"relâchement de Marche");ex(true,true,false,"étoile","relâchement de Marche","KM1 et KM2 doivent rester collés (auto-maintien, étoile).");
+if(!err){if(!r.acD)err="La bobine du temporisateur KT doit être alimentée pendant le démarrage en étoile.";else{s.kdOn=1;r=solve(s,W,items);s.km=r.km?1:0;s.km2=r.km2?1:0;s.km3=r.km3?1:0;if(r.short)err="Court-circuit au passage en triangle (verrouillage KM2/KM3 ?).";else ex(true,false,true,"triangle","fin de la temporisation","KM2 doit retomber et KM3 coller (couplage triangle).")}}
+c={};c[b0]=1;stp(c,"appui sur Arrêt");ex(false,false,false,null,"appui sur Arrêt","tous les contacteurs doivent retomber.");
+c={};c[b0]=0;stp(c,"relâchement de Arrêt");ex(false,false,false,null,"relâchement de Arrêt","tous les contacteurs doivent rester retombés.");
+if(!err){var q1=net({Q:1,kdOn:1},W,items,true,true,false,false,false);if(q1.ac3)err="verrouillage manquant : la bobine KM3 ne doit pas pouvoir être alimentée quand KM2 est collé (contact NC de KM2 en série).";
+else{var q2=net({Q:1,kdOn:0},W,items,true,false,true,false,false);if(q2.ac2)err="verrouillage manquant : la bobine KM2 ne doit pas pouvoir être alimentée quand KM3 est collé (contact NC de KM3 en série)."}}
+return err}
+function checkATV(e){var pots=ids("pot"),ctrl=items.filter(function(x){return x.type=="sw"||x.type=="comm3"||x.type=="start"});
+if(!pots.length)return"Il manque : le potentiomètre.";if(!ctrl.length)return"Il manque : un organe de commande (interrupteur, commutateur AV-0-AR ou bouton).";
+var p0=POT;POT=.5;var r0=solve({Q:1},W,items),A=r0.atv;
+if(!A.pow){POT=p0;return"Le variateur n'est pas alimenté : reliez L et N aux bornes R/L1 et S/L2."}
+if(!A.mot){POT=p0;return"Reliez les bornes U, V, W du variateur aux bornes U, V, W du moteur."}
+if(!A.potOk){POT=p0;return"Câblez le potentiomètre : une extrémité sur +5V, l'autre sur COM, le curseur sur AI1."}
+var combos=[{}];ctrl.forEach(function(c){var n=c.type=="comm3"?3:2,nx=[];combos.forEach(function(b){for(var v=0;v<n;v++){var o=Object.assign({},b);o[c.id]=v;nx.push(o)}});combos=nx});
+var fw=false,rv=false,stop=false,any=null;
+combos.forEach(function(c){var s=Object.assign({Q:1},c),r=solve(s,W,items);if(r.short)return;if(r.atv.on){if(r.atv.dir>0)fw=true;else rv=true;if(!any)any=c}else stop=true});
+var res=null;
+if(!fw||!rv)res="Il faut pouvoir commander la marche dans les deux sens (LI1 et LI2 reliées au +24 par vos organes de commande).";
+else if(!stop)res="Il faut aussi une position d'arrêt (aucune entrée LI active).";
+else{POT=.25;var sa=solve(Object.assign({Q:1},any),W,items).atv.speed;POT=.75;var sb=solve(Object.assign({Q:1},any),W,items).atv.speed;if(!(sb>sa))res="La vitesse doit augmenter avec le potentiomètre : vérifiez +5V, AI1 et COM."}
+POT=p0;return res}
+function check(){var e=EX[ex];if(e.atv)return checkATV(e);if(e.sdp)return checkSDP();if(e.sdc)return checkSDC(e);if(e.dom)return checkDom(e);if(e.two)return e.need?check2(e.need):checkP2();return check1()}
 document.getElementById("chk").onclick=function(){var e=check();if(e)msg("✘ "+e,"ko");else msg("✔ Correct : le montage se comporte comme attendu, sans court-circuit.","ok")};
 document.getElementById("rst").onclick=function(){load(ex)};
 if(location.hash!="#prof")document.getElementById("sol").style.display="none";
-document.getElementById("sol").onclick=function(){var e=EX[ex];if(e.dom){msg("Pas de corrigé affiché pour cet exercice.");return}var g=e.need?gs(e):{items:[],wires:[]};items=g.items;W=(e.two?PW2:PW1).concat(g.wires);seq=100;sel=null;msg("");sync()};
+document.getElementById("sol").onclick=function(){var e=EX[ex];if(e.dom||e.atv){msg("Pas de corrigé affiché pour cet exercice.");return}if(e.sdc){var g=genSolSD();items=g.items;W=PW_SD.concat(g.wires);seq=100;sel=null;msg("");sync();return}if(e.sdp){items=[];W=PW_SD.slice();sel=null;msg("");sync();return}var g=e.need?gs(e):{items:[],wires:[]};items=g.items;W=(e.two?PW2:PW1).concat(g.wires);seq=100;sel=null;msg("");sync()};
 function bs(s){var b=new Uint8Array(s.length);for(var i=0;i<s.length;i++)b[i]=s.charCodeAt(i)&255;return b}
 function lat(s){return String(s).replace(/[^\x20-\xff]/g,"?").replace(/[\\()]/g,"\\$&")}
 function buildPdf(jpg,iw,ih,lines,W,H){var out=[],off=[],pos=0;function put(x){var b=typeof x=="string"?bs(x):x;out.push(b);pos+=b.length}
@@ -355,7 +439,7 @@ var b64=atob(cv.toDataURL("image/jpeg",.92).split(",")[1]),jpg=new Uint8Array(b6
 var e=check(),lines=["SchemaSim - "+EX[ex].t,"Nom : "+name,"Date : "+new Date().toLocaleDateString("fr-FR"),"Vérification : "+(e?"non conforme - "+e:"montage conforme (comportement validé, sans court-circuit)")],
 bl=buildPdf(jpg,cv.width,cv.height,lines,W0,H0),a=document.createElement("a");a.href=URL.createObjectURL(bl);a.download="montage-"+name.replace(/[^\w-]+/g,"_")+".pdf";document.body.appendChild(a);a.click();document.body.removeChild(a);msg("PDF exporté.","ok")};
 img.onerror=function(){msg("Export impossible dans ce navigateur.","ko")};img.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(xml)}
-document.getElementById("pdf").onclick=exportPdf;document.getElementById("sz").onchange=function(){SZ=+this.value;sync()};
+document.getElementById("pdf").onclick=exportPdf;document.getElementById("potr").oninput=function(){POT=this.value/100;document.getElementById("potv").textContent=this.value+" %";sync()};document.getElementById("sz").onchange=function(){SZ=+this.value;sync()};
 
 var LX=[
 ["stop","stop","Bouton poussoir Arrêt (NC)","Contact normalement fermé, rappelé par un ressort. En appuyant, on coupe le circuit de la bobine : c'est l'arrêt."],
@@ -372,6 +456,9 @@ var LX=[
 ["coilR","coilR","Télérupteur : bobine et contact","Relais à impulsion : chaque impulsion sur la bobine fait changer d'état le contact (un appui allume, le suivant éteint). Un seul appui court suffit."],
 ["coilT","coilT","Minuterie : bobine et contact temporisé","Un appui alimente la bobine ; le contact se ferme tout de suite et se rouvre après une durée réglable (éclairage d'escalier)."],
 ["hc","hc","Relais heures creuses","Contact commandé par l'horloge du compteur : il se ferme pendant les heures creuses pour alimenter un chauffe-eau, par exemple."],
+["pot","pot","Potentiomètre","Résistance réglable à trois bornes : deux extrémités et un curseur. Il fournit au variateur la consigne de vitesse (curseur sur AI1)."],
+["comm3","comm3","Commutateur 3 positions AV-0-AR","Position centrale = arrêt, à gauche marche avant, à droite marche arrière : on le touche pour changer de position."],
+["coilD","coilD","Temporisateur au travail (KT)","Le contact change d'état après une durée réglable depuis la mise sous tension : utilisé pour passer d'étoile à triangle."],
 ["fcno","fcno","Fin de course NO","Interrupteur de position (FDC), reconnaissable au petit triangle sur le couteau : actionné par une pièce mobile de la machine, il ferme son contact."],
 ["fcnc","fcnc","Fin de course NC","Même appareil, mais le contact s'ouvre quand il est actionné."],
 ["coil","coil","Bobine de contacteur (KM)","Alimentée en 24 V, elle ferme les contacts de puissance et les contacts auxiliaires NO, et ouvre les NC."],
@@ -396,7 +483,7 @@ o.push('</div>');document.getElementById("lex").innerHTML=o.join("")}
 document.getElementById("lex").addEventListener("click",function(e){var t=e.target;if(t.id=="bLb")document.getElementById("bL").click();else if(t.tagName=="IMG"&&t.classList.contains("ph")){document.getElementById("lbi").src=t.src;document.getElementById("lb").style.display="flex"}});
 document.getElementById("lb").onclick=function(){this.style.display="none"};
 document.getElementById("bL").onclick=function(){lexOn=!lexOn;if(lexOn)buildLex();document.getElementById("lex").style.display=lexOn?"":"none";document.getElementById("app").style.display=lexOn?"none":"";this.textContent=lexOn?"↩ Retour à l'exercice":"📖 Composants"};
-function load(i){ex=i;var e=EX[i];mode="E";pend=null;sel=null;selW=null;selT=null;seq=0;hist=[];redoS=[];lock={};if(ktTimer){clearTimeout(ktTimer);ktTimer=null}st={Q:e.pw?1:0,km:0,km2:0,F:0,F2:0,T:0,M:(e.two&&e.need)?1:0};items=[];W=e.pw?e.pw.slice():[];
+function load(i){ex=i;var e=EX[i];mode="E";pend=null;sel=null;selW=null;selT=null;seq=0;hist=[];redoS=[];lock={};if(ktTimer){clearTimeout(ktTimer);ktTimer=null}if(kdTimer){clearTimeout(kdTimer);kdTimer=null}st={Q:e.pw?1:0,km:0,km2:0,F:0,F2:0,T:0,M:(e.two&&e.need)?1:0};items=[];W=e.pw?e.pw.slice():[];
 document.getElementById("ex").value=i;document.getElementById("cons").textContent=e.c;msg("");pal();modeUI();sync()}
 var sl=document.getElementById("ex");EX.forEach(function(x,i){var o=document.createElement("option");o.value=i;o.textContent=x.t;sl.appendChild(o)});
 sl.onchange=function(){load(+sl.value)};
