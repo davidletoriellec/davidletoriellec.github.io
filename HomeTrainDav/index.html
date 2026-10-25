@@ -11,7 +11,7 @@ body{margin:0 auto;background:var(--bg);color:var(--fg);font:16px system-ui,-app
 h1{font-size:20px;margin:4px 0 10px}
 .card{background:var(--card);border-radius:12px;padding:12px;margin-bottom:10px}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.grid .card{margin:0;padding:8px}
-.k{font-size:12px;color:var(--mut)}.v{font-size:21px;font-weight:700}.hz,.hz .k{color:#000}
+.k{font-size:12px;color:var(--mut)}.v{font-size:21px;font-weight:700}.hz,.hz .k{color:#000}.hw,.hw .k{color:#fff}.zq{padding:2px 12px;font-size:17px;margin:0}
 button,label.b{background:var(--acc);color:#fff;border:0;border-radius:10px;padding:9px 12px;font-size:15px;cursor:pointer;display:inline-block;margin:2px 0}
 button.s,label.s{background:var(--bg);color:var(--fg);border:1px solid var(--mut)}
 button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
@@ -57,9 +57,9 @@ table{width:100%;border-collapse:collapse;font-size:12px}td,th{padding:4px 2px;t
 <div class="card m" id="m-gpx"><input id="gf" type="file"><textarea id="gt" placeholder="ou colle ici le contenu du fichier GPX" style="height:70px;margin-top:6px"></textarea><button id="gp" class="s">Charger le texte collé</button><div id="gi" class="k"></div><div class="row" style="margin-top:6px"><select id="gs"></select><input id="gn" placeholder="Nom du parcours"></div><button id="gv" class="s">💾 Sauvegarder</button> <button id="gx" class="s">🗑 Supprimer la sélection</button><div class="k" style="margin-top:8px">Difficulté (100 % = pente réelle du parcours)</div><div class="row"><button id="dfm" class="s">− 5</button><div class="pc" id="dfv">100 %</div><button id="dfp" class="s">+ 5</button></div><div class="k" style="margin-top:6px">Le trainer suit la pente, de −10 % à +12 %, multipliée par la difficulté.</div></div>
 <div class="card m" id="m-hist"><div class="row" style="margin-bottom:8px"><button id="ex1" class="s">⬇ CSV résumé</button><button id="ex2" class="s">⬇ CSV détail par bloc</button></div><div id="hl"></div></div>
 
-<div class="card"><canvas id="c"></canvas><div class="lg" id="lg"></div></div>
+<div class="card"><canvas id="c"></canvas><div id="zb" style="display:none;justify-content:flex-end;align-items:center;gap:6px;margin-top:4px"><span class="k">Zoom</span><button id="zout" class="s zq">−</button><button id="zin" class="s zq">+</button></div><div class="lg" id="lg"></div><div class="lg" id="lh"></div></div>
 <div class="grid">
-<div class="card"><div class="k" id="tgk">Cible</div><div class="v" id="tg">– W</div></div>
+<div class="card" id="tc"><div class="k" id="tgk">Cible</div><div class="v" id="tg">– W</div></div>
 <div class="card"><div class="k">Puissance</div><div class="v" id="pw">– W</div></div>
 <div class="card" id="hc"><div class="k">Cardio</div><div class="v" id="hr">–</div></div>
 <div class="card"><div class="k">Cadence</div><div class="v" id="cd">– rpm</div></div>
@@ -74,7 +74,7 @@ table{width:100%;border-collapse:collapse;font-size:12px}td,th{padding:4px 2px;t
 const $=i=>document.getElementById(i);
 const US=['David','Isabelle','Daniel','Raphaël'],ZN=['Recovery','Endurance','Tempo','Threshold','VO2 Max','Anaerobic'],ZC=['#808080','#3b8bd4','#46c06a','#ffc93c','#f4623a','#b04adf'];
 /* Poids total en kg (cycliste + vélo + équipement), par personne : à modifier ici. REF = masse que le trainer suppose par défaut (hypothèse). */
-const POIDS={David:112,Isabelle:85,Daniel:85,'Raphaël':85},REF=75;
+const POIDS={David:85,Isabelle:85,Daniel:85,'Raphaël':85},REF=75;
 const zi=p=>p<55?0:p<76?1:p<91?2:p<106?3:p<121?4:5;
 const fmt=s=>Math.floor(s/60)+':'+String(Math.round(s)%60).padStart(2,'0');
 let mode='wk',run=false,el=0,cp=null,pw=0,cad=0,spd=0,hr=0,blocks=[],gpx=[],dist=0,low=0,lastT=-1,tgt=0,gr=0,pc=100,rec=[],km=0;
@@ -82,8 +82,12 @@ let U='David',P={},PW='',online=false,chain=Promise.resolve();
 try{PW=localStorage.getItem('pw')||''}catch(e){}
 try{U=localStorage.getItem('cur')||U}catch(e){}
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const SC=s=>s<0?'#7aa7d9':s<3?'#46c06a':s<5?'#ffc93c':s<10?'#f4623a':'#b0102a',SL=[['#7aa7d9','Descente'],['#46c06a','0–3 %'],['#ffc93c','3–5 %'],['#f4623a','5–10 %'],['#b0102a','> 10 %']];
-function lgs(){$('lg').innerHTML=(mode==='gpx'?SL:ZN.map((n,i)=>[ZC[i],'Z'+(i+1)+' '+n])).map(a=>'<span style="background:'+a[0]+(a[0]==='#b0102a'?';color:#fff':'')+'">'+a[1]+'</span>').join('')}lgs();
+const lt=c=>{const n=parseInt(c.slice(1),16);return((n>>16&255)*299+(n>>8&255)*587+(n&255)*114)/1000>140};
+const SC=s=>s<0?'#26c6da':s<3?'#d9c7f5':s<5?'#a57be0':s<10?'#d81b60':'#6a0f2e',SL=[['#26c6da','Descente'],['#d9c7f5','0–3 %'],['#a57be0','3–5 %'],['#d81b60','5–10 %'],['#6a0f2e','> 10 %']];
+function lgs(){const fm=+$('fm').value||185,r=a=>Math.round(a*fm),h=[['#808080','Z1 < '+r(.6)],['#3b8bd4','Z2 '+r(.6)+'–'+r(.7)],['#46c06a','Z3 '+r(.7)+'–'+r(.8)],['#ffc93c','Z4 '+r(.8)+'–'+r(.9)],['#f4623a','Z5 > '+r(.9)]],
+ chip=a=>'<span style="background:'+a[0]+';color:'+(lt(a[0])?'#000':'#fff')+'">'+a[1]+'</span>';
+ $('lg').innerHTML=(mode==='gpx'?SL:ZN.map((n,i)=>[ZC[i],'Z'+(i+1)+' '+n])).map(chip).join('');
+ $('lh').innerHTML='<span class="k">Cardio (bpm) :</span>'+h.map(chip).join('');$('zb').style.display=mode==='gpx'?'flex':'none'}lgs();
 function users(){$('us').innerHTML=US.map(n=>'<button class="s'+(n===U?' on':'')+'" data-u="'+n+'">'+n+'</button>').join('')}
 $('us').onclick=e=>{const n=e.target.dataset.u;if(!n||n===U)return;stop();save();U=n;try{localStorage.setItem('cur',U)}catch(x){}$('rec').classList.remove('on');load();users()};
 function load(){P={ftp:190,fm:185,wt:'',workouts:[],tests:[],sess:[],kmh:27,pc:100,gpxs:[]};
@@ -98,10 +102,10 @@ $('pwi').onkeydown=e=>{if(e.key==='Enter')$('pwb').click()};
 function lst(){$('sw').innerHTML='<option value="">Séances sauvegardées…</option>'+P.workouts.map((w,i)=>'<option value="'+i+'">'+esc(w.n)+'</option>').join('');$('th').textContent=P.tests.length?'Historique : '+P.tests.map(t=>t.d+' → '+t.f+' W').join(' · '):'';hl()}
 function hl(){const s=P.sess;$('hl').innerHTML=s.length?'<div class="k">'+U+' : '+s.length+' séances · '+s.reduce((a,b)=>a+b.km,0).toFixed(0)+' km virtuels au total</div>'+s.map((q,i)=>'<div class="sr" data-i="'+i+'"><b>'+q.d+'</b> '+esc(q.n)+'<br><span class="k">'+fmt(q.dur)+' · '+q.pm+' W moy · '+q.km+' km · intensité '+q.pc+' %</span></div>').join(''):'Aucune séance enregistrée pour l\'instant.'}
 $('hl').onclick=e=>{const d=e.target.closest('.sr');if(d)show(P.sess[+d.dataset.i])};
-function apply(){pc=P.pc||100;gd=P.gd||100;$('ftp').value=P.ftp;$('fm').value=P.fm;$('kh').value=P.kmh||27;$('wt').value=P.wt||$('wt').value;lst();gls();ui()}
+function apply(){pc=P.pc||100;gd=P.gd||100;$('ftp').value=P.ftp;$('fm').value=P.fm;$('kh').value=P.kmh||27;$('wt').value=P.wt||$('wt').value;lst();gls();lgs();ui()}
 function save(){if(!U)return;P.ftp=+$('ftp').value;P.fm=+$('fm').value;P.kmh=+$('kh').value||27;P.wt=$('wt').value;P.pc=pc;P.gd=gd;try{localStorage.setItem('prof_'+U,JSON.stringify(P))}catch(e){}
  if(online){const u=U,d=structuredClone(P);chain=chain.then(()=>api(u,'set',d)).then(r=>{if(!r.ok)throw 0}).catch(()=>{$('msg').textContent='Sauvegarde en ligne échouée.'})}}
-['ftp','fm','kh'].forEach(k=>$(k).onchange=save);
+['ftp','fm','kh'].forEach(k=>$(k).onchange=()=>{save();lgs()});$('zin').onclick=()=>{zmv=Math.min(16,zmv*2);draw()};$('zout').onclick=()=>{zmv=Math.max(1,zmv/2);draw()};
 const setGd=d=>{gd=Math.max(10,Math.min(200,gd+d));save();ui()};$('dfm').onclick=()=>setGd(-5);$('dfp').onclick=()=>setGd(5);
 const setPc=d=>{pc=Math.max(30,Math.min(200,pc+d));save();ui()};$('pm').onclick=()=>setPc(-5);$('pp').onclick=()=>setPc(5);
 $('sw').onchange=()=>{const w=P.workouts[$('sw').value];if(w){$('wt').value=w.t;$('nm').value=w.n;draw()}};
@@ -110,7 +114,7 @@ $('dl').onclick=()=>{const i=$('sw').value;if(i==='')return;P.workouts.splice(+i
 document.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{stop();mode=b.dataset.m;
  document.querySelectorAll('[data-m]').forEach(x=>x.classList.toggle('on',x===b));
  document.querySelectorAll('.m').forEach(x=>x.classList.toggle('on',x.id==='m-'+mode));lgs();draw()});
-let lg=0,lastI=-1,wl=null,ac=null,off=0,gd=100;
+let lg=0,lastI=-1,wl=null,ac=null,off=0,gd=100,zmv=1;
 async function wake(on){try{if(on&&navigator.wakeLock&&!wl){wl=await navigator.wakeLock.request('screen');wl.addEventListener('release',()=>{wl=null})}else if(!on&&wl){await wl.release();wl=null}}catch(e){}}
 document.addEventListener('visibilitychange',()=>{if(run&&document.visibilityState==='visible')wake(true)});
 function beep(f,d){if(!$('bp').checked||!ac)return;try{const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;g.gain.value=.3;o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch(e){}}
@@ -199,19 +203,21 @@ $('ex2').onclick=()=>{if(!P.sess.length){$('msg').textContent='Aucune séance à
 /* GPX sauvegardés + profil d'altitude */
 function gsm(){let a=0,b=0,sum=0;const n=gpx.length;for(let i=0;i<n;i++){while(b<n&&gpx[b].d<=gpx[i].d+75){sum+=gpx[b].ele;b++}while(gpx[a].d<gpx[i].d-75){sum-=gpx[a].ele;a++}gpx[i].es=sum/(b-a)}}
 const slp=d=>{const j=gAt(d+100),k=gAt(Math.max(0,d-100)),dd=gpx[j].d-gpx[k].d;return dd>20?(gpx[j].es-gpx[k].es)/dd*100:0};
-const ginfo=()=>{gsm();const D=gpx[gpx.length-1].d;let up=0;gpx.forEach((p,i)=>{if(i&&p.ele>gpx[i-1].ele)up+=p.ele-gpx[i-1].ele});$('gi').textContent=(D/1000).toFixed(1)+' km · D+ '+Math.round(up)+' m'};
+const ginfo=()=>{gsm();zmv=1;const D=gpx[gpx.length-1].d;let up=0;gpx.forEach((p,i)=>{if(i&&p.ele>gpx[i-1].ele)up+=p.ele-gpx[i-1].ele});$('gi').textContent=(D/1000).toFixed(1)+' km · D+ '+Math.round(up)+' m'};
 function gls(){$('gs').innerHTML='<option value="">GPX sauvegardés…</option>'+P.gpxs.map((g,i)=>'<option value="'+i+'">'+esc(g.n)+'</option>').join('')}
 $('gs').onchange=()=>{const g=P.gpxs[$('gs').value];if(g){gpx=g.p.map(([d,e])=>({d,ele:e}));dist=0;$('gn').value=g.n;ginfo();draw()}};
 $('gv').onclick=()=>{const n=$('gn').value.trim();if(!n||!gpx.length)return;const l=[];let last=-99;gpx.forEach((p,i)=>{if(p.d-last>=10||i===gpx.length-1){l.push([Math.round(p.d),Math.round(p.ele*10)/10]);last=p.d}});
  P.gpxs=P.gpxs.filter(g=>g.n!==n);P.gpxs.push({n,p:l});save();gls();$('msg').textContent='Parcours enregistré.'};
 $('gx').onclick=()=>{const i=$('gs').value;if(i==='')return;P.gpxs.splice(+i,1);save();gls()};
-function drawG(x,w,h,dp){const L=38*dp,B=16*dp,W=w-L,H=h-B,D=gpx[gpx.length-1].d,es=gpx.map(p=>p.ele),mn=Math.min(...es),mx=Math.max(...es),rg=Math.max(mx-mn,20),
- fx=d=>L+d/D*W,fy=e=>H-4*dp-(e-mn)/rg*(H-12*dp),col=getComputedStyle(document.body).color;
- for(let px=L;px<w;px+=2*dp){const d=(px-L)/W*D,s=slp(d),y=fy(gpx[gAt(d)].es);x.fillStyle=SC(s);x.fillRect(px,y,2*dp,H-y)}
+function drawG(x,w,h,dp){const L=38*dp,B=16*dp,W=w-L,H=h-B,D=gpx[gpx.length-1].d,vs=D/zmv,v0=Math.max(0,Math.min(D-vs,dist-.25*vs)),v1=v0+vs,
+ vis=gpx.filter(p=>p.d>=v0&&p.d<=v1),es=(vis.length?vis:gpx).map(p=>p.es),mn=Math.min(...es),mx=Math.max(...es),rg=Math.max(mx-mn,20),
+ fx=d=>L+(d-v0)/vs*W,fy=e=>H-4*dp-(e-mn)/rg*(H-12*dp),col=getComputedStyle(document.body).color;
+ for(let px=L;px<w;px+=2*dp){const d=v0+(px-L)/W*vs,s=slp(d),y=fy(gpx[gAt(d)].es);x.fillStyle=SC(s);x.fillRect(px,y,2*dp,H-y)}
  x.fillStyle=col;x.strokeStyle='rgba(128,128,128,.35)';x.lineWidth=dp;x.font=10*dp+'px system-ui';x.textAlign='right';
  [mn,(mn+mx)/2,mx].forEach(e=>{const y=fy(e);x.beginPath();x.moveTo(L,y);x.lineTo(w,y);x.stroke();x.fillText(Math.round(e)+' m',L-3*dp,y+3*dp)});
- x.textAlign='center';const st=Math.max(1,Math.round(D/5000));for(let k=0;k*st*1000<=D;k++)x.fillText(k*st+' km',Math.min(fx(k*st*1000),w-14*dp),h-3*dp);
- x.fillRect(Math.min(fx(dist),w-2),0,2*dp,H)}
+ x.textAlign='center';const st=[.1,.2,.5,1,2,5,10,20,50].find(q=>vs/1000/q<=6)||50,u=st*1000;
+ for(let k=Math.ceil(v0/u);k*u<=v1;k++)x.fillText((st<1?(k*st).toFixed(1):k*st)+' km',Math.min(Math.max(fx(k*u),L+10*dp),w-14*dp),h-3*dp);
+ x.fillRect(Math.min(Math.max(fx(dist),L),w-2),0,2*dp,H)}
 /* Fin de séance */
 const av=(q,k)=>{const a=q.map(x=>x[k]).filter(Boolean);return a.length?Math.round(a.reduce((s,x)=>s+x,0)/a.length):0};
 function fin(){const n=rec.length,F=+$('ftp').value||190,S={d:new Date().toLocaleDateString('fr-FR'),n:$('nm').value.trim()||'Séance',dur:n,pc,F,pm:av(rec,1)||av(rec,0),hm:av(rec,2),km:+km.toFixed(1),z:[0,0,0,0,0,0],r:[],B:[]};
@@ -251,6 +257,7 @@ setInterval(()=>{if(run){el++;const F=+$('ftp').value;
   if(dist>=gpx[gpx.length-1].d){stop();return}}}ui()},1000);
 function ui(){const m=Math.floor(el/60);
  $('tg').textContent=mode==='gpx'?gr.toFixed(1)+' %':(run||mode==='ftp'&&el?Math.round(tgt)+' W':'– W');
+ const tc=$('tc');if(mode==='gpx'&&gpx.length){const c=SC(slp(dist));tc.style.background=c;tc.className='card '+(lt(c)?'hz':'hw')}else{tc.style.background='';tc.className='card'}
  $('pw').textContent=pw+' W';$('cd').textContent=Math.round(cad)+' rpm';
  const p=hr/(+$('fm').value||185),hz=p<.6?0:p<.7?1:p<.8?2:p<.9?3:4;$('hr').textContent=hr||'–';$('hc').style.background=hr?HZ[hz]:'';$('hc').classList.toggle('hz',!!hr);
  $('tm').textContent=m+':'+String(el%60).padStart(2,'0');$('kv').textContent=km.toFixed(2)+' km';$('pv').textContent=pc+' %';$('dfv').textContent=gd+' %';$('tgk').textContent=mode==='gpx'?'Pente':'Cible';blk();
