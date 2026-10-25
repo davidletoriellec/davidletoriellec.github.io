@@ -87,7 +87,7 @@ const SC=s=>s<0?'#26c6da':s<3?'#d9c7f5':s<5?'#a57be0':s<10?'#d81b60':'#6a0f2e',S
 function lgs(){const fm=+$('fm').value||185,r=a=>Math.round(a*fm),h=[['#808080','Z1 < '+r(.6)],['#3b8bd4','Z2 '+r(.6)+'–'+r(.7)],['#46c06a','Z3 '+r(.7)+'–'+r(.8)],['#ffc93c','Z4 '+r(.8)+'–'+r(.9)],['#f4623a','Z5 > '+r(.9)]],
  chip=a=>'<span style="background:'+a[0]+';color:'+(lt(a[0])?'#000':'#fff')+'">'+a[1]+'</span>';
  $('lg').innerHTML=(mode==='gpx'?SL:ZN.map((n,i)=>[ZC[i],'Z'+(i+1)+' '+n])).map(chip).join('');
- $('lh').innerHTML='<span class="k">Cardio (bpm) :</span>'+h.map(chip).join('');$('zb').style.display=mode==='gpx'?'flex':'none'}lgs();
+ $('lh').innerHTML=h.map(chip).join('');$('zb').style.display=mode==='gpx'?'flex':'none'}lgs();
 function users(){$('us').innerHTML=US.map(n=>'<button class="s'+(n===U?' on':'')+'" data-u="'+n+'">'+n+'</button>').join('')}
 $('us').onclick=e=>{const n=e.target.dataset.u;if(!n||n===U)return;stop();save();U=n;try{localStorage.setItem('cur',U)}catch(x){}$('rec').classList.remove('on');load();users()};
 function load(){P={ftp:190,fm:185,wt:'',workouts:[],tests:[],sess:[],kmh:27,pc:100,gpxs:[]};
