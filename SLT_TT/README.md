@@ -16,7 +16,7 @@ Appli web pédagogique (1ʳᵉ année) : l’étudiant règle RB, RA, Rhomme, fe
 Dans `index.html`, cherche `RESSOURCE_URL` et change l’adresse (et `RESSOURCE_TITRE` pour le texte du bouton). Laisse `""` pour cacher le bouton.
 
 ## Corrigé pour les enseignants
-Ajoute `#profs` à la fin de l’adresse (`.../regime-tt/#profs`) : un bouton « Corrigé (enseignants) » apparaît dans la zone Conclusion.
+Ajoute `#prof` à la fin de l’adresse (`.../regime-tt/#prof`) : un bouton « Corrigé (enseignants) » apparaît dans la zone Conclusion.
 
 ## À savoir
 - Le PDF est généré avec la bibliothèque jsPDF, chargée depuis cdnjs : une connexion internet est nécessaire.
