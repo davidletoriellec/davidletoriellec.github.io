@@ -248,8 +248,8 @@
           <p class="card-desc">Présentation générale de la salle de travaux pratiques et description des différents appareillages utilisés.</p>
         </div>
         <div class="card-actions">
-          <button class="btn btn-primary" onclick="playVideo('Matériel de la salle', 'https://pod.univ-lille.fr/video/50018-01-presentation-et-appareillagesmp4/?autoplay=true')">Visionner</button>
-          <a href="https://pod.univ-lille.fr/video/50018-01-presentation-et-appareillagesmp4/?autoplay=true" target="_blank" rel="noopener" class="btn btn-secondary">Lien direct ↗</a>
+          <button class="btn btn-primary" onclick="playVideo('Matériel de la salle', 'https://www.dailymotion.com/embed/video/k6u9jWnI1Ie8CsMn3L0?autoplay=1')">Visionner</button>
+          <a href="https://dai.ly/k6u9jWnI1Ie8CsMn3L0" target="_blank" rel="noopener" class="btn btn-secondary">Lien direct ↗</a>
         </div>
       </div>
 
@@ -261,8 +261,8 @@
           <p class="card-desc">Étude pratique et mesures du circuit comportant une résistance et une bobine (circuit RL).</p>
         </div>
         <div class="card-actions">
-          <button class="btn btn-primary" onclick="playVideo('Montage 2 : RL', 'https://pod.univ-lille.fr/video/50021-03-montage-2-rlmp4/?autoplay=true')">Visionner</button>
-          <a href="https://pod.univ-lille.fr/video/50021-03-montage-2-rlmp4/?autoplay=true" target="_blank" rel="noopener" class="btn btn-secondary">Lien direct ↗</a>
+          <button class="btn btn-primary" onclick="playVideo('Montage 2 : RL', 'https://www.dailymotion.com/embed/video/k73QvWxY5FRgxrMn3L8?autoplay=1')">Visionner</button>
+          <a href="https://dai.ly/k73QvWxY5FRgxrMn3L8" target="_blank" rel="noopener" class="btn btn-secondary">Lien direct ↗</a>
         </div>
       </div>
 
@@ -274,8 +274,8 @@
           <p class="card-desc">Analyse du comportement dynamique et de la résonance du circuit RLC série/parallèle.</p>
         </div>
         <div class="card-actions">
-          <button class="btn btn-primary" onclick="playVideo('Montage 3 : RLC', 'https://pod.univ-lille.fr/video/50022-04-montage-3-rlcmp4/?autoplay=true')">Visionner</button>
-          <a href="https://pod.univ-lille.fr/video/50022-04-montage-3-rlcmp4/?autoplay=true" target="_blank" rel="noopener" class="btn btn-secondary">Lien direct ↗</a>
+          <button class="btn btn-primary" onclick="playVideo('Montage 3 : RLC', 'https://www.dailymotion.com/embed/video/kS7DcW99VcuENKMn3L4?autoplay=1')">Visionner</button>
+          <a href="https://dai.ly/kS7DcW99VcuENKMn3L4" target="_blank" rel="noopener" class="btn btn-secondary">Lien direct ↗</a>
         </div>
       </div>
 
@@ -287,8 +287,8 @@
           <p class="card-desc">Étude du montage combinant plusieurs résistances et un condensateur (circuit R1R2C).</p>
         </div>
         <div class="card-actions">
-          <button class="btn btn-primary" onclick="playVideo('Montage 4 : R1R2C', 'https://pod.univ-lille.fr/video/50019-05-montage-4-r1r2cmp4/?autoplay=true')">Visionner</button>
-          <a href="https://pod.univ-lille.fr/video/50019-05-montage-4-r1r2cmp4/?autoplay=true" target="_blank" rel="noopener" class="btn btn-secondary">Lien direct ↗</a>
+          <button class="btn btn-primary" onclick="playVideo('Montage 4 : R1R2C', 'https://www.dailymotion.com/embed/video/k36NEa3OK0uFrlMn3KW?autoplay=1')">Visionner</button>
+          <a href="https://dai.ly/k36NEa3OK0uFrlMn3KW" target="_blank" rel="noopener" class="btn btn-secondary">Lien direct ↗</a>
         </div>
       </div>
 
@@ -296,13 +296,13 @@
   </div>
 
   <script>
-    function playVideo(title, url) {
+    function playVideo(title, embedUrl) {
       const container = document.getElementById('playerContainer');
       const iframe = document.getElementById('videoIframe');
       const titleElem = document.getElementById('playerTitle');
       
       titleElem.textContent = title;
-      iframe.src = url;
+      iframe.src = embedUrl;
       container.classList.add('active');
       
       container.scrollIntoView({ behavior: 'smooth' });
