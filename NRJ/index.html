@@ -1,1 +1,225 @@
+<!DOCTYPE html>
+<!-- TP Puissance et énergie – v1 -->
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TP Puissance et énergie</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{--bg:#f6f7f9;--fg:#1c2330;--card:#fff;--bd:#d5dae2;--ac:#1f6feb;--mut:#5d6778;--ok:#1a7f37;--hot:#d1242f;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12161c;--fg:#e6e9ef;--card:#1b212b;--bd:#323b49;--ac:#5aa2ff;--mut:#9aa5b8;--ok:#4cc26b;--hot:#ff7b72;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#12161c;--fg:#e6e9ef;--card:#1b212b;--bd:#323b49;--ac:#5aa2ff;--mut:#9aa5b8;--ok:#4cc26b;--hot:#ff7b72;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+.w{max-width:980px;margin:0 auto;padding:14px}
+h1{font-size:20px;margin:4px 0 12px}h2{font-size:16px;margin:0 0 10px}
+.c{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:14px;margin-bottom:14px}
+.r{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
+label{display:flex;flex-direction:column;font-size:12px;color:var(--mut);gap:3px}
+input,select,textarea,button{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:6px 9px}
+input{width:110px}textarea{width:100%;min-height:80px;box-sizing:border-box;resize:vertical}
+button{cursor:pointer;background:var(--ac);color:#fff;border-color:var(--ac)}button.s{background:var(--bg);color:var(--fg);border-color:var(--bd)}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:12px 0}
+.k{border:1px solid var(--bd);border-radius:8px;padding:8px 10px}.k b{display:block;font-size:20px}.k span{font-size:12px;color:var(--mut)}
+.on{color:var(--hot)}.msg{color:var(--mut);font-size:13px;min-height:18px}
+canvas{width:100%;height:auto;display:block}
+table{border-collapse:collapse;width:100%;font-size:14px}td,th{border:1px solid var(--bd);padding:5px 8px;text-align:right}th:first-child,td:first-child{text-align:left}
+.t{overflow-x:auto}
+[hidden]{display:none!important}.qa{border:1px solid var(--bd);border-radius:8px;padding:8px;margin-top:8px}.qa input{width:100%;box-sizing:border-box;margin-bottom:6px}
+#zb{position:absolute;border:1px dashed var(--ac);background:rgba(31,111,235,.18);pointer-events:none}
+.vl{position:absolute;width:0;border-left:1px dashed #fff;filter:drop-shadow(0 0 1px #000);pointer-events:none}
+#tt{position:absolute;pointer-events:none;background:var(--card);border:1px solid var(--bd);border-radius:6px;padding:3px 7px;font-size:12px;white-space:nowrap;z-index:5}
+</style></head><body><div class="w">
+<h1>TP Puissance et énergie</h1>
+<div class="c"><div class="r">
+<label>Nom<input id="nom" style="width:150px"></label>
+<label>Prénom<input id="pre" style="width:150px"></label>
+<label>Groupe<input id="grp" style="width:80px"></label>
+<label>Étude<select id="et" style="width:260px"><option value="1">1 – Étude sur les lampes</option><option value="2">2 – Étude sur le four</option></select></label>
+<button id="pdf">Exporter en PDF</button></div><div class="msg" id="pm"></div></div>
 
+<div id="s1">
+<div class="c"><h2>A. Mesures sur une lampe (tension secteur, 230 V)</h2>
+<div class="r"><label>Lampe<select id="lamp" style="width:230px"><option value="inc">Incandescence 60 W</option><option value="led">LED 9 W</option></select></label>
+<button id="bU">1. Relever U</button><button id="bI">2. Relever I</button>
+<label>3. Votre calcul U×I (VA)<input id="sc"></label><button class="s" id="bS">Valider</button>
+<button id="bP">4. Mesurer P (wattmètre)</button></div>
+<div class="g"><div class="k"><span>U (V)</span><b id="vU">–</b></div><div class="k"><span>I (A)</span><b id="vI">–</b></div><div class="k"><span>U×I élève (VA)</span><b id="vS">–</b></div><div class="k"><span>P wattmètre (W)</span><b id="vP">–</b></div><div class="k"><span>P / (U×I)</span><b id="vF">–</b></div></div>
+<div class="msg" id="m1"></div>
+<div class="msg">Comparez U×I et P et expliquez la différence dans les questions traitées (en bas de l’étude).</div></div>
+
+<div class="c"><h2>B. Rentabilité : LED vs incandescence</h2>
+<div class="r">
+<label>Nb d’ampoules<input id="n" type="number" value="11"></label>
+<label>Durée d’usage (h/jour)<input id="hd" type="number" step="0.5" value="3"></label>
+<label>Prix kWh (€) – EDF Bleu base<input id="kw" type="number" step="0.001" value="0.200"></label>
+<label>Horizon (mois)<input id="hz" type="number" value="120"></label></div>
+<div class="r" style="margin-top:8px">
+<label>Incand. prix (€)<input id="pi" type="number" step="0.05" value="0.75"></label>
+<label>Incand. durée de vie (h)<input id="li" type="number" value="1000"></label>
+<label>Incand. puissance (W)<input id="wi" type="number" value="60"></label>
+<label>LED prix (€)<input id="pl" type="number" step="0.05" value="4.2"></label>
+<label>LED durée de vie (h)<input id="ll" type="number" value="20000"></label>
+<label>LED puissance (W)<input id="wl" type="number" value="9"></label></div>
+<div class="r" style="margin-top:12px"><label>Votre coût d’installation incand. (€)<input id="ra1"></label><label>Votre coût d’installation LED (€)<input id="ra2"></label><label>Votre rentabilité (mois)<input id="ra3"></label></div><div id="cor1" hidden><b>Corrigé</b><div class="t"><table id="tb"></table></div>
+<div class="g"><div class="k"><span>Rentable au bout de</span><b id="be">–</b></div></div><canvas id="cr" width="900" height="300"></canvas></div></div>
+<div class="c"><h2>Questions traitées – Étude 1</h2><div id="qa1"></div><button class="s" id="aq1" style="margin-top:8px">+ Ajouter une question</button></div>
+</div>
+
+<div id="s2" hidden>
+<div class="c"><h2>Four de 1500 W – cuisson d’un poulet (régulation tout ou rien)</h2>
+<div class="r">
+<label>Consigne (°C)<input id="st" type="number" value="180"></label>
+<label>Durée de cuisson (min)<input id="du" type="number" value="75"></label>
+<label>Vitesse<select id="sp"><option value="1">×1</option><option value="60">×60</option><option value="300" selected>×300</option><option value="1200">×1200</option></select></label>
+<label>Prix kWh (€)<input id="kw2" type="number" step="0.001" value="0.200"></label>
+<label>Graphique<select id="vw"><option value="all">Cuisson entière</option><option value="win">15 dernières min</option></select></label>
+<button id="go">Démarrer</button><button class="s" id="rs">Réinitialiser</button><button class="s" id="zr">Réinitialiser le zoom</button></div><div class="r" style="margin-top:8px"><label>Zoom – abscisse de (min)<input id="zx0" type="number" step="any"></label><label>à (min)<input id="zx1" type="number" step="any"></label><button class="s" id="za">Appliquer</button></div><div class="msg">Ou tracez un rectangle à la souris sur le graphique de température (temps et °C) ; double-clic pour revenir.</div>
+<div class="g">
+<div class="k"><span>Temps de cuisson</span><b id="o_t">00:00:00</b></div>
+<div class="k"><span>Température (°C)</span><b id="o_T">20</b></div>
+<div class="k"><span>Tension U (V)</span><b id="o_U">–</b></div>
+<div class="k"><span>Courant I (A)</span><b id="o_I">–</b></div>
+<div class="k pr"><span>Puissance P (W)</span><b id="o_P">0</b></div>
+<div class="k pr"><span>Énergie (kWh)</span><b id="o_E">0,000</b></div></div>
+<div id="gw" style="position:relative"><canvas id="co" width="900" height="300"></canvas><canvas id="cp" width="900" height="180"></canvas><div id="zb" hidden></div><div class="vl" id="v1" hidden></div><div class="vl" id="v2" hidden></div><div id="tt" hidden></div></div>
+<div class="g pr">
+<div class="k"><span>Régime permanent : durée à fond</span><b id="o_on">–</b></div>
+<div class="k"><span>Régime permanent : durée à 0</span><b id="o_off">–</b></div>
+<div class="k"><span>Ratio fond / (fond + zéro)</span><b id="o_a">–</b></div>
+<div class="k"><span>Coût réel de la cuisson</span><b id="o_c">–</b></div></div>
+<div class="r"><label>Ratio TOR déterminé (%)<input id="ra4"></label><label>Puissance moyenne (W)<input id="pm2"></label><label>Énergie (kWh)<input id="ra5"></label><label>Coût de la cuisson (€)<input id="ce"></label></div></div>
+<div class="c"><h2>Questions traitées – Étude 2</h2><div id="qa2"></div><button class="s" id="aq2" style="margin-top:8px">+ Ajouter une question</button></div>
+</div>
+</div>
+<script>
+const $=i=>document.getElementById(i),fm=(v,d=2)=>Number(v).toFixed(d).replace(".",","),num=v=>parseFloat(String(v).replace(",","."));
+const rn=(v,p)=>v*(1+(Math.random()-.5)*2*p);
+const LIGHT={bg:"#fff",fg:"#111",grid:"#ccc"};
+const pal=()=>{const s=getComputedStyle(document.documentElement);return{bg:"rgba(0,0,0,0)",fg:s.getPropertyValue("--fg").trim(),grid:s.getPropertyValue("--bd").trim()}};
+function plot(c,S,x0,x1,fx,P){const g=c.getContext("2d"),W=c.width,H=c.height,m={l:62,r:62,t:28,b:34};
+g.clearRect(0,0,W,H);g.fillStyle=P.bg;g.fillRect(0,0,W,H);g.font="14px sans-serif";g.lineWidth=1;
+const X=x=>m.l+(x-x0)/(x1-x0)*(W-m.l-m.r),Y=(s,v)=>H-m.b-(v-s.min)/(s.max-s.min)*(H-m.t-m.b);
+const L=S.find(s=>s.side=="l"),R=S.find(s=>s.side=="r");c._v={m};
+for(let i=0;i<=5;i++){const x=m.l+i*(W-m.l-m.r)/5,y=m.t+i*(H-m.t-m.b)/5;g.strokeStyle=P.grid;g.beginPath();g.moveTo(x,m.t);g.lineTo(x,H-m.b);g.moveTo(m.l,y);g.lineTo(W-m.r,y);g.stroke();
+g.fillStyle=P.fg;g.textAlign="center";g.fillText(fx(x0+i*(x1-x0)/5),x,H-12);
+const fr=1-i/5;if(L){g.textAlign="right";g.fillStyle=L.col;g.fillText((L.min+fr*(L.max-L.min)).toFixed(L.max-L.min<10?1:0),m.l-6,y+5)}
+if(R){g.textAlign="left";g.fillStyle=R.col;g.fillText(Math.round(R.min+fr*(R.max-R.min)),W-m.r+6,y+5)}}
+let lx=m.l;S.forEach(s=>{g.save();g.beginPath();g.rect(m.l,m.t,W-m.l-m.r,H-m.t-m.b);g.clip();g.setLineDash(s.dash||[]);g.strokeStyle=s.col;g.lineWidth=2;g.beginPath();let f=1,py=0;
+s.pts.forEach(p=>{const x=X(p[0]),y=Y(s,p[1]);if(f){g.moveTo(x,y);f=0}else{if(s.step)g.lineTo(x,py);g.lineTo(x,y)}py=y});g.stroke();g.restore();
+g.fillStyle=s.col;g.textAlign="left";g.fillText("■ "+s.label,lx,16);lx+=g.measureText("■ "+s.label).width+22})}
+
+/* ---------- Étude 1 : mesures ---------- */
+const meas={inc:{txt:""},led:{txt:""}},LP={inc:{n:"Incandescence 60 W",R:881.67},led:{n:"LED 9 W",P:9,cos:.83}};
+const cur=()=>meas[$("lamp").value];
+function showL(){const m=cur();$("vU").textContent=m.U?fm(m.U):"–";$("vI").textContent=m.I?fm(m.I,4):"–";$("vS").textContent=m.S?fm(m.S):"–";$("vP").textContent=m.P?fm(m.P):"–";
+$("vF").textContent=m.P&&m.S?fm(m.P/m.S,3):"–";$("sc").value=m.S?fm(m.S):"";
+$("m1").textContent=m.P&&m.S?"Écart U×I − P = "+fm(m.S-m.P)+" VA/W. Que représente le rapport P / (U×I) ?":""}
+$("lamp").onchange=showL;
+$("bU").onclick=()=>{const m=cur();m.U=rn(230,.004);m.I=m.P=m.S=null;showL()};
+$("bI").onclick=()=>{const m=cur(),l=$("lamp").value;if(!m.U){$("m1").textContent="Relevez d’abord U.";return}
+m.I=l=="inc"?m.U/rn(LP.inc.R,.003):rn(LP.led.P,.01)/(230*LP.led.cos);m.P=m.S=null;showL()};
+$("bS").onclick=()=>{const m=cur(),v=num($("sc").value);if(!m.I){$("m1").textContent="Relevez U puis I d’abord.";return}
+m.S=v;showL();const ok=Math.abs(v-m.U*m.I)/(m.U*m.I)<.02;$("m1").textContent=ok?"Calcul correct.":"Votre calcul ne correspond pas à U×I, vérifiez-le.";if(!ok)m.S=null}
+$("bP").onclick=()=>{const m=cur(),l=$("lamp").value;if(!m.S){$("m1").textContent="Validez d’abord votre calcul U×I.";return}
+m.P=rn(m.U*m.I*(l=="inc"?1:LP.led.cos),.005);showL()};
+function addQ(c){const d=document.createElement("div");d.className="qa";d.innerHTML='<input placeholder="Question traitée (ex. 1.2 – pourquoi U×I ≠ P ?)"><textarea placeholder="Réponse, calculs, interprétation"></textarea>';$(c).appendChild(d)}
+const qaOf=c=>[...$(c).children].map(d=>[d.children[0].value,d.children[1].value]);
+$("aq1").onclick=()=>addQ("qa1");$("aq2").onclick=()=>addQ("qa2");addQ("qa1");addQ("qa2");
+
+/* ---------- Étude 1 : rentabilité ---------- */
+function rent(){const v=i=>num($(i).value),n=v("n"),hd=v("hd"),k=v("kw"),H=v("hz");
+const A={pr:v("pi"),li:v("li"),w:v("wi")},B={pr:v("pl"),li:v("ll"),w:v("wl")};
+const cost=(a,m)=>{const h=m*30.42*hd,ach=n*a.pr*Math.max(1,Math.ceil(h/a.li)),co=h*a.w/1000*n*k;return[ach,co,ach+co,h]};
+let be=null;for(let m=0;m<=H;m+=.1){if(cost(B,m)[2]<=cost(A,m)[2]){be=m;break}}
+const pa=[],pb=[];for(let m=0;m<=H;m+=H/200){pa.push([m,cost(A,m)[2]]);pb.push([m,cost(B,m)[2]])}
+return{a:cost(A,H),b:cost(B,H),a0:cost(A,0),b0:cost(B,0),be,H,pa,pb}}
+function drawRent(c,P){const r=rent(),mx=Math.ceil(Math.max(r.a[2],r.b[2])/10)*10||10;
+plot(c,[{pts:r.pa,col:"#d1242f",label:"Incandescence (€ cumulés)",min:0,max:mx,side:"l"},{pts:r.pb,col:"#1f9d55",label:"LED (€ cumulés)",min:0,max:mx,side:"l"}],0,r.H,x=>Math.round(x)+" m",P);return r}
+function calcR(){const r=drawRent($("cr"),pal());
+$("tb").innerHTML="<tr><th></th><th>Incandescence</th><th>LED</th></tr><tr><td>Coût d’installation (achat initial)</td><td>"+fm(r.a0[0])+" €</td><td>"+fm(r.b0[0])+" €</td></tr>"+
+"<tr><td>Achats cumulés sur "+r.H+" mois (remplacements)</td><td>"+fm(r.a[0])+" €</td><td>"+fm(r.b[0])+" €</td></tr>"+
+"<tr><td>Coût de la consommation ("+Math.round(r.a[3])+" h)</td><td>"+fm(r.a[1])+" €</td><td>"+fm(r.b[1])+" €</td></tr>"+
+"<tr><th>Coût total</th><th>"+fm(r.a[2])+" €</th><th>"+fm(r.b[2])+" €</th></tr>";
+$("be").textContent=r.be==null?"non atteint":fm(r.be,1)+" mois"}
+["n","hd","kw","hz","pi","li","wi","pl","ll","wl"].forEach(i=>$(i).oninput=calcR);
+
+/* ---------- Étude 2 : four ---------- */
+const PN=1500,RTH=.5,CTH=5200,HY=3,TA=20,R1=.04,CE=1200,TS=25;let S,acc=0;
+function init(){S={t:0,T:TA,Te:TA,Ts:TA,on:true,run:false,E:0,ss:false,sOn:0,sOff:0,pts:[]};$("go").textContent="Démarrer";ovenUI()}
+function step(){const st=num($("st").value),du=num($("du").value)*60;
+if(S.on&&S.Ts>=st+HY){S.on=false;S.ss=true}else if(!S.on&&S.Ts<=st-HY)S.on=true;
+const q=(S.Te-S.T)/R1;S.Te+=((S.on?PN:0)-q)/CE;S.T+=(q-(S.T-TA)/RTH)/CTH;S.Ts+=(S.T-S.Ts)/TS;S.E+=(S.on?PN:0)/3.6e6;S.t++;
+if(S.ss){S.on?S.sOn++:S.sOff++}
+if(S.t%5==0)S.pts.push([S.t,S.Ts,S.on?PN:0]);
+if(S.t>=du){S.run=false;$("go").textContent="Terminé";}}
+const hms=s=>[s/3600|0,(s/60|0)%60,s%60].map(x=>String(x).padStart(2,"0")).join(":");
+function view(){const st=num($("st").value),du=num($("du").value)*60,w=$("vw").value=="win",x1=w?Math.max(900,S.t):Math.max(du,S.t),x0=w?x1-900:0,tm=Math.ceil((st+30)/50)*50;
+return Z?{x0:Z.x0,x1:Z.x1,y0:Z.y0,y1:Z.y1,st}:{x0,x1,y0:0,y1:tm,st}}
+const fT=x=>String(Math.round(Math.max(0,x)/6)/10).replace(".",",")+" min";
+function drawOven(c,P,pc){const v=view();
+plot(c,[{pts:S.pts.map(p=>[p[0],p[1]]),col:"#d1242f",label:"Température (°C)",min:v.y0,max:v.y1,side:"l"},{pts:[[-1e6,v.st],[1e6,v.st]],col:"#888",dash:[8,5],label:"Consigne",min:v.y0,max:v.y1,side:"l"}],v.x0,v.x1,fT,P);
+plot(pc,[{pts:S.pts.map(p=>[p[0],p[2]]),col:"#1f6feb",label:"Sortie TOR – puissance (W)",min:0,max:1500,side:"l",step:1}],v.x0,v.x1,fT,P)}
+function ovenUI(){const kw=num($("kw2").value),on=S.run&&S.on;$("o_t").textContent=hms(S.t);$("o_T").textContent=fm(rn(S.Ts,.001),1);
+$("o_U").textContent=S.run?fm(rn(230,.003),1):"–";$("o_I").textContent=on?fm(rn(PN/230,.004),2):(S.run?"0,00":"–");$("o_P").textContent=on?fm(rn(PN,.003),0):"0";
+$("o_P").className=on?"on":"";$("o_E").textContent=fm(S.E,3);
+const tt=S.sOn+S.sOff;$("o_on").textContent=S.ss?S.sOn+" s":"–";$("o_off").textContent=S.ss?S.sOff+" s":"–";
+$("o_a").textContent=tt?fm(S.sOn/tt,3)+" ("+fm(100*S.sOn/tt,1)+" %)":"–";$("o_c").textContent=S.E?fm(S.E*kw)+" €":"–";drawOven($("co"),pal(),$("cp"))}
+$("go").onclick=()=>{if($("go").textContent=="Terminé")return;S.run=!S.run;$("go").textContent=S.run?"Pause":"Reprendre"};
+$("rs").onclick=init;$("vw").onchange=ovenUI;
+setInterval(()=>{if(!S.run)return;acc+=num($("sp").value)*.1;while(acc>=1&&S.run){step();acc--}ovenUI()},100);
+
+$("et").onchange=()=>{$("s1").hidden=$("et").value!="1";$("s2").hidden=$("et").value!="2";calcR();ovenUI()};
+
+/* ---------- Export PDF ---------- */
+$("pdf").onclick=async()=>{const pm=$("pm");pm.textContent="";
+if(!$("nom").value.trim()||!$("pre").value.trim()||!$("grp").value.trim()){pm.textContent="Renseignez nom, prénom et groupe avant l’export.";return}
+if(!window.jspdf){pm.textContent="Bibliothèque PDF non chargée.";return}
+const d=window.claude?await claude.use("downloads"):null;
+const doc=new jspdf.jsPDF({unit:"mm",format:"a4"}),L=15,W=180;let y=18;
+const need=h=>{if(y+h>282){doc.addPage();y=18}};
+const ln=(t,s=11,b)=>{doc.setFont("helvetica",b?"bold":"normal");doc.setFontSize(s);const a=doc.splitTextToSize(t,W);need(a.length*5.2);doc.text(a,L,y);y+=a.length*5.2+1};
+const box=(t,txt)=>{ln(t,10,1);doc.setFont("helvetica","normal");doc.setFontSize(10);const a=doc.splitTextToSize(txt||"",W-4),h=Math.max(38,a.length*4.6+8);need(h);doc.rect(L,y,W,h);doc.text(a,L+2,y+6);y+=h+5};
+const qaPdf=c=>qaOf(c).forEach(q=>{ln("Question traitée : "+(q[0]||"–"),10,1);box("Réponse :",q[1])});
+const img=f=>{const c=document.createElement("canvas");c.width=900;c.height=300;f(c,LIGHT);need(62);doc.addImage(c.toDataURL("image/png"),"PNG",L,y,W,60);y+=64};
+ln("TP Puissance et énergie",16,1);
+ln("Nom : "+$("nom").value+"   Prénom : "+$("pre").value+"   Groupe : "+$("grp").value+"   Date : "+new Date().toLocaleDateString("fr-FR"),11);y+=3;
+ln("1. Étude sur les lampes",13,1);
+["inc","led"].forEach(l=>{const m=meas[l];ln("Lampe "+LP[l].n,11,1);
+if(m.P&&m.S)ln("U = "+fm(m.U)+" V ; I = "+fm(m.I,4)+" A ; U×I (calcul élève) = "+fm(m.S)+" VA ; P (wattmètre) = "+fm(m.P)+" W ; P/(U×I) = "+fm(m.P/m.S,3)+" ; écart = "+fm(m.S-m.P)+".");
+else ln("Mesures non réalisées ou incomplètes.");
+});
+const P=isProf(),r=rent();ln("Rentabilité LED / incandescence : "+$("n").value+" ampoules, "+$("hd").value+" h/jour, "+$("kw").value+" EUR/kWh, horizon "+r.H+" mois.",10);
+if(P)ln("Corrigé – installation : incandescence "+fm(r.a0[0])+" EUR, LED "+fm(r.b0[0])+" EUR. Total sur l’horizon : incandescence "+fm(r.a[2])+" EUR, LED "+fm(r.b[2])+" EUR. Rentable au bout de : "+(r.be==null?"non atteint":fm(r.be,1)+" mois")+".",10);
+if(P)img(drawRent);ln("Réponses de l’élève : installation incandescence = "+($("ra1").value||"–")+" EUR ; LED = "+($("ra2").value||"–")+" EUR ; rentable au bout de "+($("ra3").value||"–")+" mois.",10);qaPdf("qa1");
+doc.addPage();y=18;ln("2. Étude sur le four (1500 W, régulation tout ou rien)",13,1);
+if(S.t){const tt=S.sOn+S.sOff;ln("Consigne "+$("st").value+" °C ; durée simulée "+hms(S.t)+" ; prix du kWh "+$("kw2").value+" EUR.",10);if(P)ln("Corrigé : énergie "+fm(S.E,3)+" kWh ; coût réel "+fm(S.E*num($("kw2").value))+" EUR.",10);
+if(P)ln("Corrigé – régime permanent : "+S.sOn+" s à fond, "+S.sOff+" s à zéro ; ratio fond/(fond+zéro) = "+(tt?fm(S.sOn/tt,3):"–")+".",10);
+ln("Réponses de l’élève : ratio TOR = "+($("ra4").value||"–")+" % ; puissance moyenne = "+($("pm2").value||"–")+" W ; énergie = "+($("ra5").value||"–")+" kWh ; coût = "+($("ce").value||"–")+" EUR.",10);{const a=document.createElement("canvas"),b=document.createElement("canvas");a.width=b.width=900;a.height=300;b.height=180;drawOven(a,LIGHT,b);need(100);doc.addImage(a.toDataURL("image/png"),"PNG",L,y,W,60);y+=60;doc.addImage(b.toDataURL("image/png"),"PNG",L,y,W,36);y+=40}}
+else ln("Simulation non réalisée.",10);
+qaPdf("qa2");
+const fn="TP_"+$("nom").value.trim()+"_"+$("pre").value.trim()+"_"+$("grp").value.trim()+".pdf";try{if(d)await d.save({filename:fn,data:doc.output("blob")});else doc.save(fn)}catch(e){pm.textContent=e&&e.code=="declined"?"Export annulé.":"L’export a échoué."}};
+let Z=null,dr=null;const cv=$("co");
+const pos=e=>{const r=cv.getBoundingClientRect(),k=cv.width/r.width;return[(e.clientX-r.left)*k,(e.clientY-r.top)*k]};
+cv.onpointerdown=e=>{dr=pos(e);cv.setPointerCapture(e.pointerId)};
+cv.onpointerup=e=>{if(!dr)return;const a=dr,b=pos(e);dr=null;$("zb").hidden=true;if(Math.abs(a[0]-b[0])<12||Math.abs(a[1]-b[1])<12)return;
+const v=view(),m=cv._v.m,W=cv.width,H=cv.height,gx=p=>v.x0+(p-m.l)/(W-m.l-m.r)*(v.x1-v.x0),gy=p=>v.y1-(p-m.t)/(H-m.t-m.b)*(v.y1-v.y0);
+setZ({x0:gx(Math.min(a[0],b[0])),x1:gx(Math.max(a[0],b[0])),y0:gy(Math.max(a[1],b[1])),y1:gy(Math.min(a[1],b[1]))})};
+const setZ=z=>{Z=z;$("zx0").value=z?+(z.x0/60).toFixed(2):"";$("zx1").value=z?+(z.x1/60).toFixed(2):"";ovenUI()};
+cv.ondblclick=$("zr").onclick=()=>setZ(null);
+$("za").onclick=()=>{const v=view(),a=num($("zx0").value),b=num($("zx1").value);if(!(b>a))return;setZ({x0:a*60,x1:b*60,y0:v.y0,y1:v.y1})};
+const gw=$("gw"),tt=$("tt"),cs=[cv,$("cp")],vl=[$("v1"),$("v2")];
+const p2=(e,c)=>{const r=c.getBoundingClientRect(),k=c.width/r.width;return[(e.clientX-r.left)*k,(e.clientY-r.top)*k]};
+const hideH=()=>{vl.forEach(l=>l.hidden=true);tt.hidden=true};
+function mv(e,c){const[px,py]=p2(e,c),m=c._v.m,v=view(),W=c.width,H=c.height;
+if(dr&&c==cv){const[qx,qy]=p2(e,cv),k=cv.getBoundingClientRect().width/cv.width,z=$("zb");z.hidden=false;z.style.left=cv.offsetLeft+Math.min(dr[0],qx)*k+"px";z.style.top=cv.offsetTop+Math.min(dr[1],qy)*k+"px";z.style.width=Math.abs(qx-dr[0])*k+"px";z.style.height=Math.abs(qy-dr[1])*k+"px"}
+if(px<m.l||px>W-m.r||py<m.t||py>H-m.b){hideH();return}
+const x=v.x0+(px-m.l)/(W-m.l-m.r)*(v.x1-v.x0),X=m.l+(x-v.x0)/(v.x1-v.x0)*(W-m.l-m.r);
+cs.forEach((k,i)=>{const sc=k.getBoundingClientRect().width/k.width,l=vl[i];l.hidden=false;l.style.left=k.offsetLeft+X*sc+"px";l.style.top=k.offsetTop+m.t*sc+"px";l.style.height=(k.height-m.t-m.b)*sc+"px"});
+const p=S.pts[Math.round(x/5)-1],ok=p&&Math.abs(p[0]-x)<30;let y="";
+if(c==cv)y=ok?"T = "+fm(p[1],1)+" °C":"°C = "+fm(v.y1-(py-m.t)/(H-m.t-m.b)*(v.y1-v.y0),1);else if(ok)y="P = "+fm(p[2],0)+" W";
+tt.textContent="t = "+hms(Math.max(0,Math.round(x)))+(y?"  ·  "+y:"");tt.hidden=false;
+const g=gw.getBoundingClientRect(),lf=e.clientX-g.left+14;tt.style.left=(lf>g.width-190?lf-200:lf)+"px";tt.style.top=e.clientY-g.top+14+"px"}
+cs.forEach(k=>{k.onpointermove=e=>mv(e,k);k.onpointerleave=hideH});
+const isProf=()=>location.hash.toLowerCase()=="#profs";const ap=()=>{const p=isProf();document.querySelectorAll(".pr").forEach(e=>e.hidden=!p);$("cor1").hidden=!p};window.onhashchange=ap;ap();
+showL();calcR();init();
+</script></body></html>
