@@ -10,5 +10,5 @@ Export PDF (nom, prénom, groupe, questions traitées et réponses).
 ## Utilisation
 
 - Ouvrir `index.html` dans un navigateur, ou l’héberger avec GitHub Pages.
-- **Mode prof (corrigé)** : ajouter `#profs` à l’adresse, par exemple `https://<compte>.github.io/<depot>/index.html#profs`.
+- **Mode prof (corrigé)** : ajouter `#prof` à l’adresse, par exemple `https://<compte>.github.io/<depot>/index.html#prof`.
 - L’export PDF utilise jsPDF, chargé depuis cdnjs : une connexion Internet est nécessaire.
