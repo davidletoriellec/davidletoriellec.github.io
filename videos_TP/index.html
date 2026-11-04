@@ -74,61 +74,6 @@
       box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15);
     }
 
-    .video-player-container {
-      margin-bottom: 2.5rem;
-      background: #000;
-      border-radius: var(--radius);
-      overflow: hidden;
-      box-shadow: var(--shadow);
-      display: none;
-    }
-
-    .video-player-container.active {
-      display: block;
-    }
-
-    .iframe-wrapper {
-      position: relative;
-      padding-bottom: 56.25%; /* 16:9 aspect ratio */
-      height: 0;
-    }
-
-    .iframe-wrapper iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border: 0;
-    }
-
-    .player-header {
-      background: #1e293b;
-      color: #fff;
-      padding: 0.75rem 1.25rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .player-title {
-      font-weight: 600;
-      font-size: 1.1rem;
-    }
-
-    .close-btn {
-      background: transparent;
-      border: none;
-      color: #94a3b8;
-      font-size: 1.5rem;
-      cursor: pointer;
-      line-height: 1;
-    }
-
-    .close-btn:hover {
-      color: #fff;
-    }
-
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -184,10 +129,10 @@
 
     .btn {
       flex: 1;
-      padding: 0.6rem;
+      padding: 0.75rem;
       border-radius: 6px;
-      font-size: 0.9rem;
-      font-weight: 500;
+      font-size: 0.95rem;
+      font-weight: 600;
       text-align: center;
       cursor: pointer;
       text-decoration: none;
@@ -203,17 +148,6 @@
     .btn-primary:hover {
       background: var(--primary-hover);
     }
-
-    .btn-secondary {
-      background: #f1f5f9;
-      color: var(--text-muted);
-      border: 1px solid var(--border);
-    }
-
-    .btn-secondary:hover {
-      background: #e2e8f0;
-      color: var(--text);
-    }
   </style>
 </head>
 <body>
@@ -228,16 +162,6 @@
       <input type="text" id="searchInput" placeholder="Rechercher une vidéo ou un montage..." onkeyup="filterCards()">
     </div>
 
-    <div class="video-player-container" id="playerContainer">
-      <div class="player-header">
-        <span class="player-title" id="playerTitle">Lecture en cours</span>
-        <button class="close-btn" onclick="closePlayer()" title="Fermer">&times;</button>
-      </div>
-      <div class="iframe-wrapper">
-        <iframe id="videoIframe" src="" allowfullscreen allow="autoplay"></iframe>
-      </div>
-    </div>
-
     <div class="grid" id="cardGrid">
       
       <!-- Carte 1 -->
@@ -248,8 +172,7 @@
           <p class="card-desc">Présentation générale de la salle de travaux pratiques et description des différents appareillages utilisés.</p>
         </div>
         <div class="card-actions">
-          <button class="btn btn-primary" onclick="playVideo('Matériel de la salle', 'https://www.dailymotion.com/embed/video/k6u9jWnI1Ie8CsMn3L0?autoplay=1')">Visionner</button>
-          <a href="https://dai.ly/k6u9jWnI1Ie8CsMn3L0" target="_blank" rel="noopener" class="btn btn-secondary">Lien direct ↗</a>
+          <a href="https://dai.ly/k6u9jWnI1Ie8CsMn3L0" target="_blank" rel="noopener" class="btn btn-primary">Regarder la vidéo ↗</a>
         </div>
       </div>
 
@@ -261,8 +184,7 @@
           <p class="card-desc">Étude pratique et mesures du circuit comportant une résistance et une bobine (circuit RL).</p>
         </div>
         <div class="card-actions">
-          <button class="btn btn-primary" onclick="playVideo('Montage 2 : RL', 'https://www.dailymotion.com/embed/video/k73QvWxY5FRgxrMn3L8?autoplay=1')">Visionner</button>
-          <a href="https://dai.ly/k73QvWxY5FRgxrMn3L8" target="_blank" rel="noopener" class="btn btn-secondary">Lien direct ↗</a>
+          <a href="https://dai.ly/k73QvWxY5FRgxrMn3L8" target="_blank" rel="noopener" class="btn btn-primary">Regarder la vidéo ↗</a>
         </div>
       </div>
 
@@ -274,8 +196,7 @@
           <p class="card-desc">Analyse du comportement dynamique et de la résonance du circuit RLC série/parallèle.</p>
         </div>
         <div class="card-actions">
-          <button class="btn btn-primary" onclick="playVideo('Montage 3 : RLC', 'https://www.dailymotion.com/embed/video/kS7DcW99VcuENKMn3L4?autoplay=1')">Visionner</button>
-          <a href="https://dai.ly/kS7DcW99VcuENKMn3L4" target="_blank" rel="noopener" class="btn btn-secondary">Lien direct ↗</a>
+          <a href="https://dai.ly/kS7DcW99VcuENKMn3L4" target="_blank" rel="noopener" class="btn btn-primary">Regarder la vidéo ↗</a>
         </div>
       </div>
 
@@ -287,8 +208,7 @@
           <p class="card-desc">Étude du montage combinant plusieurs résistances et un condensateur (circuit R1R2C).</p>
         </div>
         <div class="card-actions">
-          <button class="btn btn-primary" onclick="playVideo('Montage 4 : R1R2C', 'https://www.dailymotion.com/embed/video/k36NEa3OK0uFrlMn3KW?autoplay=1')">Visionner</button>
-          <a href="https://dai.ly/k36NEa3OK0uFrlMn3KW" target="_blank" rel="noopener" class="btn btn-secondary">Lien direct ↗</a>
+          <a href="https://dai.ly/k36NEa3OK0uFrlMn3KW" target="_blank" rel="noopener" class="btn btn-primary">Regarder la vidéo ↗</a>
         </div>
       </div>
 
@@ -296,26 +216,6 @@
   </div>
 
   <script>
-    function playVideo(title, embedUrl) {
-      const container = document.getElementById('playerContainer');
-      const iframe = document.getElementById('videoIframe');
-      const titleElem = document.getElementById('playerTitle');
-      
-      titleElem.textContent = title;
-      iframe.src = embedUrl;
-      container.classList.add('active');
-      
-      container.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function closePlayer() {
-      const container = document.getElementById('playerContainer');
-      const iframe = document.getElementById('videoIframe');
-      
-      iframe.src = '';
-      container.classList.remove('active');
-    }
-
     function filterCards() {
       const input = document.getElementById('searchInput').value.toLowerCase();
       const cards = document.querySelectorAll('.card');
