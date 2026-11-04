@@ -220,6 +220,6 @@ if(c==cv)y=ok?"T = "+fm(p[1],1)+" °C":"°C = "+fm(v.y1-(py-m.t)/(H-m.t-m.b)*(v.
 tt.textContent="t = "+hms(Math.max(0,Math.round(x)))+(y?"  ·  "+y:"");tt.hidden=false;
 const g=gw.getBoundingClientRect(),lf=e.clientX-g.left+14;tt.style.left=(lf>g.width-190?lf-200:lf)+"px";tt.style.top=e.clientY-g.top+14+"px"}
 cs.forEach(k=>{k.onpointermove=e=>mv(e,k);k.onpointerleave=hideH});
-const isProf=()=>location.hash.toLowerCase()=="#profs";const ap=()=>{const p=isProf();document.querySelectorAll(".pr").forEach(e=>e.hidden=!p);$("cor1").hidden=!p};window.onhashchange=ap;ap();
+const isProf=()=>location.hash.toLowerCase()=="#prof";const ap=()=>{const p=isProf();document.querySelectorAll(".pr").forEach(e=>e.hidden=!p);$("cor1").hidden=!p};window.onhashchange=ap;ap();
 showL();calcR();init();
 </script></body></html>
