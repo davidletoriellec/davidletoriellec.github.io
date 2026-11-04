@@ -143,7 +143,7 @@ $('bv').onclick=()=>meas('v');$('ba').onclick=()=>meas('a');$('clr').onclick=()=
 $('ddr').addEventListener('input',()=>{dc=false});$('dcb').onclick=()=>{dc=!dc;draw()};
 ['rb','ra','rh','rdv','rdon','ddr','pe','man','fault'].forEach(i=>$(i).addEventListener('input',draw));
 matchMedia('(prefers-color-scheme:dark)').addEventListener('change',draw);draw();
-const hp=()=>{$('chk').hidden=location.hash!=='#profs';if($('chk').hidden)$('fb').hidden=true};hp();addEventListener('hashchange',hp);
+const hp=()=>{$('chk').hidden=location.hash!=='#prof';if($('chk').hidden)$('fb').hidden=true};hp();addEventListener('hashchange',hp);
 
 const cl=t=>String(t).replace(/Ω/g,' ohms').replace(/IΔn/g,'IDn').replace(/[’‘]/g,"'").replace(/[–—]/g,'-').replace(/≤/g,'<=').replace(/→/g,'->').replace(/⚡/g,'');
 function png(){return new Promise((res,rej)=>{const im=new Image();im.onload=()=>{const c=document.createElement('canvas');c.width=1400;c.height=1040;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,1400,1040);x.drawImage(im,0,0,1400,1040);res(c.toDataURL('image/png'))};im.onerror=rej;
