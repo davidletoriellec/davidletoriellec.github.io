@@ -1,0 +1,12 @@
+{
+  "name": "labosim",
+  "version": "1.2.0",
+  "description": "Laboratoire d'électricité virtuel : appareils réalistes, câblage libre, oscilloscope, wattmètre, pinces, relais",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "test": "node tests/solver.test.js",
+    "start": "npx http-server . -p 8080"
+  },
+  "engines": { "node": ">=16" }
+}
