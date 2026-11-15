@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.4
+- Câbles : suppression des losanges ; poignées rondes orange (câble : points ; orthogonal : segments).
+- Correction : le moteur à courant continu s'arrête quand il n'est plus alimenté.
+- Alimentation triphasée 400 V (N, L1, L2, L3), moteur asynchrone triphasé 1,5 kW (cos φ 0,84, couplage étoile/triangle), caisse de charge 0–4 kW (mono/continu ou triphasée, paliers de 200 W ou valeur tapée).
+- Sonde de tension (÷10, ÷100) et sonde de courant (÷10, ÷100, ÷300) avec sorties BNC vers l'oscilloscope.
+- Compte-tours et couple-mètre pour les moteurs.
+- Oscilloscope : mode XY.
+- Sauvegarde et ouverture des montages (fichier JSON).
+
 ## v1.3
 - Câbles : trois tracés au choix en cliquant sur le fil — Câble (courbe passant par des points orange, losanges pour en ajouter, double-clic pour en retirer), Droit, Orthogonal (angles arrondis, segments déplaçables).
 - « Clac » sonore quand un relais ou un contacteur colle (bouton 🔊 pour couper).

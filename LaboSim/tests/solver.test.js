@@ -5,7 +5,7 @@ const el = () => ({ style: {}, dataset: {}, classList: { toggle() {}, remove() {
 const store = {};
 global.document = { getElementById: id => store[id] || (store[id] = el()), querySelectorAll: () => [] };
 global.window = { addEventListener() {} };
-const L = new Function(code + `;return{add,wire,connect,render,mkWave,bz,tp,wsamples,buildPdf,pdfWrap,reset(){comps=[];wires=[];notes=[];uid=1;sel=selW=selN=pend=null},get err(){return err},get wires(){return wires},get comps(){return comps}}`)();
+const L = new Function(code + `;return{add,wire,connect,render,mkWave,bz,tp,wsamples,buildPdf,pdfWrap,serializeMontage,loadMontage,reset(){comps=[];wires=[];notes=[];uid=1;sel=selW=selN=pend=null},get err(){return err},get wires(){return wires},get comps(){return comps},get solve(){return solve}}`)();
 
 let fail = 0;
 const near = (name, got, want, tol) => { const ok = Math.abs(got - want) <= tol * Math.max(1, Math.abs(want)); if (!ok) fail++; console.log((ok ? 'ok   ' : 'FAIL ') + name + ' → ' + got.toPrecision(5) + ' (attendu ' + want + ')'); };
@@ -73,7 +73,38 @@ L.reset(); { const s = L.add('ac'), w = L.add('watt'), l = L.add('led'); s.val =
 // 11. Notes de repérage, PDF
 L.reset(); L.add('bat'); const pdf = L.buildPdf([{ ops: 'BT /F1 12 Tf 40 500 Td (Test) Tj ET\n', img: null }], null);
 yes('PDF construit', pdf.size > 300); yes('retour à la ligne', L.pdfWrap('un deux trois quatre', 9).length === 3);
+// 11b. Le moteur CC s'arrête quand il n'est plus alimenté
+L.reset(); { const b = L.add('bat'), k = L.add('sw'), m = L.add('mdc'); b.val = 12; k.closed = true;
+  L.wire(b.id + ':1', k.id + ':0'); L.wire(k.id + ':1', m.id + ':1'); L.wire(m.id + ':0', b.id + ':0'); L.render(); yes('MCC alimenté : tourne', m.rpm > 2500);
+  k.closed = false; L.render(); yes('MCC non alimenté : arrêté', m.rpm === 0 && m.run === 0); k.closed = true; L.render(); yes('MCC ré-alimenté : retourne', m.rpm > 2500);
+  b.val = 12; m.load = 100; k.closed = false; L.render(); yes('MCC en charge coupé : arrêté', m.rpm === 0); }
+// 11c. Alimentation triphasée + moteur 1,5 kW (étoile / triangle) + couple-mètre et compte-tours
+L.reset(); { const a = L.add('a3', 190, 300), m = L.add('m3', 640, 150), t = L.add('tach', 730, 190), q = L.add('cpm', 580, 220); a.val = 400;
+  L.wire(a.id + ':1', m.id + ':0'); L.wire(a.id + ':2', m.id + ':1'); L.wire(a.id + ':3', m.id + ':2'); L.render();
+  near('moteur 3~ étoile : P (W)', m.P, 1500 / 0.8, 0.02); near('moteur 3~ : Q (VAr)', m.Q, 1500 / 0.8 * Math.tan(Math.acos(0.84)), 0.02); near('moteur 3~ : vitesse (tr/min)', m.rpm, 1440, 0.01);
+  near('compte-tours', t.tv, 1440, 0.01); near('couple-mètre (N·m)', q.tv, 0.8 * 1500 / 0.8 / (2 * Math.PI * 1440 / 60), 0.02);
+  m.cpl = 'D'; L.render(); near('mauvais couplage (triangle sur 400 V) : P × 3', m.P, 3 * (400 / 230) ** 2 / 3 * 1500 / 0.8, 0.03); }
+// 11d. Caisse de charge mono et tri
+L.reset(); { const s = L.add('ac'), c = L.add('cch'); s.val = 230; c.val = 1000;
+  L.wire(s.id + ':1', c.id + ':1'); L.wire(c.id + ':0', s.id + ':0'); L.render(); near('caisse mono : P (W)', c.P, 1000, 0.01);
+  c.val = 0; L.render(); near('caisse à 0 W', c.P, 0, 0.01); }
+L.reset(); { const a = L.add('a3'), c = L.add('cch'); c.cm = 'tri'; c.un = 400; c.val = 4000;
+  L.wire(a.id + ':1', c.id + ':0'); L.wire(a.id + ':2', c.id + ':1'); L.wire(a.id + ':3', c.id + ':2'); L.render(); near('caisse tri : P (W)', c.P, 4000, 0.01); }
+// 11e. Sondes : tension (÷10) et courant (÷100) vers l'oscilloscope
+L.reset(); { const s = L.add('ac'), sv = L.add('sv'), o = L.add('scope'); s.val = 230; sv.ratio = 10;
+  L.wire(sv.id + ':3', s.id + ':1'); L.wire(sv.id + ':2', s.id + ':0'); L.connect(sv.id + ':1', o.id + ':1'); L.render();
+  near('sonde de tension ÷10 (V eff.)', Math.hypot(...o.sig[0][1]), 23, 0.01); sv.ratio = 100; L.render(); near('sonde de tension ÷100 (V eff.)', Math.hypot(...o.sig[0][1]), 2.3, 0.01); }
+L.reset(); { const s = L.add('ac'), r = L.add('res'), sc = L.add('sc'), o = L.add('scope'); s.val = 24; r.val = 24; sc.ratio = 10;
+  L.wire(s.id + ':1', r.id + ':0'); L.wire(r.id + ':1', s.id + ':0'); place(sc, L.wires[0], .5); L.connect(sc.id + ':1', o.id + ':1'); L.render();
+  near('sonde de courant ÷10 : 1 A -> 0,1 V', Math.hypot(...o.sig[0][1]), 0.1, 0.02); sc.ratio = 100; L.render(); near('sonde de courant ÷100 : 1 A -> 0,01 V', Math.hypot(...o.sig[0][1]), 0.01, 0.02); }
+// 11f. Mode XY : cercle de Lissajous (CH1 = sinus, CH2 déphasé de 90° par un condensateur à la fréquence de coupure)
+L.reset(); { const g = L.add('gbf'), r = L.add('res'), c = L.add('cap'), o = L.add('scope'); g.amp = 5; r.val = 1591.55; c.val = 0.1; o.xy = true;
+  L.wire(g.id + ':1', r.id + ':0'); L.wire(r.id + ':1', c.id + ':0'); L.wire(c.id + ':1', g.id + ':0'); L.wire(o.id + ':1', r.id + ':0'); L.wire(o.id + ':0', g.id + ':0'); L.wire(o.id + ':3', c.id + ':0'); L.render(); yes('mode XY : rendu', true); }
+// 11g. Sauvegarde / ouverture
+L.reset(); { const b = L.add('bat'), r = L.add('res'), a = L.add('amp'); b.val = 10; r.val = 100; L.wire(b.id + ':1', r.id + ':0'); L.wire(r.id + ':1', a.id + ':1'); L.wire(a.id + ':0', b.id + ':0'); L.render();
+  const txt = L.serializeMontage(); yes('montage : JSON valide', JSON.parse(txt).comps.length === 3); L.reset(); yes('montage : rechargé', L.loadMontage(txt) === true);
+  near('montage rechargé : I (A)', Math.abs(L.comps.find(c => c.type === 'amp').I), 0.1, 0.01); yes('montage invalide refusé', L.loadMontage('{pas du json') === false); }
 // 12. Dessin de tous les appareils
-L.reset(); ['bat', 'ac', 'gbf', 'res', 'bulb', 'cap', 'ind', 'sw', 'com', 'rel', 'ctc', 'mdc', 'mac', 'led', 'cfl', 'amp', 'volt', 'watt', 'pince', 'scope'].forEach(t => L.add(t));
+L.reset(); ['bat', 'ac', 'gbf', 'res', 'bulb', 'cap', 'ind', 'sw', 'com', 'rel', 'ctc', 'mdc', 'mac', 'led', 'cfl', 'a3', 'm3', 'cch', 'sv', 'sc', 'tach', 'cpm', 'amp', 'volt', 'watt', 'pince', 'scope'].forEach(t => L.add(t));
 L.add('volt').ana = 1; L.add('amp').ana = 1; L.render(); yes('rendu complet', true);
 console.log(fail ? `\n${fail} test(s) en échec` : '\nTous les tests passent'); process.exit(fail ? 1 : 0);
