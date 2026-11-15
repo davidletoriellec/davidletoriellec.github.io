@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.6
+- Étiquettes colorées : couleur modifiable par étiquette, simple point coloré dans le menu.
+- Plan de travail de 4000 × 3000 : zoom (molette, boutons, pincement), déplacement de la vue, ajustement au montage ; l'export PDF prend tout le montage.
+- Wattmètre ISW8000 : suppression du trait entre les deux bornes de droite.
+- Appareils à aiguille : échelles 0–100 et 0–30 affichées ensemble, l'échelle en service (selon le calibre) en noir.
+
 ## v1.5
 - Caisse de charge : bornes dédiées M1/M2 (monophasé ou continu) et L1/L2/L3 (triphasé), sélecteur de branchement ; les anciens montages sont migrés.
 - Étiquettes sur le matériel (TP ELEN, TP ENER, TP1, TP2, Projet…, modifiables) et filtre du menu (tout / étiquette / sans étiquette), export et import de la configuration, fichier `labosim-tags.json` chargé sur GitHub Pages.

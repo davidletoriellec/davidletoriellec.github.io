@@ -1,11 +1,11 @@
 // Tests du solveur de LaboSim (Node >= 16, sans dépendance) : `npm test`
 const fs = require('fs'), path = require('path');
 const code = fs.readFileSync(path.join(__dirname, '..', 'js', 'app.js'), 'utf8').replace(/example\(\);\s*$/, '');
-const el = () => ({ style: {}, dataset: {}, classList: { toggle() {}, remove() {} }, addEventListener() {}, querySelectorAll: () => [], querySelector: () => null, set innerHTML(v) { this._h = v }, get innerHTML() { return this._h }, set textContent(v) {}, value: '', onclick: null, createSVGPoint: () => ({}) });
+const el = () => ({ style: {}, dataset: {}, classList: { toggle() {}, remove() {} }, addEventListener() {}, querySelectorAll: () => [], querySelector: () => null, set innerHTML(v) { this._h = v }, get innerHTML() { return this._h }, set textContent(v) {}, value: '', onclick: null, createSVGPoint: () => ({}), setAttribute() {}, getBoundingClientRect: () => ({ left: 0, top: 0, width: 900, height: 600 }), clientWidth: 900, clientHeight: 600 });
 const store = {};
 global.document = { getElementById: id => store[id] || (store[id] = el()), querySelectorAll: () => [] };
 global.window = { addEventListener() {} };
-const L = new Function(code + `;return{add,wire,connect,render,mkWave,bz,tp,wsamples,buildPdf,pdfWrap,serializeMontage,loadMontage,buildMenu,setFilter(v){tagFilter=v},get TAGS(){return TAGS},menuHtml(){return menuEl.innerHTML},reset(){comps=[];wires=[];notes=[];uid=1;sel=selW=selN=pend=null},get err(){return err},get wires(){return wires},get comps(){return comps},get solve(){return solve}}`)();
+const L = new Function(code + `;return{add,wire,connect,render,mkWave,bz,tp,wsamples,buildPdf,pdfWrap,serializeMontage,loadMontage,buildMenu,setFilter(v){tagFilter=v},get TAGS(){return TAGS},get view(){return view},fitView,zoomAt,contentBounds,menuHtml(){return menuEl.innerHTML},reset(){comps=[];wires=[];notes=[];uid=1;sel=selW=selN=pend=null},get err(){return err},get wires(){return wires},get comps(){return comps},get solve(){return solve}}`)();
 
 let fail = 0;
 const near = (name, got, want, tol) => { const ok = Math.abs(got - want) <= tol * Math.max(1, Math.abs(want)); if (!ok) fail++; console.log((ok ? 'ok   ' : 'FAIL ') + name + ' → ' + got.toPrecision(5) + ' (attendu ' + want + ')'); };
@@ -118,6 +118,19 @@ L.reset(); { L.TAGS.map.res = ['TP1']; L.TAGS.map.bat = ['TP1', 'Projet']; L.set
   L.setFilter('Projet'); L.buildMenu(); h = L.menuHtml(); yes('filtre Projet : résistance masquée', !h.includes('Résistance') && h.includes('Alimentation continue'));
   L.setFilter('-'); L.buildMenu(); h = L.menuHtml(); yes('sans étiquette : ampoule visible, résistance masquée', h.includes('Ampoule') && !h.includes('Résistance'));
   L.setFilter('*'); L.buildMenu(); h = L.menuHtml(); yes('tout : tout visible', h.includes('Ampoule') && h.includes('Résistance')); yes('repérage toujours visible', h.includes('Rectangle pointillé')); }
+// 11k. Zone de travail : bornes du contenu, ajustement et zoom
+L.reset(); { yes('zone vide : vue par défaut', L.contentBounds().w === 900);
+  L.add('bat', 2000, 1500); L.add('res', 2400, 1500); const b = L.contentBounds(); yes('contenu éloigné : bornes englobantes', b.x < 2000 && b.x + b.w > 2400 && b.y < 1500 && b.y + b.h > 1500);
+  L.fitView(); yes('ajuster : le montage est dans la vue', L.view.x <= b.x + 1 && L.view.x + 900 / L.view.z >= b.x + b.w - 1);
+  const z0 = L.view.z; L.zoomAt(1.25, 450, 300); near('zoom avant', L.view.z, z0 * 1.25, 0.01); L.zoomAt(100, 450, 300); near('zoom limité à 300 %', L.view.z, 3, 0.01); }
+// 11l. Étiquettes colorées : points de couleur dans le menu
+L.reset(); { L.TAGS.map.res = ['TP1', 'Projet']; L.setFilter('*'); L.buildMenu(); const h = L.menuHtml();
+  yes('points de couleur dans le menu', h.includes('class="dots"') && h.includes(L.TAGS.colors['TP1']) && h.includes(L.TAGS.colors['Projet'])); delete L.TAGS.map.res; }
+// 11m. ISW8000 sans trait entre les bornes de droite ; appareils à aiguille à deux échelles
+L.reset(); { L.add('watt'); const v = L.add('volt'); v.ana = 1; v.rng = 10; L.render(); const svg = document.getElementById('cv')._h;
+  yes('ISW : plus de trait entre les bornes de droite', !svg.includes('M127 -26V16')); yes('ISW : fusible conservé', svg.includes('mesure I'));
+  yes('aiguille : échelle 30 grisée (calibre 10)', svg.includes('#8c8c80')); const g1 = (svg.match(/#8c8c80/g) || []).length; v.rng = 3; L.render(); const g2 = (document.getElementById('cv')._h.match(/#8c8c80/g) || []).length;
+  yes('aiguille : deux échelles tracées, l\'active change avec le calibre', g1 > 20 && g2 > 20); }
 // 12. Dessin de tous les appareils
 L.reset(); ['bat', 'ac', 'gbf', 'res', 'bulb', 'cap', 'ind', 'sw', 'com', 'rel', 'ctc', 'mdc', 'mac', 'led', 'cfl', 'a3', 'm3', 'cch', 'sv', 'sc', 'tach', 'cpm', 'amp', 'volt', 'watt', 'pince', 'scope'].forEach(t => L.add(t));
 L.add('volt').ana = 1; L.add('amp').ana = 1; L.render(); yes('rendu complet', true);

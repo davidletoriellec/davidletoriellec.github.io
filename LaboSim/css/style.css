@@ -30,3 +30,7 @@ main{min-width:0}
 #tfrow{display:flex;gap:6px;margin:4px 0 8px}#tfrow select{flex:1;min-width:0}#tfrow button{width:auto!important;margin:0!important}#side button small{font-size:10px}
 #tgm{display:none;position:fixed;inset:0;z-index:28;background:rgba(0,0,0,.65);overflow:auto;padding:12px}#tgm>div{background:var(--panel);max-width:900px;margin:0 auto;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px}
 #tgm table{border-collapse:collapse;width:100%;font-size:13px}#tgm td,#tgm th{border-bottom:1px solid var(--line);padding:3px 6px;text-align:center}#tgm td:first-child,#tgm th:first-child{text-align:left}#tgm .chip{display:inline-flex;gap:2px;margin:2px}#tgm input[type=text]{font:inherit;padding:4px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+main{position:relative}#zc{position:absolute;top:8px;right:10px;display:flex;gap:6px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:4px 6px;z-index:5}#zc button{padding:2px 9px;font-size:16px;line-height:1.2}#zl{min-width:42px;text-align:right;font-size:12px}
+.dot{width:12px;height:12px;border-radius:50%;flex:none;border:1px solid var(--line);display:inline-block;align-self:center}
+#menu button{display:flex;justify-content:space-between;align-items:center;gap:6px}.dots{display:inline-flex;gap:3px;flex:none}.dots i{width:8px;height:8px;border-radius:50%;display:inline-block}
+#tgm input[type=color]{width:30px;height:26px;padding:0;border:none;background:none;cursor:pointer}

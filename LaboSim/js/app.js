@@ -18,7 +18,7 @@ const FIELDS={bat:[['val','Tension',UNITS.V,{min:0,max:30,sl:[0,30,0.5]}]],
  cch:[['val','Puissance',UNITS.W,{min:0,max:4000,sl:[0,4000,200]}],['un','Tension nominale',UNITS.V,{min:1}]],
  m3:[['pn','Puissance utile',UNITS.W,{min:1}],['un','Tension d’enroulement',UNITS.V,{min:1}],['cosphi','cos φ',UNITS.NU,{min:0.1,max:1}],['eta','Rendement',UNITS.PCT,{min:0.1,max:1}]]};
 const selH=(p,o,v)=>`<select data-p="${p}">${o.map(([a,l])=>`<option value="${a}"${String(a)===String(v)?' selected':''}>${l}</option>`).join('')}</select>`;
-const COLS=['#d32f2f','#1b1b1b','#1976d2','#2e7d32','#f9a825','#fb8c00','#8e24aa','#6d4c41','#9e9e9e'];const VERSION='1.5';
+const COLS=['#d32f2f','#1b1b1b','#1976d2','#2e7d32','#f9a825','#fb8c00','#8e24aa','#6d4c41','#9e9e9e'];const VERSION='1.6';
 let comps=[],wires=[],sel=null,selW=null,pend=null,mouse={x:0,y:0},drag=null,wd=null,notes=[],selN=null,uid=1,err='',theory=false;
 const cv=document.getElementById('cv'),st=document.getElementById('st'),pn=document.getElementById('pn');
 const T=(c,i)=>{const t=geo(c).t[i];return{x:c.x+t[0],y:c.y+t[1]}};
@@ -169,7 +169,7 @@ function body(c){let s='';
  else if(c.type==='watt'){const S=c.Ur*c.Ir,D=c.disp||'W',v=err?null:D==='W'?c.P:D==='VAr'?c.Q:D==='VA'?S:D==='PF'?(S>1e-9?c.P/S:0):D==='V'?c.Ur:c.Ir,
   num=v===null?'-----':Math.abs(v)<1e-9?'0.000':String(+v.toPrecision(4)),
   bt=(x,l)=>`<rect x="${x}" y="22" width="24" height="18" rx="3" fill="#2a2a2a" stroke="#111"/><circle cx="${x+12}" cy="31" r="3" fill="${D===l?'#ff3b30':'#4a2a2a'}"/>${txt(x+12,18,l,8,'#222')}`;
-  s=`<rect x="-130" y="-60" width="260" height="120" rx="6" fill="#ddd9cf" stroke="#8c887c" stroke-width="2"/><rect x="-122" y="-50" width="134" height="56" rx="3" fill="#1a0a0a" stroke="#333"/>${txt(8,-10,num,28,'#ff2a1a','end','ui-monospace,Consolas,monospace')}${txt(-116,-38,D==='PF'?'':D,9,'#ff6a5a','start')}${bt(-124,'W')}${bt(-96,'VAr')}${bt(-68,'VA')}${bt(-40,'PF')}${bt(-4,'V')}${bt(24,'A')}${txt(-60,54,'IeS ISW8000 · WATTMETER',8,'#555')}${txt(75,-44,'SOURCE',8,'#222')}${txt(115,-44,'LOAD',8,'#222')}<path d="M75 16H115" stroke="#555" stroke-width="2"/><rect x="85" y="10" width="20" height="12" rx="2" fill="#f4f0e0" stroke="#444" stroke-width="1.5"/><path d="M88 16H102" stroke="#444" stroke-width="1.2"/>${txt(95,34,'mesure I',6,'#444')}<path d="M127 -26V16M123 -26H127M123 16H127" stroke="#555" fill="none" stroke-width="1.5"/>${jack(75,-26,'#d32f2f')}${jack(75,16,'#1976d2')}${jack(115,-26,'#d32f2f')}${jack(115,16,'#1b1b1b')}`}
+  s=`<rect x="-130" y="-60" width="260" height="120" rx="6" fill="#ddd9cf" stroke="#8c887c" stroke-width="2"/><rect x="-122" y="-50" width="134" height="56" rx="3" fill="#1a0a0a" stroke="#333"/>${txt(8,-10,num,28,'#ff2a1a','end','ui-monospace,Consolas,monospace')}${txt(-116,-38,D==='PF'?'':D,9,'#ff6a5a','start')}${bt(-124,'W')}${bt(-96,'VAr')}${bt(-68,'VA')}${bt(-40,'PF')}${bt(-4,'V')}${bt(24,'A')}${txt(-60,54,'IeS ISW8000 · WATTMETER',8,'#555')}${txt(75,-44,'SOURCE',8,'#222')}${txt(115,-44,'LOAD',8,'#222')}<path d="M75 16H115" stroke="#555" stroke-width="2"/><rect x="85" y="10" width="20" height="12" rx="2" fill="#f4f0e0" stroke="#444" stroke-width="1.5"/><path d="M88 16H102" stroke="#444" stroke-width="1.2"/>${txt(95,34,'mesure I',6,'#444')}${jack(75,-26,'#d32f2f')}${jack(75,16,'#1976d2')}${jack(115,-26,'#d32f2f')}${jack(115,16,'#1b1b1b')}`}
  else if(c.type==='pince'){const S=c.Ur*c.Ir,D=c.disp||'A',cl=c.cl,
   v=err?null:D==='A'?(c.mode==='AC'?c.Ia:c.I):D==='W'?c.P:D==='VAr'?c.Q:D==='VA'?S:D==='PF'?(S>1e-9?c.P/S:0):D==='V'?c.Ur:c.Ir,
   tv=v===null?'----':D==='PF'?v.toFixed(2):fmt(v,D),ang=cl?cl.ang+(c.rev?180:0):0;
@@ -203,13 +203,15 @@ function body(c){let s='';
   s=`<circle cy="-26" r="${26+b*22}" fill="rgba(255,210,60,${(b*.45).toFixed(2)})"/><rect x="-42" y="12" width="84" height="42" rx="6" fill="#4a4f57" stroke="#22262b" stroke-width="2"/><rect x="-16" y="-2" width="32" height="14" fill="#b9bcc2" stroke="#6e7177"/><path d="M-16 3H16M-16 8H16" stroke="#6e7177"/><circle cy="-26" r="26" fill="${b>.02?`rgba(255,${Math.round(240-b*50)},${Math.round(170-b*90)},${(.4+.6*b).toFixed(2)})`:'rgba(205,225,240,.35)'}" stroke="#7b8794" stroke-width="2"/><path d="M-8 -4L-6 -28L0 -18L6 -28L8 -4" fill="none" stroke="${b>.02?'#fff3c4':'#8a8a8a'}" stroke-width="2"/>${jack(-26,40,'#bdbdbd')}${jack(26,40,'#bdbdbd')}${hot?txt(0,-62,'surtension !',12,'#d32f2f'):''}`}
  else if(c.type==='sw'){
   s=`<rect x="-60" y="-30" width="120" height="64" rx="8" fill="#c9ced6" stroke="#6b7684" stroke-width="2"/><rect x="-14" y="-24" width="28" height="36" rx="5" fill="#2b2f36"/><line x1="0" y1="-6" x2="0" y2="${c.closed?-18:6}" stroke="#e53935" stroke-width="10" stroke-linecap="round"/>${txt(28,-12,'ON',10,'#333')}${txt(30,10,'OFF',10,'#333')}${jack(-42,22,'#bdbdbd')}${jack(42,22,'#bdbdbd')}`}
- else if(c.ana){const A=c.type==='amp',R=A?RA:RV,u=A?'A':'V',val=err?0:(c.mode==='AC'?(A?c.Ia:c.Ua):(A?-c.I:-c.U))||0,fr=Math.max(-.12,Math.min(1.12,val/c.rng)),ang=-48+fr*96,
+ else if(c.ana){const A=c.type==='amp',R=A?RA:RV,u=A?'A':'V',val=err?0:(c.mode==='AC'?(A?c.Ia:c.Ua):(A?-c.I:-c.U))||0,fr=Math.max(-.12,Math.min(1.12,val/c.rng)),ang=-48+fr*96,s30=[0.3,3,30,300].includes(c.rng),
   pol=(a,r)=>[(r*Math.sin(a*Math.PI/180)).toFixed(1),(8-r*Math.cos(a*Math.PI/180)).toFixed(1)],
-  tk=[...Array(51)].map((_,i)=>{const a=-48+i*96/50,p1=pol(a,74),p2=pol(a,i%5?69:63);return`<path d="M${p1[0]} ${p1[1]}L${p2[0]} ${p2[1]}" stroke="#222" stroke-width="${i%5?1:1.6}"/>`}).join(''),
-  nm=[0,20,40,60,80,100].map(n=>{const p=pol(-48+n*.96,54);return txt(p[0],+p[1]+3,n,8,'#222')}).join(''),
+  scl=(N,major,r1,rm,rM,rl,labs,act,fs)=>{const col=act?'#111':'#8c8c80',a0=pol(-48,r1),a1=pol(48,r1);let o=`<path d="M${a0[0]} ${a0[1]}A${r1} ${r1} 0 0 1 ${a1[0]} ${a1[1]}" fill="none" stroke="${col}" stroke-width=".8"/>`;
+   for(let i=0;i<=N;i++){const a=-48+i*96/N,p1=pol(a,r1),p2=pol(a,i%major?rm:rM);o+=`<path d="M${p1[0]} ${p1[1]}L${p2[0]} ${p2[1]}" stroke="${col}" stroke-width="${i%major?1:1.6}"/>`}
+   labs.forEach(([n,d])=>{const q=pol(-48+d*96,rl);o+=txt(q[0],+q[1]+3,n,fs,col)});return o},
+  tk=scl(50,5,74,69,63,55,[0,20,40,60,80,100].map(n=>[n,n/100]),!s30,8)+scl(30,5,47,43,40,33,[0,5,10,15,20,25,30].map(n=>[n,n/30]),s30,6.5),
   ka=i=>-120+i*240/(R.length-1),
   kl=R.map((r,i)=>txt((40*Math.sin(ka(i)*Math.PI/180)).toFixed(1),(60-40*Math.cos(ka(i)*Math.PI/180)).toFixed(1),fmt(r,u).replace(' ',''),6.5,'#222')).join('');
-  s=`<rect x="-95" y="-100" width="190" height="215" rx="18" fill="#f2b705" stroke="#8a6500" stroke-width="3"/><rect x="-75" y="-90" width="150" height="100" rx="6" fill="#f7f4e6" stroke="#333" stroke-width="2"/>${tk}${nm}${txt(-62,-76,'COM',9,'#111','start')}${txt(62,-76,u,9,'#111','end')}${txt(0,-34,u,16,'#111')}${txt(-64,4,c.mode==='AC'?'AC ~':'DC =',7,'#c62828','start')}${Math.abs(fr)>1.1?txt(0,-14,'SURCHARGE',8,'#c62828'):''}<line x1="0" y1="0" x2="0" y2="-68" stroke="#111" stroke-width="2" transform="translate(0 8) rotate(${ang})"/><circle cx="0" cy="8" r="5" fill="#111"/><circle cx="0" cy="58" r="30" fill="#1c1c1c" stroke="#000" stroke-width="2"/>${kl}<line x1="0" y1="-4" x2="0" y2="-24" stroke="#fff" stroke-width="4" stroke-linecap="round" transform="translate(0 58) rotate(${ka(Math.max(0,R.indexOf(c.rng)))})"/>${jack(-25,98,'#1b1b1b')}${jack(25,98,'#d32f2f')}`}
+  s=`<rect x="-95" y="-100" width="190" height="215" rx="18" fill="#f2b705" stroke="#8a6500" stroke-width="3"/><rect x="-75" y="-90" width="150" height="100" rx="6" fill="#f7f4e6" stroke="#333" stroke-width="2"/>${tk}${txt(-62,-76,'COM',9,'#111','start')}${txt(62,-76,u,9,'#111','end')}${txt(0,-6,u,14,'#111')}${txt(-64,4,c.mode==='AC'?'AC ~':'DC =',7,'#c62828','start')}${Math.abs(fr)>1.1?txt(42,4,'SURCHARGE',7,'#c62828'):''}<line x1="0" y1="0" x2="0" y2="-68" stroke="#111" stroke-width="2" transform="translate(0 8) rotate(${ang})"/><circle cx="0" cy="8" r="5" fill="#111"/><circle cx="0" cy="58" r="30" fill="#1c1c1c" stroke="#000" stroke-width="2"/>${kl}<line x1="0" y1="-4" x2="0" y2="-24" stroke="#fff" stroke-width="4" stroke-linecap="round" transform="translate(0 58) rotate(${ka(Math.max(0,R.indexOf(c.rng)))})"/>${jack(-25,98,'#1b1b1b')}${jack(25,98,'#d32f2f')}`}
  else{const A=c.type==='amp';
   s=`<rect x="-48" y="-75" width="96" height="150" rx="12" fill="#f4b400" stroke="#7a5a00" stroke-width="2"/><rect x="-38" y="-65" width="76" height="34" rx="4" fill="#c9d8b6" stroke="#333" stroke-width="2"/>${txt(33,-40,reading(c),15,'#14210c','end','ui-monospace,Consolas,monospace')}${txt(-34,-55,c.mode==='AC'?'AC ~':'DC =',8,'#14210c','start')}<circle cy="6" r="21" fill="#2b2b2b" stroke="#111" stroke-width="2"/><line x1="0" y1="0" x2="0" y2="-16" stroke="#fff" stroke-width="4" stroke-linecap="round" transform="translate(0 6) rotate(${(A?1:-1)*(c.mode==='AC'?75:40)})"/>${[['V=',-40],['V~',-75],['A=',40],['A~',75]].map(([l,d])=>txt((32*Math.sin(d*Math.PI/180)).toFixed(1),(9-32*Math.cos(d*Math.PI/180)).toFixed(1),l,9,'#222')).join('')}${txt(-24,44,'COM',9,'#222')}${txt(24,44,A?'A':'V',10,'#b71c1c')}${jack(-24,62,'#1b1b1b')}${jack(24,62,'#d32f2f')}`}
  return s}
@@ -234,7 +236,7 @@ function clampOf(c){let best=null,bd=28;for(const w of wires){if(w.hide)continue
  for(let k=0;k<S.length;k++){const pt=S[k],dd=Math.hypot(pt.x-c.x,pt.y-c.y);if(dd<bd){bd=dd;const n=S[Math.min(S.length-1,k+1)],q=S[Math.max(0,k-1)];best={w,pt,ang:Math.atan2(n.y-q.y,n.x-q.x)*180/Math.PI}}}}
  return best}
 function render(){
- solve();let s='<defs><pattern id="g" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="var(--grid)"/></pattern></defs><rect width="900" height="600" fill="url(#g)"/>'+noteSvg('r')+tgtLinks();
+ solve();let s='<defs><pattern id="g" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="var(--grid)"/></pattern></defs><rect width="'+WW+'" height="'+WH+'" fill="url(#g)"/><rect width="'+WW+'" height="'+WH+'" fill="none" stroke="var(--line)" stroke-width="3"/>'+noteSvg('r')+tgtLinks();
  comps.forEach(c=>{const[bx,by,bw,bh]=geo(c).b,on=sel===c.id;let lab='';
   if(theory&&c.U!==undefined&&!err&&c.type!=='amp'&&!['watt','gbf','scope','pince','com','rel','ctc','a3','sv','sc','tach','cpm'].includes(c.type))lab=c.type==='sw'?'':(c.type==='cch'||c.type==='m3')?fmt(c.P,'W')+(c.type==='m3'?' · '+Math.round(c.rpm||0)+' tr/min':''):`${fmt(c.Ur,'V')} · ${fmt(c.Ir,'A')}`+((c.type==='mdc'||c.type==='mac')?' · '+Math.round(c.rpm||0)+' tr/min':'');
   s+=`<g transform="translate(${c.x} ${c.y})" data-c="${c.id}" style="cursor:grab">${body(c)}<rect x="${bx-4}" y="${by-4}" width="${bw+8}" height="${bh+8}" rx="10" fill="transparent" stroke="${on?'var(--acc)':'none'}" stroke-dasharray="5 4" stroke-width="2"/>${txt(0,by+bh+20,lab,12,'var(--ink)')}</g>`});
@@ -307,8 +309,24 @@ function delSel(){if(sel!==null){wires=wires.filter(w=>!w.a.startsWith(sel+':')&
  else if(selN!==null){notes.splice(selN,1);selN=null}pend=null;panel();render()}
 /* ---- Interactions ---- */
 const pt=e=>{const p=cv.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(cv.getScreenCTM().inverse())};
-let hd=null,ndrag=null,rz=null;
+let hd=null,ndrag=null,rz=null,pan=null,pinch=null,view={x:0,y:0,z:1};const ptrs=new Map(),WW=4000,WH=3000;
+function applyView(){const w=cv.clientWidth||900,h=cv.clientHeight||600;view.z=Math.min(3,Math.max(.15,view.z));cv.setAttribute('viewBox',view.x+' '+view.y+' '+w/view.z+' '+h/view.z);const zl=document.getElementById('zl');if(zl)zl.textContent=Math.round(view.z*100)+' %'}
+function zoomAt(f,cx,cy){const r=cv.getBoundingClientRect(),px=cx-r.left,py=cy-r.top,wx=view.x+px/view.z,wy=view.y+py/view.z;view.z=Math.min(3,Math.max(.15,view.z*f));view.x=wx-px/view.z;view.y=wy-py/view.z;applyView()}
+function contentBounds(){let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;const ad=(x,y)=>{x0=Math.min(x0,x);y0=Math.min(y0,y);x1=Math.max(x1,x);y1=Math.max(y1,y)};
+ comps.forEach(c=>{const b=geo(c).b;ad(c.x+b[0],c.y+b[1]);ad(c.x+b[0]+b[2],c.y+b[1]+b[3])});
+ wires.forEach(w=>{if(w.hide)return;const a=tp(w.a),b=tp(w.b);if(a&&b)wsamples(w,a,b).forEach(q=>ad(q.x,q.y))});
+ notes.forEach(n=>{if(n.k==='r'){ad(n.x,n.y);ad(n.x+n.w,n.y+n.h)}else{const L=n.t.split('\n');ad(n.x,n.y-n.s);ad(n.x+Math.max(...L.map(l=>l.length),1)*n.s*.6,n.y+L.length*(n.s+4))}});
+ if(x0>x1)return{x:0,y:0,w:900,h:600};const m=50;return{x:x0-m,y:y0-m,w:Math.max(x1-x0+2*m,300),h:Math.max(y1-y0+2*m,200)}}
+function fitView(){const b=contentBounds(),w=cv.clientWidth||900,h=cv.clientHeight||600;view.z=Math.max(.15,Math.min(w/b.w,h/b.h,2));view.x=b.x-(w/view.z-b.w)/2;view.y=b.y-(h/view.z-b.h)/2;applyView()}
+const pinfo=()=>{const a=[...ptrs.values()];return{d:Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)||1,cx:(a[0].x+a[1].x)/2,cy:(a[0].y+a[1].y)/2}};
+function doPinch(){const p=pinfo();zoomAt(p.d/pinch.d,p.cx,p.cy);view.x-=(p.cx-pinch.cx)/view.z;view.y-=(p.cy-pinch.cy)/view.z;applyView();pinch=p}
+cv.addEventListener('wheel',e=>{e.preventDefault();zoomAt(Math.exp(-e.deltaY*(e.ctrlKey?.01:.0015)),e.clientX,e.clientY)},{passive:false});
+const zctr=f=>{const r=cv.getBoundingClientRect();zoomAt(f,r.left+r.width/2,r.top+r.height/2)};
+document.getElementById('zi').onclick=()=>zctr(1.25);document.getElementById('zo').onclick=()=>zctr(.8);document.getElementById('zf').onclick=()=>fitView();
+window.addEventListener('resize',applyView);
 cv.addEventListener('pointerdown',e=>{const X=e.target,t=X.closest('[data-t]'),hk=X.closest('[data-hk]'),ho=X.closest('[data-ho]'),rzz=X.closest('[data-rz]'),c=X.closest('[data-c]'),w=X.closest('[data-w]'),nt=X.closest('[data-nt]');mouse=pt(e);
+ ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});if(ptrs.size===2){drag=wd=hd=ndrag=rz=pan=null;pend=null;pinch=pinfo();return}
+ if(e.button===1){e.preventDefault();pan={cx:e.clientX,cy:e.clientY,vx:view.x,vy:view.y};return}
  if(t){const k=t.dataset.t;if(!pend)pend=k;else{if(pend!==k&&!wires.some(x=>(x.a===pend&&x.b===k)||(x.a===k&&x.b===pend)))connect(pend,k);pend=null}render();return}
  if(hk&&selW!==null){const w2=wires[selW],pr=hk.dataset.hk.split(':'),i=+pr[1];if(pr[0]==='g'){w2.pts=w2.pts||[];w2.pts.splice(i,0,{x:mouse.x,y:mouse.y})}hd={w:w2,t:'p',i};return}
  if(ho&&selW!==null){hd={w:wires[selW],t:'o',k:+ho.dataset.ho};return}
@@ -316,16 +334,20 @@ cv.addEventListener('pointerdown',e=>{const X=e.target,t=X.closest('[data-t]'),h
  if(c){const o=comps.find(o=>o.id==c.dataset.c);pend=null;sel=o.id;selW=null;selN=null;drag={o,dx:mouse.x-o.x,dy:mouse.y-o.y,moved:false};panel();return}
  if(w){pend=null;selW=+w.dataset.w;sel=null;selN=null;const ww=wires[selW];wd={w:ww,sx:mouse.x,sy:mouse.y};panel();render();return}
  if(nt){const n=notes[+nt.dataset.nt];pend=null;sel=null;selW=null;selN=+nt.dataset.nt;ndrag={n,dx:mouse.x-n.x,dy:mouse.y-n.y};panel();render();return}
- pend=null;selW=null;sel=null;selN=null;panel();render()});
-window.addEventListener('pointermove',e=>{if(!drag&&!pend&&!wd&&!hd&&!ndrag&&!rz)return;mouse=pt(e);
+ pend=null;selW=null;sel=null;selN=null;pan={cx:e.clientX,cy:e.clientY,vx:view.x,vy:view.y};panel();render()});
+window.addEventListener('pointermove',e=>{if(ptrs.has(e.pointerId))ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(pinch&&ptrs.size>=2){doPinch();return}
+ if(pan){view.x=pan.vx-(e.clientX-pan.cx)/view.z;view.y=pan.vy-(e.clientY-pan.cy)/view.z;applyView();return}
+ if(!drag&&!pend&&!wd&&!hd&&!ndrag&&!rz)return;mouse=pt(e);
  if(hd){if(hd.t==='p'){hd.w.pts[hd.i]={x:mouse.x,y:mouse.y}}else{const a=tp(hd.w.a),b=tp(hd.w.b),P=orthPts(hd.w,a,b),o=hd.w.os=hd.w.os||{};if(o.y1===undefined){o.y1=P[1].y;o.x2=P[2].x;o.y3=P[3].y}
    if(hd.k===1)o.y1=Math.round(mouse.y/10)*10;else if(hd.k===2)o.x2=Math.round(mouse.x/10)*10;else o.y3=Math.round(mouse.y/10)*10}render();return}
  if(wd){if(wmode(wd.w)==='cable'&&Math.hypot(mouse.x-wd.sx,mouse.y-wd.sy)>4){const w=wd.w,a=tp(w.a),b=tp(w.b),N=[a,...(w.pts||[]),b];let bi=0,bd=1e9;for(let i=0;i<N.length-1;i++){const d=segDist({x:wd.sx,y:wd.sy},N[i],N[i+1]);if(d<bd){bd=d;bi=i}}
    w.pts=w.pts||[];w.pts.splice(bi,0,{x:mouse.x,y:mouse.y});hd={w,t:'p',i:bi};wd=null;render()}return}
  if(ndrag){ndrag.n.x=Math.round((mouse.x-ndrag.dx)/10)*10;ndrag.n.y=Math.round((mouse.y-ndrag.dy)/10)*10;render();return}
  if(rz){rz.n.w=Math.max(40,mouse.x-rz.n.x);rz.n.h=Math.max(30,mouse.y-rz.n.y);render();return}
- if(drag){drag.moved=true;const bb=geo(drag.o).b;drag.o.x=Math.max(10-bb[0],Math.min(890-bb[0]-bb[2],Math.round((mouse.x-drag.dx)/20)*20));drag.o.y=Math.max(10-bb[1],Math.min(590-bb[1]-bb[3],Math.round((mouse.y-drag.dy)/20)*20));render()}else render()});
-window.addEventListener('pointerup',()=>{wd=null;hd=null;ndrag=null;rz=null;if(drag){const c=drag.o;
+ if(drag){drag.moved=true;const bb=geo(drag.o).b;drag.o.x=Math.max(10-bb[0],Math.min(WW-10-bb[0]-bb[2],Math.round((mouse.x-drag.dx)/20)*20));drag.o.y=Math.max(10-bb[1],Math.min(WH-10-bb[1]-bb[3],Math.round((mouse.y-drag.dy)/20)*20));render()}else render()});
+window.addEventListener('pointercancel',e=>{ptrs.delete(e.pointerId);pinch=null;pan=null});
+window.addEventListener('pointerup',e=>{ptrs.delete(e.pointerId);if(ptrs.size<2)pinch=null;pan=null;wd=null;hd=null;ndrag=null;rz=null;if(drag){const c=drag.o;
  if(!drag.moved){if(c.type==='sw'){c.closed=!c.closed;panel();render()}else if(c.type==='com'){c.pos=c.pos?0:1;panel();render()}
   else if(c.type==='watt'){const h=[['W',-124],['VAr',-96],['VA',-68],['PF',-40],['V',-4],['A',24]].find(([l,x])=>drag.dx>=x&&drag.dx<=x+24&&drag.dy>=22&&drag.dy<=40);if(h){c.disp=h[0];panel();render()}}}
  else if(c.type==='pince'||c.type==='sc'){const k=clampOf(c);if(k){c.x=k.pt.x;c.y=k.pt.y;render()}}}
@@ -337,9 +359,9 @@ const MENU=[['Alimentations',[['bat','Alimentation continue 0–30 V'],['ac','Al
  ['Appareils de mesure',[['amp','Multimètre – ampèremètre'],['volt','Multimètre – voltmètre'],['amp','Ampèremètre à aiguille',1],['volt','Voltmètre à aiguille',1],['watt','Wattmètre ISW8000'],['pince','Pince ampèremétrique'],['sv','Sonde de tension ÷10 / ÷100'],['sc','Sonde de courant ÷10 / ÷100 / ÷300'],['tach','Compte-tours'],['cpm','Couple-mètre'],['scope','Oscilloscope 2 voies']]],
  ['Repérage',[['#r','Rectangle pointillé'],['#t','Texte']]]];
 const menuEl=document.getElementById('menu'),side=document.getElementById('side');
-function addNote(k){notes.push(k==='r'?{k,x:300,y:200,w:220,h:130,col:'#7c4dff',t:''}:{k,x:320,y:240,t:'Texte',s:16,col:'#1976d2'});sel=null;selW=null;selN=notes.length-1;panel();render()}
+function addNote(k){const vx=Math.round((view.x+(cv.clientWidth||900)/2/view.z)/10)*10,vy=Math.round((view.y+(cv.clientHeight||600)/2/view.z)/10)*10;notes.push(k==='r'?{k,x:vx-110,y:vy-65,w:220,h:130,col:'#7c4dff',t:''}:{k,x:vx-30,y:vy,t:'Texte',s:16,col:'#1976d2'});sel=null;selW=null;selN=notes.length-1;panel();render()}
 function menuClick(b){const it=MENU[+b.dataset.g][1][+b.dataset.i],t=it[0];
- if(t[0]==='#')addNote(t==='#r'?'r':'t');else{const n=comps.length,c=add(t,150+(n%5)*140,140+(Math.floor(n/5)%3)*150);if(it[2]){c.ana=1;panel();render()}}
+ if(t[0]==='#')addNote(t==='#r'?'r':'t');else{const n=comps.length,vx=view.x+(cv.clientWidth||900)/2/view.z,vy=view.y+(cv.clientHeight||600)/2/view.z,c=add(t,Math.round((vx+((n%5)-2)*30)/20)*20,Math.round((vy+((n%5)-2)*30)/20)*20);if(it[2]){c.ana=1;panel();render()}}
  side.classList.remove('open')}
 cv.addEventListener('dblclick',e=>{const k=e.target.closest('[data-hk]');if(k&&k.dataset.hk[0]==='p'&&selW!==null){wires[selW].pts.splice(+k.dataset.hk.split(':')[1],1);render()}});
 document.getElementById('mb').onclick=()=>side.classList.toggle('open');
@@ -348,7 +370,7 @@ document.getElementById('th').onchange=e=>{theory=e.target.checked;render()};
 function example(){comps=[];wires=[];notes=[];selN=null;uid=1;
  const b=add('bat',160,300),s=add('sw',400,120),l=add('bulb',640,150),a=add('amp',440,380),v=add('volt',790,300);s.closed=true;l.val=10;l.un=9;
  wire(b.id+':1',s.id+':0');wire(s.id+':1',l.id+':0');wire(l.id+':1',a.id+':1');wire(a.id+':0',b.id+':0');wire(v.id+':1',l.id+':0');wire(v.id+':0',l.id+':1');
- sel=null;panel();render()}
+ sel=null;panel();render();fitView()}
 document.getElementById('ex').onclick=example;
 let ovId=null,cuDrag=null;const ov=document.getElementById('ov'),ovs=document.getElementById('ovs'),ovr=document.getElementById('ovr'),ovctl=document.getElementById('ovctl');
 function openOv(c){ovId=c.id;ov.style.display='block';ovctl.innerHTML=scopeCtl(c)+`<label>Curseurs V sur ${selH('cch',[[1,'CH1'],[2,'CH2']],c.cch)}</label>`;bindP(ovctl,c,()=>{render();renderOv()});renderOv()}
@@ -369,7 +391,7 @@ window.addEventListener('pointermove',e=>{if(!cuDrag)return;const c=comps.find(x
 window.addEventListener('pointerup',()=>{cuDrag=null});
 /* ---- Export PDF (sans bibliothèque) ---- */
 const PAL={'--ink':'#1c2430','--panel':'#ffffff','--bg':'#ffffff','--grid':'#e1e6ee','--acc':'#1976d2','--line':'#d5dbe5','--mut':'#6b7686','--bad':'#c62828'};
-function svgJpeg(svg,w,h,sc){return new Promise(res=>{const cl=svg.cloneNode(true);cl.querySelectorAll('[data-t],[data-hk],[data-ho],[data-rz],[data-cu]').forEach(n=>n.remove());
+function svgJpeg(svg,w,h,sc,vb){return new Promise(res=>{const cl=svg.cloneNode(true);if(vb)cl.setAttribute('viewBox',vb.x+' '+vb.y+' '+vb.w+' '+vb.h);cl.querySelectorAll('[data-t],[data-hk],[data-ho],[data-rz],[data-cu]').forEach(n=>n.remove());
  cl.setAttribute('xmlns','http://www.w3.org/2000/svg');cl.setAttribute('width',w);cl.setAttribute('height',h);
  const str=new XMLSerializer().serializeToString(cl).replace(/var\((--[a-z]+)\)/g,(m,k)=>PAL[k]||'#000'),im=new Image();
  im.onload=()=>{const k=document.createElement('canvas');k.width=w*sc;k.height=h*sc;const g=k.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,k.width,k.height);g.drawImage(im,0,0,k.width,k.height);
@@ -397,7 +419,7 @@ function openPdf(m){pdfMode=m;try{const o=JSON.parse(localStorage.getItem('labos
 $('pb').onclick=()=>openPdf('schema');$('ovp').onclick=()=>openPdf('scope');$('pf_x').onclick=()=>{pfm.style.display='none'};
 $('pf_go').onclick=async()=>{const g=k=>$('pf_'+k).value.trim(),id={nom:g('nom'),pre:g('pre'),grp:g('grp'),res:g('res')},msg=$('pf_msg'),c=pdfMode==='scope'?comps.find(x=>x.id===ovId):null,scope=!!c;
  try{localStorage.setItem('labosim_id',JSON.stringify(id))}catch(e){}
- msg.textContent='Génération…';const j=await svgJpeg(scope?ovs:cv,scope?640:900,scope?520:600,2);
+ msg.textContent='Génération…';const bb=scope?null:contentBounds(),j=scope?await svgJpeg(ovs,640,520,2):await svgJpeg(cv,bb.w,bb.h,Math.min(2,3000/Math.max(bb.w,bb.h)),bb);
  if(!j){msg.textContent='Impossible de générer l’image du schéma dans ce navigateur.';return}
  const date=new Date().toLocaleDateString('fr-FR');
  let ops=pdfTxt(40,557,16,scope?'LaboSim - Oscilloscope':'LaboSim - Schéma de montage',1)+pdfTxt(740,557,9,'LaboSim v'+VERSION)+pdfTxt(40,536,11,'NOM : '+id.nom)+pdfTxt(260,536,11,'PRÉNOM : '+id.pre)+pdfTxt(480,536,11,'GROUPE : '+id.grp)+pdfTxt(40,516,11,'RESSOURCE : '+id.res)+pdfTxt(480,516,11,'Date : '+date);
@@ -412,6 +434,7 @@ $('pf_go').onclick=async()=>{const g=k=>$('pf_'+k).value.trim(),id={nom:g('nom')
 const NOTICE=`<h4>Principes</h4><ul><li><b>Ajouter un appareil</b> : menu de gauche (Alimentations, Charges, Commandes, Appareils de mesure). Sur téléphone, bouton ☰. Glisse l’appareil sur le plan.</li>
 <li><b>Câbler</b> : clique une prise, puis une autre. Clique sur un câble pour changer sa couleur ou le supprimer. Trois tracés au choix en cliquant sur le câble : <b>Câble</b> (courbe : glisse le câble pour créer des points orange, les losanges en ajoutent, double-clic sur un point pour le retirer), <b>Droit</b> (ligne directe) ou <b>Orthogonal</b> (angles droits : glisse les losanges pour déplacer un segment). « Réinitialiser le tracé » revient au tracé par défaut.</li>
 <li><b>Prises BNC</b> (GBF, oscilloscope) : le centre est l’<b>âme</b> (signal), la collerette est la <b>masse</b>. BNC → prise banane : un câble pour l’âme, un pour la masse. BNC → BNC : un seul clic = câble coaxial (âme + masse).</li>
+<li><b>Zone de travail</b> : plan de 4000 × 3000. Molette ou boutons + / − (en haut à droite du plan) pour zoomer, glisser le fond pour déplacer la vue, deux doigts pour pincer-zoomer, ⤢ pour ajuster la vue à tout le montage.</li>
 <li><b>Repérage</b> : rectangles pointillés (redimensionnables) et textes, menu « Repérage ». Ils apparaissent dans l’export PDF.</li>
 <li><b>Valeurs théoriques</b> (en haut) : affiche U et I sur les composants, pour la correction.</li>
 <li>Tous les réglages numériques ont une <b>unité au choix</b> (mΩ, kΩ, MΩ, pF, µF, mH, kHz…).</li></ul>
@@ -425,7 +448,7 @@ const NOTICE=`<h4>Principes</h4><ul><li><b>Ajouter un appareil</b> : menu de gau
 <li><b>Relais</b> : A1/A2 = bobine ; 11 = commun, 14 = contact travail (NO), 12 = contact repos (NC). Il colle quand la tension bobine atteint 80 % de sa valeur nominale, avec un « clac » (bouton 🔊 en haut pour couper le son).</li>
 <li><b>Contacteur</b> : A1/A2 = bobine ; contacts NO 13-14 et 23-24 (puissance).</li></ul>
 <h4>Appareils de mesure</h4><ul><li><b>Ampèremètre</b> : en <u>série</u>, courant entrant par la borne rouge. Branché en dérivation il crée un court-circuit. <b>Voltmètre</b> : en <u>dérivation</u>. Mode DC ou AC (valeur efficace).</li>
-<li><b>Appareils à aiguille</b> : choisir un calibre au moins égal à la valeur attendue. Échelle 0–100 : valeur = lecture × calibre / 100.</li>
+<li><b>Appareils à aiguille</b> : choisir un calibre au moins égal à la valeur attendue. Deux échelles sont gravées : 0–100 (calibres 0,1 V · 1 · 10 · 100 · 1000, ou 1 mA · 10 mA · 100 mA · 1 A · 10 A) et 0–30 (calibres 0,3 · 3 · 30 · 300) ; l’échelle en service est tracée en noir. Valeur = lecture × calibre / 100 (ou / 30).</li>
 <li><b>Wattmètre ISW8000</b> : le <b>courant</b> se mesure entre les deux bornes du bas (bleue → noire, symbole du fusible) ; la <b>tension</b> se mesure sur les deux bornes de droite (rouge du haut, noire du bas). Les deux bornes rouges du haut sont reliées entre elles.<br>
 <i>Câblage 4 fils</i> : phase de la source → rouge SOURCE ; rouge LOAD → phase de la charge ; neutre de la source → bleue ; neutre de la charge → noire.<br>
 <i>Câblage 3 fils</i> : la phase de la source et celle de la charge se rejoignent sur la rouge LOAD ; bleue et noire comme ci-dessus.<br>
@@ -436,33 +459,37 @@ Boutons W (P), VAr (Q), VA (S), PF, V, A : clique dessus ou choisis l’affichag
 <li><b>Sonde de tension</b> (÷10 ou ÷100) : deux cordons côté mesure, comme un voltmètre (rouge = +) ; sortie BNC vers l’oscilloscope, isolée du circuit. La tension réelle = lecture × rapport.</li>
 <li><b>Sonde de courant</b> (÷10, ÷100 ou ÷300) : mini-pince à poser sur un câble, sortie BNC vers l’oscilloscope ; elle délivre 1 V pour « rapport » ampères (÷100 : 10 mV/A). Courant réel = tension lue × rapport. « Inverser » change le sens.</li>
 <li><b>Compte-tours</b> et <b>couple-mètre</b> : à poser près d’un moteur (≈ 100 px) ; ils affichent la vitesse (tr/min) ou le couple utile (N·m) du moteur le plus proche.</li></ul>
-<h4>Étiquettes et filtre du matériel</h4><ul><li>Le bouton <b>🏷</b> (haut du menu de gauche) ouvre la gestion des étiquettes : crée, renomme ou supprime des étiquettes (TP ELEN, TP ENER, TP1, TP2, Projet…) puis coche les appareils concernés.</li><li>La liste déroulante du menu filtre le matériel : <i>Tout le matériel</i>, une étiquette, ou <i>Sans étiquette</i>. Les étiquettes s’affichent en petit sous chaque bouton.</li><li>La configuration est mémorisée dans le navigateur ; « Exporter » / « Importer » permettent de la partager. Sur un site GitHub Pages, un fichier <code>labosim-tags.json</code> placé à côté de <code>index.html</code> est chargé automatiquement.</li></ul>
+<h4>Étiquettes et filtre du matériel</h4><ul><li>Le bouton <b>🏷</b> (haut du menu de gauche) ouvre la gestion des étiquettes : crée, renomme ou supprime des étiquettes (TP ELEN, TP ENER, TP1, TP2, Projet…) puis coche les appareils concernés.</li><li>La liste déroulante du menu filtre le matériel : <i>Tout le matériel</i>, une étiquette, ou <i>Sans étiquette</i>. Chaque étiquette a une couleur (modifiable) : un petit point de cette couleur apparaît à droite des appareils concernés dans le menu.</li><li>La configuration est mémorisée dans le navigateur ; « Exporter » / « Importer » permettent de la partager. Sur un site GitHub Pages, un fichier <code>labosim-tags.json</code> placé à côté de <code>index.html</code> est chargé automatiquement.</li></ul>
 <h4>Sauvegarde d’un montage</h4><ul><li>« 💾 Enregistrer » télécharge un fichier <code>montage_labosim.json</code> (appareils, câbles, repérages) ; « 📂 Ouvrir » le recharge.</li></ul>
 <h4>Export PDF</h4><ul><li>« Export PDF » (en haut) : schéma de montage + champs NOM, PRÉNOM, GROUPE, RESSOURCE et notes libres. Le même bouton existe dans l’écran agrandi de l’oscilloscope : le PDF contient alors la copie d’écran, les mesures des curseurs et le texte libre.</li></ul>`;
 $('novb').innerHTML=NOTICE;$('nb').onclick=()=>{$('nov').style.display='block'};$('novc').onclick=()=>{$('nov').style.display='none'};
 $('snd').onclick=()=>{soundOn=!soundOn;$('snd').textContent=soundOn?'🔊':'🔇'};
-/* ---- Étiquettes du matériel (TP, projet…) et filtre du menu ---- */
-let TAGS={tags:['TP ELEN','TP ENER','TP1','TP2','Projet'],map:{}},tagFilter='*',tagsLocal=false;
-const itKey=it=>it[0]+(it[2]?':a':'');
-function normTags(d){const t=[...new Set((Array.isArray(d&&d.tags)?d.tags:[]).map(x=>String(x).trim()).filter(Boolean))],m={};Object.entries((d&&d.map)||{}).forEach(([k,v])=>{if(Array.isArray(v))m[k]=v.map(String).filter(x=>t.includes(x))});return{tags:t,map:m}}
+/* ---- Étiquettes du matériel (TP, projet…) : couleurs et filtre du menu ---- */
+const TCOL=['#e53935','#fb8c00','#43a047','#1e88e5','#8e24aa','#00897b','#6d4c41','#546e7a'];
+let TAGS={tags:['TP ELEN','TP ENER','TP1','TP2','Projet'],map:{},colors:{'TP ELEN':TCOL[0],'TP ENER':TCOL[1],'TP1':TCOL[2],'TP2':TCOL[3],'Projet':TCOL[4]}},tagFilter='*',tagsLocal=false;
+const itKey=it=>it[0]+(it[2]?':a':''),tcol=t=>TAGS.colors[t]||'#888';
+function normTags(d){const t=[...new Set((Array.isArray(d&&d.tags)?d.tags:[]).map(x=>String(x).trim()).filter(Boolean))],m={},co={};Object.entries((d&&d.map)||{}).forEach(([k,v])=>{if(Array.isArray(v))m[k]=v.map(String).filter(x=>t.includes(x))});
+ t.forEach((x,i)=>{const c=d&&d.colors&&d.colors[x];co[x]=/^#[0-9a-f]{6}$/i.test(c)?c:TCOL[i%TCOL.length]});return{tags:t,map:m,colors:co}}
 function saveTags(){try{localStorage.setItem('labosim_tags',JSON.stringify(TAGS));localStorage.setItem('labosim_filter',tagFilter)}catch(e){}}
 function initTags(){try{const o=JSON.parse(localStorage.getItem('labosim_tags')||'null');if(o&&o.tags){TAGS=normTags(o);tagsLocal=true}tagFilter=localStorage.getItem('labosim_filter')||'*'}catch(e){}
  try{if(!tagsLocal&&typeof fetch==='function')fetch('labosim-tags.json').then(r=>r.ok?r.json():null).then(d=>{if(d&&d.tags){TAGS=normTags(d);buildMenu()}}).catch(()=>{})}catch(e){}}
 function buildMenu(){const tf=$('tf');if(tagFilter!=='*'&&tagFilter!=='-'&&!TAGS.tags.includes(tagFilter))tagFilter='*';
  tf.innerHTML='<option value="*">Tout le matériel</option>'+TAGS.tags.map(t=>`<option value="${esc_(t)}">${esc_(t)}</option>`).join('')+'<option value="-">Sans étiquette</option>';tf.value=tagFilter;
+ $('tfd').style.background=tagFilter==='*'||tagFilter==='-'?'transparent':tcol(tagFilter);
  const tg=it=>TAGS.map[itKey(it)]||[],show=it=>it[0][0]==='#'||tagFilter==='*'||(tagFilter==='-'?tg(it).length===0:tg(it).includes(tagFilter));let any=false;
- menuEl.innerHTML=MENU.map(([g,items],gi)=>{const L=items.map((it,ii)=>show(it)?`<button data-g="${gi}" data-i="${ii}">${it[1]}${it[0][0]!=='#'&&tg(it).length?`<small class="mut"> · ${tg(it).map(esc_).join(' · ')}</small>`:''}</button>`:'').join('');if(L&&g!=='Repérage')any=true;return L?`<h3>${g}</h3>`+L:''}).join('')+(any?'':'<p class="mut" style="font-size:12px">Aucun matériel avec cette étiquette.</p>');
+ menuEl.innerHTML=MENU.map(([g,items],gi)=>{const L=items.map((it,ii)=>show(it)?`<button data-g="${gi}" data-i="${ii}"><span>${it[1]}</span>${it[0][0]!=='#'&&tg(it).length?`<span class="dots">${tg(it).map(t=>`<i style="background:${tcol(t)}" title="${esc_(t)}"></i>`).join('')}</span>`:''}</button>`:'').join('');if(L&&g!=='Repérage')any=true;return L?`<h3>${g}</h3>`+L:''}).join('')+(any?'':'<p class="mut" style="font-size:12px">Aucun matériel avec cette étiquette.</p>');
  menuEl.querySelectorAll('button').forEach(b=>b.onclick=()=>menuClick(b))}
 function renderTags(){const n=TAGS.tags.length,ents=MENU.filter(([g])=>g!=='Repérage');
  const rows=ents.map(([g,items])=>`<tr><th colspan="${n+1}" style="background:var(--bg)">${g}</th></tr>`+items.map(it=>`<tr><td>${it[1]}</td>${TAGS.tags.map((t,ti)=>`<td><input type="checkbox" data-ck="${itKey(it)}|${ti}"${(TAGS.map[itKey(it)]||[]).includes(t)?' checked':''}></td>`).join('')}</tr>`).join('')).join('');
- $('tgb2').innerHTML=`<div>${TAGS.tags.map((t,i)=>`<span class="chip"><input type="text" data-tr="${i}" value="${esc_(t)}" size="${Math.max(6,t.length)}"><button data-td="${i}" title="Supprimer l’étiquette">×</button></span>`).join('')}<span class="chip"><input type="text" id="tnew" placeholder="Nouvelle étiquette" size="16"><button id="tadd">Ajouter</button></span></div>
-<div style="overflow:auto"><table><tr><th>Appareil</th>${TAGS.tags.map((t,i)=>`<th>${esc_(t)}<br><button data-ta="${i}" title="Tout cocher / tout décocher">☑</button></th>`).join('')}</tr>${rows}</table></div>
+ $('tgb2').innerHTML=`<div>${TAGS.tags.map((t,i)=>`<span class="chip"><input type="color" data-tc="${i}" value="${tcol(t)}" title="Couleur de l’étiquette"><input type="text" data-tr="${i}" value="${esc_(t)}" size="${Math.max(6,t.length)}"><button data-td="${i}" title="Supprimer l’étiquette">×</button></span>`).join('')}<span class="chip"><input type="text" id="tnew" placeholder="Nouvelle étiquette" size="16"><button id="tadd">Ajouter</button></span></div>
+<div style="overflow:auto"><table><tr><th>Appareil</th>${TAGS.tags.map((t,i)=>`<th><i class="dot" style="background:${tcol(t)}"></i> ${esc_(t)}<br><button data-ta="${i}" title="Tout cocher / tout décocher">☑</button></th>`).join('')}</tr>${rows}</table></div>
 <div style="display:flex;gap:8px;flex-wrap:wrap"><button id="texp">Exporter la configuration</button><button id="timp">Importer…</button><input type="file" id="tfl" accept=".json,application/json" style="display:none"><button id="trst">Décocher tout</button></div>`;
- const keyOf=k=>ents.flatMap(([g,items])=>items).find(it=>itKey(it)===k),done=()=>{saveTags();buildMenu()};
+ const done=()=>{saveTags();buildMenu()};
  $('tgb2').querySelectorAll('[data-ck]').forEach(i=>i.onchange=()=>{const[k,ti]=i.dataset.ck.split('|'),t=TAGS.tags[+ti],a=TAGS.map[k]||[];TAGS.map[k]=i.checked?[...new Set([...a,t])]:a.filter(x=>x!==t);done()});
- $('tgb2').querySelectorAll('[data-tr]').forEach(i=>i.onchange=()=>{const old=TAGS.tags[+i.dataset.tr],nv=i.value.trim();if(!nv||TAGS.tags.includes(nv)){renderTags();return}TAGS.tags[+i.dataset.tr]=nv;Object.keys(TAGS.map).forEach(k=>{TAGS.map[k]=TAGS.map[k].map(x=>x===old?nv:x)});if(tagFilter===old)tagFilter=nv;done();renderTags()});
- $('tgb2').querySelectorAll('[data-td]').forEach(b=>b.onclick=()=>{const old=TAGS.tags[+b.dataset.td];TAGS.tags.splice(+b.dataset.td,1);Object.keys(TAGS.map).forEach(k=>{TAGS.map[k]=TAGS.map[k].filter(x=>x!==old)});if(tagFilter===old)tagFilter='*';done();renderTags()});
- $('tadd').onclick=()=>{const v=$('tnew').value.trim();if(v&&!TAGS.tags.includes(v)){TAGS.tags.push(v);done();renderTags()}};
+ $('tgb2').querySelectorAll('[data-tc]').forEach(i=>i.onchange=()=>{TAGS.colors[TAGS.tags[+i.dataset.tc]]=i.value;done();renderTags()});
+ $('tgb2').querySelectorAll('[data-tr]').forEach(i=>i.onchange=()=>{const old=TAGS.tags[+i.dataset.tr],nv=i.value.trim();if(!nv||TAGS.tags.includes(nv)){renderTags();return}TAGS.tags[+i.dataset.tr]=nv;TAGS.colors[nv]=TAGS.colors[old];delete TAGS.colors[old];Object.keys(TAGS.map).forEach(k=>{TAGS.map[k]=TAGS.map[k].map(x=>x===old?nv:x)});if(tagFilter===old)tagFilter=nv;done();renderTags()});
+ $('tgb2').querySelectorAll('[data-td]').forEach(b=>b.onclick=()=>{const old=TAGS.tags[+b.dataset.td];TAGS.tags.splice(+b.dataset.td,1);delete TAGS.colors[old];Object.keys(TAGS.map).forEach(k=>{TAGS.map[k]=TAGS.map[k].filter(x=>x!==old)});if(tagFilter===old)tagFilter='*';done();renderTags()});
+ $('tadd').onclick=()=>{const v=$('tnew').value.trim();if(v&&!TAGS.tags.includes(v)){TAGS.tags.push(v);TAGS.colors[v]=TCOL[(TAGS.tags.length-1)%TCOL.length];done();renderTags()}};
  $('tgb2').querySelectorAll('[data-ta]').forEach(b=>b.onclick=()=>{const t=TAGS.tags[+b.dataset.ta],all=ents.flatMap(([g,items])=>items).every(it=>(TAGS.map[itKey(it)]||[]).includes(t));ents.forEach(([g,items])=>items.forEach(it=>{const k=itKey(it),a=TAGS.map[k]||[];TAGS.map[k]=all?a.filter(x=>x!==t):[...new Set([...a,t])]}));done();renderTags()});
  $('trst').onclick=()=>{TAGS.map={};done();renderTags()};
  $('texp').onclick=()=>saveFile(new Blob([JSON.stringify(TAGS,null,1)],{type:'application/json'}),'etiquettes_labosim.json');
@@ -476,36 +503,36 @@ function loadMontage(txt){let d;try{d=JSON.parse(txt);if(!d||!Array.isArray(d.co
  if(String(d.version||'0')<'1.5'&&Array.isArray(d.wires)){const mg=new Set((d.comps||[]).filter(c=>c&&c.type==='cch'&&c.cm==='tri').map(c=>c.id));d.wires.forEach(w=>{['a','b'].forEach(k=>{const q=String(w[k]).split(':');if(mg.has(+q[0]))w[k]=q[0]+':'+(+q[1]+2)})})}
  comps=[];wires=[];notes=[];uid=1;(d.comps||[]).forEach(sc=>{if(sc&&INFO[sc.type]){const c=add(sc.type,sc.x,sc.y);Object.assign(c,sc)}});
  uid=Math.max(1,...comps.map(c=>c.id+1));wires=(d.wires||[]).filter(w=>{try{return w&&tp(w.a)&&tp(w.b)}catch(e){return false}});notes=Array.isArray(d.notes)?d.notes:[];pairId=d.pairId||Math.max(1,...wires.map(w=>(w.pair||0)+1));
- sel=selW=selN=pend=null;panel();render();return true}
+ sel=selW=selN=pend=null;panel();render();fitView();return true}
 $('sv_').onclick=()=>saveFile(new Blob([serializeMontage()],{type:'application/json'}),'montage_labosim.json');
 $('op_').onclick=()=>$('fl').click();
 $('fl').onchange=e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>loadMontage(String(r.result));r.readAsText(f);e.target.value=''};
 const place=(c,w,t)=>{const pt=bz(tp(w.a),tp(w.b),w,t);c.x=pt.x;c.y=pt.y};
 document.getElementById('ex8').onclick=()=>{comps=[];wires=[];notes=[];selN=null;uid=1;
  const a=add('a3',190,300),m=add('m3',640,150),t=add('tach',730,190);
- wire(a.id+':1',m.id+':0');wire(a.id+':2',m.id+':1');wire(a.id+':3',m.id+':2');sel=null;panel();render()};
+ wire(a.id+':1',m.id+':0');wire(a.id+':2',m.id+':1');wire(a.id+':3',m.id+':2');sel=null;panel();render();fitView()};
 document.getElementById('ex7').onclick=()=>{comps=[];wires=[];notes=[];selN=null;uid=1;
  const s=add('ac',170,300),w=add('watt',480,420),m=add('mac',640,160);s.val=230;
- wire(s.id+':1',w.id+':1');wire(w.id+':3',m.id+':1');wire(m.id+':0',w.id+':2');wire(w.id+':0',s.id+':0');sel=null;panel();render()};
+ wire(s.id+':1',w.id+':1');wire(w.id+':3',m.id+':1');wire(m.id+':0',w.id+':2');wire(w.id+':0',s.id+':0');sel=null;panel();render();fitView()};
 document.getElementById('ex5').onclick=()=>{comps=[];wires=[];notes=[];selN=null;uid=1;
  const s=add('ac',200,300),r=add('res',520,130),l=add('ind',760,330),p=add('pince',0,0),q=add('pince',0,0);s.val=24;r.val=22;l.val=200;l.r=10;p.disp='W';p.mode='AC';q.mode='AC';
  wire(s.id+':1',r.id+':0');wire(r.id+':1',l.id+':0');wire(l.id+':1',s.id+':0');wire(p.id+':1',s.id+':1');wire(p.id+':0',s.id+':0');
- place(p,wires[0],.5);place(q,wires[2],.5);sel=null;panel();render()};
+ place(p,wires[0],.5);place(q,wires[2],.5);sel=null;panel();render();fitView()};
 document.getElementById('ex6').onclick=()=>{comps=[];wires=[];notes=[];selN=null;uid=1;
  const b=add('bat',130,150),k=add('sw',340,110),r=add('rel',540,300),b2=add('bat',140,440),l=add('bulb',760,430);b.val=12;b2.val=9;l.val=10;l.un=9;
  wire(b.id+':1',k.id+':0');wire(k.id+':1',r.id+':0');wire(r.id+':1',b.id+':0');wire(b2.id+':1',r.id+':2');wire(r.id+':3',l.id+':0');wire(l.id+':1',b2.id+':0');
- sel=null;panel();render()};
+ sel=null;panel();render();fitView()};
 document.getElementById('ex4').onclick=document.getElementById('ex4').onclick=()=>{comps=[];wires=[];notes=[];selN=null;uid=1;
  const g=add('gbf',170,130),r=add('res',420,110),c=add('cap',650,170),o=add('scope',500,380);r.val=1000;c.val=0.1;g.amp=5;o.td=5e-4;o.v1=o.v2=2;
  wire(g.id+':1',r.id+':0');wire(r.id+':1',c.id+':0');wire(c.id+':1',g.id+':0');wire(o.id+':1',r.id+':0');wire(o.id+':0',g.id+':0');wire(o.id+':3',c.id+':0');
- sel=null;panel();render()};
+ sel=null;panel();render();fitView()};
 document.getElementById('ex3').onclick=()=>{comps=[];wires=[];notes=[];selN=null;uid=1;
  const s=add('ac',200,300),w=add('watt',470,400),r=add('res',560,140),l=add('ind',790,300);s.val=24;r.val=22;l.val=200;l.r=10;
  wire(s.id+':1',w.id+':1');wire(w.id+':3',r.id+':0');wire(r.id+':1',l.id+':0');wire(l.id+':1',w.id+':2');wire(w.id+':0',s.id+':0');
- sel=null;panel();render()};
+ sel=null;panel();render();fitView()};
 document.getElementById('ex2').onclick=()=>{comps=[];wires=[];notes=[];selN=null;uid=1;
  const s=add('ac',200,300),r=add('res',520,140),a=add('amp',480,380),v=add('volt',790,300);s.val=24;a.mode=v.mode='AC';r.val=47;
  wire(s.id+':1',r.id+':0');wire(r.id+':1',a.id+':1');wire(a.id+':0',s.id+':0');wire(v.id+':1',r.id+':0');wire(v.id+':0',r.id+':1');
- sel=null;panel();render()};
+ sel=null;panel();render();fitView()};
 initTags();buildMenu();
 example();

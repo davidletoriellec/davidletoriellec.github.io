@@ -1,4 +1,4 @@
-# ⚡ LaboSim – laboratoire d'électricité virtuel (v1.5)
+# ⚡ LaboSim – laboratoire d'électricité virtuel (v1.6)
 
 Simulateur de travaux pratiques d'électricité qui tourne dans un navigateur, sans installation ni serveur.
 Les appareils sont dessinés comme en vrai et l'élève les **câble lui-même** avec des cordons banane ou BNC.
@@ -16,14 +16,14 @@ Une notice intégrée (bouton « Notice ») explique le câblage de chaque appar
 
 Autres fonctions : unités au choix pour chaque réglage (mΩ…MΩ, pF…mF, µH…H, Hz…MHz, mV…kV, mW…kW), câbles banane/BNC/coaxiaux
 à trois tracés au choix (courbe à points, droit, orthogonal), 9 couleurs de câbles, « clac » des relais et contacteurs, oscilloscope avec écran agrandi et curseurs (ΔT, 1/ΔT, ΔV, valeur max, déphasage),
-export PDF (NOM, PRÉNOM, GROUPE, RESSOURCE, notes libres) du schéma et de l'écran de l'oscilloscope, sauvegarde et ouverture des montages (fichier `.json`), étiquettes (TP ELEN, TP ENER, TP1, TP2, Projet…) avec filtre du menu de matériel.
+export PDF (NOM, PRÉNOM, GROUPE, RESSOURCE, notes libres) du schéma et de l'écran de l'oscilloscope, sauvegarde et ouverture des montages (fichier `.json`), étiquettes (TP ELEN, TP ENER, TP1, TP2, Projet…) avec couleurs et filtre du menu de matériel, plan de travail de 4000 × 3000 avec zoom et déplacement, appareils à aiguille à deux échelles (100 et 30).
 
 ## Étiquettes et filtre du matériel
 
 Le bouton 🏷 du menu ouvre la gestion des étiquettes : créer, renommer, supprimer, cocher les appareils concernés. La liste déroulante du menu
-affiche tout le matériel, une étiquette ou « Sans étiquette ». La configuration est mémorisée dans le navigateur et peut être exportée/importée.
+affiche tout le matériel, une étiquette ou « Sans étiquette ». Chaque étiquette a une couleur : un petit point coloré apparaît dans le menu à côté des appareils concernés. La configuration est mémorisée dans le navigateur et peut être exportée/importée.
 Pour un site GitHub Pages, le fichier `labosim-tags.json` (à côté de `index.html`) est chargé au démarrage si aucune configuration locale n'existe :
-format `{"tags":["TP1","TP2"],"map":{"res":["TP1"],"amp:a":["TP2"]}}` (`:a` = appareil à aiguille).
+format `{"tags":["TP1","TP2"],"colors":{"TP1":"#43a047","TP2":"#1e88e5"},"map":{"res":["TP1"],"amp:a":["TP2"]}}` (`:a` = appareil à aiguille).
 
 ## Lancer en local
 
