@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.3
+- Câbles : trois tracés au choix en cliquant sur le fil — Câble (courbe passant par des points orange, losanges pour en ajouter, double-clic pour en retirer), Droit, Orthogonal (angles arrondis, segments déplaçables).
+- « Clac » sonore quand un relais ou un contacteur colle (bouton 🔊 pour couper).
+- Moteur à courant continu (rotor animé, vitesse, sens selon la polarité, couple résistant réglable) et moteur monophasé (cos φ 0,82).
+- Lampe à LED et lampe fluocompacte (courant capacitif, seuil d'allumage).
+
 ## v1.2
 - Menu structuré à gauche : Alimentations, Charges, Commandes, Appareils de mesure, Repérage.
 - Notice d'utilisation intégrée, numéro de version affiché.

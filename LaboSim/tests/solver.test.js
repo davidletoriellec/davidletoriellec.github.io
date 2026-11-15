@@ -5,7 +5,7 @@ const el = () => ({ style: {}, dataset: {}, classList: { toggle() {}, remove() {
 const store = {};
 global.document = { getElementById: id => store[id] || (store[id] = el()), querySelectorAll: () => [] };
 global.window = { addEventListener() {} };
-const L = new Function(code + `;return{add,wire,connect,render,mkWave,bz,tp,buildPdf,pdfWrap,reset(){comps=[];wires=[];notes=[];uid=1;sel=selW=selN=pend=null},get err(){return err},get wires(){return wires},get comps(){return comps}}`)();
+const L = new Function(code + `;return{add,wire,connect,render,mkWave,bz,tp,wsamples,buildPdf,pdfWrap,reset(){comps=[];wires=[];notes=[];uid=1;sel=selW=selN=pend=null},get err(){return err},get wires(){return wires},get comps(){return comps}}`)();
 
 let fail = 0;
 const near = (name, got, want, tol) => { const ok = Math.abs(got - want) <= tol * Math.max(1, Math.abs(want)); if (!ok) fail++; console.log((ok ? 'ok   ' : 'FAIL ') + name + ' → ' + got.toPrecision(5) + ' (attendu ' + want + ')'); };
@@ -52,13 +52,28 @@ L.reset(); { const b = L.add('bat'), c = L.add('ctc'), b2 = L.add('bat'), r1 = L
   L.wire(b.id + ':1', c.id + ':0'); L.wire(c.id + ':1', b.id + ':0');
   L.wire(b2.id + ':1', c.id + ':2'); L.wire(c.id + ':3', r1.id + ':0'); L.wire(r1.id + ':1', b2.id + ':0'); L.wire(b2.id + ':1', c.id + ':4'); L.wire(c.id + ':5', r2.id + ':0'); L.wire(r2.id + ':1', b2.id + ':0'); L.render();
   yes('contacteur collé', c.on); near('2 contacts : courant de la source 2 (A)', Math.abs(b2.I), 0.2, 0.02); }
-// 10. Poignées de déformation : la forme du câble change, pas l'électrique
-L.reset(); { const b = L.add('bat', 200, 300), r = L.add('res', 500, 300); L.wire(b.id + ':1', r.id + ':0'); const w = L.wires[0], a = L.tp(w.a), c = L.tp(w.b), p0 = L.bz(a, c, w, 1 / 3);
-  w.o1 = [40, -60]; const p1 = L.bz(a, c, w, 1 / 3); yes('poignée 1 déplace le câble', Math.hypot(p1.x - p0.x, p1.y - p0.y) > 10); }
+// 10. Tracés de câbles : câble à points, droit, orthogonal
+L.reset(); { const b = L.add('bat', 200, 300), r = L.add('res', 500, 300); L.wire(b.id + ':1', r.id + ':0'); const w = L.wires[0], a = L.tp(w.a), c = L.tp(w.b), d0 = L.bz(a, c, w, .5);
+  w.pts = [{ x: 350, y: 480 }]; const S = L.wsamples(w, a, c); yes('câble : passe par le point', Math.min(...S.map(p => Math.hypot(p.x - 350, p.y - 480))) < 3);
+  w.mode = 'line'; const m = L.bz(a, c, w, .5); near('droit : milieu x', m.x, (a.x + c.x) / 2, 0.01); near('droit : milieu y', m.y, (a.y + c.y) / 2, 0.01);
+  w.mode = 'ortho'; const P = L.wsamples(w, a, c); yes('orthogonal : segments horizontaux ou verticaux', P.every((p, i) => i === 0 || Math.abs(p.x - P[i - 1].x) < 1e-6 || Math.abs(p.y - P[i - 1].y) < 1e-6));
+  w.os = { y1: 420, x2: 350, y3: 420 }; yes('orthogonal : segment déplacé', L.wsamples(w, a, c).some(p => Math.abs(p.y - 420) < 1e-6)); }
+// 10b. Moteur à courant continu, moteur monophasé, lampes
+L.reset(); { const b = L.add('bat'), m = L.add('mdc'), a = L.add('amp'); b.val = 12;
+  L.wire(b.id + ':1', m.id + ':1'); L.wire(m.id + ':0', a.id + ':1'); L.wire(a.id + ':0', b.id + ':0'); L.render();
+  near('MCC à vide : courant (A)', -a.I, 0.15, 0.1); near('MCC à vide : vitesse (tr/min)', m.rpm, 3000, 0.03);
+  m.load = 100; L.render(); near('MCC en charge : courant (A)', -a.I, 1.5, 0.1); yes('MCC en charge : plus lent', m.rpm < 2600 && m.rpm > 1800);
+  b.val = 1; L.render(); yes('MCC : ne démarre pas sous 1 V en charge', m.rpm === 0); }
+L.reset(); { const s = L.add('ac'), w = L.add('watt'), m = L.add('mac'); s.val = 230;
+  L.wire(s.id + ':1', w.id + ':1'); L.wire(w.id + ':3', m.id + ':1'); L.wire(m.id + ':0', w.id + ':2'); L.wire(w.id + ':0', s.id + ':0'); L.render();
+  near('moteur monophasé : cos φ', w.P / (w.Ur * w.Ir), 0.82, 0.01); near('moteur monophasé : P absorbée (W)', w.P, 370 / 0.7, 0.01); yes('moteur monophasé : tourne', m.rpm > 2500); yes('moteur monophasé : Q > 0', w.Q > 0); }
+L.reset(); { const s = L.add('ac'), w = L.add('watt'), l = L.add('led'); s.val = 230;
+  L.wire(s.id + ':1', w.id + ':1'); L.wire(w.id + ':3', l.id + ':1'); L.wire(l.id + ':0', w.id + ':2'); L.wire(w.id + ':0', s.id + ':0'); L.render();
+  near('LED : P (W)', w.P, 8, 0.02); near('LED : cos φ', w.P / (w.Ur * w.Ir), 0.6, 0.02); yes('LED : courant en avance (Q < 0)', w.Q < 0); }
 // 11. Notes de repérage, PDF
 L.reset(); L.add('bat'); const pdf = L.buildPdf([{ ops: 'BT /F1 12 Tf 40 500 Td (Test) Tj ET\n', img: null }], null);
 yes('PDF construit', pdf.size > 300); yes('retour à la ligne', L.pdfWrap('un deux trois quatre', 9).length === 3);
 // 12. Dessin de tous les appareils
-L.reset(); ['bat', 'ac', 'gbf', 'res', 'bulb', 'cap', 'ind', 'sw', 'com', 'rel', 'ctc', 'amp', 'volt', 'watt', 'pince', 'scope'].forEach(t => L.add(t));
+L.reset(); ['bat', 'ac', 'gbf', 'res', 'bulb', 'cap', 'ind', 'sw', 'com', 'rel', 'ctc', 'mdc', 'mac', 'led', 'cfl', 'amp', 'volt', 'watt', 'pince', 'scope'].forEach(t => L.add(t));
 L.add('volt').ana = 1; L.add('amp').ana = 1; L.render(); yes('rendu complet', true);
 console.log(fail ? `\n${fail} test(s) en échec` : '\nTous les tests passent'); process.exit(fail ? 1 : 0);
