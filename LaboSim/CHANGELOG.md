@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.5
+- Caisse de charge : bornes dédiées M1/M2 (monophasé ou continu) et L1/L2/L3 (triphasé), sélecteur de branchement ; les anciens montages sont migrés.
+- Étiquettes sur le matériel (TP ELEN, TP ENER, TP1, TP2, Projet…, modifiables) et filtre du menu (tout / étiquette / sans étiquette), export et import de la configuration, fichier `labosim-tags.json` chargé sur GitHub Pages.
+
 ## v1.4
 - Câbles : suppression des losanges ; poignées rondes orange (câble : points ; orthogonal : segments).
 - Correction : le moteur à courant continu s'arrête quand il n'est plus alimenté.

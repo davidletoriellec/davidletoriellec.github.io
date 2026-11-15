@@ -1,6 +1,6 @@
 const INFO={bat:{n:'Alimentation continue 0–30 V',v:9,u:'V',max:30},ac:{n:'Alimentation alternative 0–230 V~',v:12,max:230},res:{n:'Résistance',v:100,u:'Ω'},bulb:{n:'Ampoule',v:5,u:'W',lab:'Puissance nominale'},cap:{n:'Condensateur',v:10,u:'µF',lab:'Capacité'},ind:{n:'Bobine',v:100,u:'mH',lab:'Inductance'},watt:{n:'Wattmètre ISW8000'},pince:{n:'Pince ampèremétrique (PROVA 21)'},rel:{n:'Relais'},ctc:{n:'Contacteur 2 NO'},mdc:{n:'Moteur à courant continu'},mac:{n:'Moteur asynchrone monophasé'},led:{n:'Lampe à LED'},cfl:{n:'Lampe fluocompacte'},a3:{n:'Alimentation triphasée',v:400},cch:{n:'Caisse de charge',v:1000},m3:{n:'Moteur asynchrone triphasé'},sv:{n:'Sonde de tension'},sc:{n:'Sonde de courant'},tach:{n:'Compte-tours'},cpm:{n:'Couple-mètre'},com:{n:'Commutateur 2 voies (3 bornes)'},gbf:{n:'GBF (générateur de fonctions)'},scope:{n:'Oscilloscope 2 voies'},sw:{n:'Interrupteur'},amp:{n:'Multimètre (ampèremètre)'},volt:{n:'Multimètre (voltmètre)'}};
-const GEO={gbf:{t:[[62,43,'b'],[62,28,'b']],b:[-100,-55,200,110]},scope:{t:[[-90,103,'b'],[-90,88,'b'],[-30,103,'b'],[-30,88,'b']],b:[-150,-110,300,220]},cap:{t:[[-52,0],[52,0]],b:[-70,-20,140,40]},ind:{t:[[-52,0],[52,0]],b:[-70,-20,140,40]},watt:{t:[[75,16],[75,-26],[115,16],[115,-26]],b:[-130,-60,260,120]},pince:{t:[[194,18],[194,-16]],b:[-45,-45,257,90]},rel:{t:[[-60,44],[-30,44],[20,44],[50,44],[80,44]],b:[-90,-60,180,120]},ctc:{t:[[-90,44],[-60,44],[-20,44],[10,44],[45,44],[75,44]],b:[-110,-60,220,120]},mdc:{t:[[-25,37],[25,37]],b:[-50,-50,100,100]},mac:{t:[[-25,37],[25,37]],b:[-50,-50,100,100]},led:{t:[[-26,40],[26,40]],b:[-45,-70,90,125]},cfl:{t:[[-26,40],[26,40]],b:[-45,-70,90,125]},a3:{t:[[-75,36],[-25,36],[25,36],[75,36]],b:[-110,-55,220,110]},cch:{t:[[-25,38],[25,38]],b:[-90,-50,180,100]},cchT:{t:[[-50,38],[0,38],[50,38]],b:[-90,-50,180,100]},m3:{t:[[-40,37],[0,37],[40,37]],b:[-60,-52,120,102]},
- sv:{t:[[45,7,'b'],[45,-8,'b'],[-50,16],[-50,-16]],b:[-75,-35,150,70]},sc:{t:[[100,9,'b'],[100,-6,'b']],b:[-45,-45,175,90]},tach:{t:[],b:[-48,-40,96,78]},cpm:{t:[],b:[-72,-44,144,72]},com:{t:[[-45,24],[0,24],[45,24]],b:[-65,-32,130,66]},ac:{t:[[-40,34],[40,34]],b:[-95,-50,190,100]},bat:{t:[[-35,34],[35,34]],b:[-85,-50,170,100]},res:{t:[[-52,0],[52,0]],b:[-70,-20,140,40]},bulb:{t:[[-26,40],[26,40]],b:[-45,-55,90,110]},sw:{t:[[-42,22],[42,22]],b:[-60,-30,120,64]},amp:{t:[[-24,62],[24,62]],b:[-48,-75,96,150]}};GEO.volt=GEO.amp;GEO.voltA=GEO.ampA={t:[[-25,98],[25,98]],b:[-95,-100,190,215]};const geo=c=>GEO[c.type+(c.ana?'A':c.type==='cch'&&c.cm==='tri'?'T':'')]||GEO[c.type];
+const GEO={gbf:{t:[[62,43,'b'],[62,28,'b']],b:[-100,-55,200,110]},scope:{t:[[-90,103,'b'],[-90,88,'b'],[-30,103,'b'],[-30,88,'b']],b:[-150,-110,300,220]},cap:{t:[[-52,0],[52,0]],b:[-70,-20,140,40]},ind:{t:[[-52,0],[52,0]],b:[-70,-20,140,40]},watt:{t:[[75,16],[75,-26],[115,16],[115,-26]],b:[-130,-60,260,120]},pince:{t:[[194,18],[194,-16]],b:[-45,-45,257,90]},rel:{t:[[-60,44],[-30,44],[20,44],[50,44],[80,44]],b:[-90,-60,180,120]},ctc:{t:[[-90,44],[-60,44],[-20,44],[10,44],[45,44],[75,44]],b:[-110,-60,220,120]},mdc:{t:[[-25,37],[25,37]],b:[-50,-50,100,100]},mac:{t:[[-25,37],[25,37]],b:[-50,-50,100,100]},led:{t:[[-26,40],[26,40]],b:[-45,-70,90,125]},cfl:{t:[[-26,40],[26,40]],b:[-45,-70,90,125]},a3:{t:[[-75,36],[-25,36],[25,36],[75,36]],b:[-110,-55,220,110]},cch:{t:[[-70,38],[-40,38],[10,38],[40,38],[70,38]],b:[-90,-50,180,100]},m3:{t:[[-40,37],[0,37],[40,37]],b:[-60,-52,120,102]},
+ sv:{t:[[45,7,'b'],[45,-8,'b'],[-50,16],[-50,-16]],b:[-75,-35,150,70]},sc:{t:[[100,9,'b'],[100,-6,'b']],b:[-45,-45,175,90]},tach:{t:[],b:[-48,-40,96,78]},cpm:{t:[],b:[-72,-44,144,72]},com:{t:[[-45,24],[0,24],[45,24]],b:[-65,-32,130,66]},ac:{t:[[-40,34],[40,34]],b:[-95,-50,190,100]},bat:{t:[[-35,34],[35,34]],b:[-85,-50,170,100]},res:{t:[[-52,0],[52,0]],b:[-70,-20,140,40]},bulb:{t:[[-26,40],[26,40]],b:[-45,-55,90,110]},sw:{t:[[-42,22],[42,22]],b:[-60,-30,120,64]},amp:{t:[[-24,62],[24,62]],b:[-48,-75,96,150]}};GEO.volt=GEO.amp;GEO.voltA=GEO.ampA={t:[[-25,98],[25,98]],b:[-95,-100,190,215]};const geo=c=>GEO[c.type+(c.ana?'A':'')]||GEO[c.type];
 const TD=[];for(let e=-7;e<=-1;e++)[1,2,5].forEach(m=>TD.push(+(m+'e'+e)));
 const VD=[0.005,0.01,0.02,0.05,0.1,0.2,0.5,1,2,5,10,20];let pairId=1;const RV=[0.1,1,3,10,30,100,300,1000],RA=[0.001,0.01,0.1,0.3,1,3,10];
 const UNITS={V:[['mV',1e-3],['V',1],['kV',1e3]],Om:[['mΩ',1e-3],['Ω',1],['kΩ',1e3],['MΩ',1e6]],uF:[['pF',1e-6],['nF',1e-3],['µF',1],['mF',1e3]],mH:[['µH',1e-3],['mH',1],['H',1e3]],W:[['mW',1e-3],['W',1],['kW',1e3]],Hz:[['Hz',1],['kHz',1e3],['MHz',1e6]],A:[['mA',1e-3],['A',1]],rpm:[['tr/min',1]],pct:[['%',1]],NU:[['',1]],PCT:[['%',0.01]]};
@@ -18,7 +18,7 @@ const FIELDS={bat:[['val','Tension',UNITS.V,{min:0,max:30,sl:[0,30,0.5]}]],
  cch:[['val','Puissance',UNITS.W,{min:0,max:4000,sl:[0,4000,200]}],['un','Tension nominale',UNITS.V,{min:1}]],
  m3:[['pn','Puissance utile',UNITS.W,{min:1}],['un','Tension d’enroulement',UNITS.V,{min:1}],['cosphi','cos φ',UNITS.NU,{min:0.1,max:1}],['eta','Rendement',UNITS.PCT,{min:0.1,max:1}]]};
 const selH=(p,o,v)=>`<select data-p="${p}">${o.map(([a,l])=>`<option value="${a}"${String(a)===String(v)?' selected':''}>${l}</option>`).join('')}</select>`;
-const COLS=['#d32f2f','#1b1b1b','#1976d2','#2e7d32','#f9a825','#fb8c00','#8e24aa','#6d4c41','#9e9e9e'];const VERSION='1.4';
+const COLS=['#d32f2f','#1b1b1b','#1976d2','#2e7d32','#f9a825','#fb8c00','#8e24aa','#6d4c41','#9e9e9e'];const VERSION='1.5';
 let comps=[],wires=[],sel=null,selW=null,pend=null,mouse={x:0,y:0},drag=null,wd=null,notes=[],selN=null,uid=1,err='',theory=false;
 const cv=document.getElementById('cv'),st=document.getElementById('st'),pn=document.getElementById('pn');
 const T=(c,i)=>{const t=geo(c).t[i];return{x:c.x+t[0],y:c.y+t[1]}};
@@ -76,7 +76,7 @@ function solveOnce(){
   const G=(a,b,gr,gi)=>{const i=ix(a),j=ix(b);if(i>=0){Ar[i][i]+=gr;Ai[i][i]+=gi}if(j>=0){Ar[j][j]+=gr;Ai[j][j]+=gi}if(i>=0&&j>=0){Ar[i][j]-=gr;Ai[i][j]-=gi;Ar[j][i]-=gr;Ai[j][i]-=gi}};
   comps.forEach(c=>{const y=Yof(c,w);if(y)G(c.id+':0',c.id+':1',y[0],y[1]);if(c.type==='scope'){G(c.id+':0',c.id+':1',1e-6,0);G(c.id+':2',c.id+':3',1e-6,0)}if(c.type==='com')G(c.id+':1',c.id+':'+(c.pos?2:0),200,0);
    if(c.type==='sv')G(c.id+':2',c.id+':3',1/4e6,0);
-   if(c.type==='cch'){const Y=cchY(c);if(Y>0){G(c.id+':0',c.id+':1',Y,0);if(c.cm==='tri'){G(c.id+':1',c.id+':2',Y,0);G(c.id+':2',c.id+':0',Y,0)}}}
+   if(c.type==='cch'){const Y=cchY(c);if(Y>0){if(c.cm==='tri'){G(c.id+':2',c.id+':3',Y,0);G(c.id+':3',c.id+':4',Y,0);G(c.id+':4',c.id+':2',Y,0)}else G(c.id+':0',c.id+':1',Y,0)}}
    if(c.type==='m3'){const y=m3Y(c,w);[[0,1],[1,2],[2,0]].forEach(([i,j])=>G(c.id+':'+i,c.id+':'+j,y[0],y[1]))}if(c.type==='rel'){G(c.id+':0',c.id+':1',1/Math.max(c.rc,1),0);G(c.id+':2',c.id+(c.on?':3':':4'),200,0)}if(c.type==='ctc'){G(c.id+':0',c.id+':1',1/Math.max(c.rc,1),0);if(c.on){G(c.id+':2',c.id+':3',200,0);G(c.id+':4',c.id+':5',200,0)}}});
   wires.forEach(x=>G(x.a,x.b,1/Rw,0));
   if(q===0)comps.forEach(c=>{if(c.type==='mdc'&&c.run){const I=c.run*mdcP(c).Ic,i1=ix(c.id+':1'),i0=ix(c.id+':0');if(i1>=0)Ar[i1][n]-=I;if(i0>=0)Ar[i0][n]+=I}});
@@ -104,7 +104,7 @@ function solveOnce(){
   c.P=cols.reduce((t,x)=>t+x[0]*x[2]+x[1]*x[3],0);c.Q=cols.reduce((t,x)=>t+x[1]*x[2]-x[0]*x[3],0);
   if(c.type==='mdc'){const Pm=mdcP(c);c.rps=c.run?Math.max(0,(Math.abs(c.U)-Pm.U0)/Pm.D)/(2*Math.PI):0;c.rpm=c.rps*60}
   if(c.type==='mac'){let bb=-1,f=0;ac.forEach((x,k)=>{const m=Math.hypot(x[0],x[1]);if(m>bb){bb=m;f=ws[k+1]/(2*Math.PI)}});c.rps=c.Ur>=.6*c.un&&f>0?f*.95:0;c.rpm=c.rps*60}
-  if(c.type==='cch'||c.type==='m3'){let P=0,Q=0;const pr=[[0,1],[1,2],[2,0]].slice(0,c.type==='cch'&&c.cm!=='tri'?1:3);
+  if(c.type==='cch'||c.type==='m3'){let P=0,Q=0;const pr=c.type==='m3'?[[0,1],[1,2],[2,0]]:c.cm==='tri'?[[2,3],[3,4],[4,2]]:[[0,1]];
    X.forEach((_,q)=>pr.forEach(([i,j])=>{const a=Vc(c.id+':'+i,q),b=Vc(c.id+':'+j,q),u=[a[0]-b[0],a[1]-b[1]],y=c.type==='cch'?[cchY(c),0]:m3Y(c,ws[q]),cu=[u[0]*y[0]-u[1]*y[1],u[0]*y[1]+u[1]*y[0]];P+=u[0]*cu[0]+u[1]*cu[1];Q+=u[1]*cu[0]-u[0]*cu[1]}));c.P=P;c.Q=Q;
    if(c.type==='m3'){let bb=-1,f=0;ac.forEach((x,k)=>{const m=Math.hypot(x[0],x[1]);if(m>bb){bb=m;f=ws[k+1]/(2*Math.PI)}});const Uw=c.cpl==='D'?c.Ur:c.Ur/Math.sqrt(3);c.rps=Uw>=.6*c.un&&f>0?f/2*.96:0;c.rpm=c.rps*60}}
   if(c.type==='scope'){c.ws=ws;c.sig=[0,2].map(o=>X.map((_,q)=>{const a=Vc(c.id+':'+(o+1),q),b=Vc(c.id+':'+o,q);return[a[0]-b[0],a[1]-b[1]]}))}});
@@ -179,7 +179,7 @@ function body(c){let s='';
  else if(c.type==='a3'){const kn=(x,a)=>`<circle cx="${x}" cy="-20" r="12" fill="#3a4350" stroke="#1c222b" stroke-width="2"/><line x1="0" y1="-3" x2="0" y2="-9" stroke="#fff" stroke-width="3" stroke-linecap="round" transform="translate(${x} -20) rotate(${a})"/>`;
   s=`<rect x="-110" y="-55" width="220" height="110" rx="8" fill="#b9c6d6" stroke="#4d5e73" stroke-width="2"/><rect x="-110" y="-55" width="220" height="12" rx="4" fill="#c62828"/>${txt(0,-46,'ALIMENTATION TRIPHASÉE',8,'#fff')}<rect x="-100" y="-36" width="140" height="44" rx="4" fill="#0b1a12" stroke="#444"/>${txt(-30,-16,c.val.toFixed(0)+' V',18,'#46e07a','middle','ui-monospace,Consolas,monospace')}${txt(-30,-2,'phase '+(c.val/Math.sqrt(3)).toFixed(0)+' V · '+fmt(c.f,'Hz'),9,'#ffb74d','middle','ui-monospace,Consolas,monospace')}${kn(62,-135+c.val/400*270)}${kn(92,-135+Math.log10(c.f)/6*270)}${txt(62,6,'TENSION',6.5,'#334')}${txt(92,6,'FRÉQ.',6.5,'#334')}${[['N',-75,'#1976d2'],['L1',-25,'#f9a825'],['L2',25,'#2e7d32'],['L3',75,'#d32f2f']].map(([l,x,cl])=>txt(x,19,l,9,'#222')+jack(x,36,cl)).join('')}`}
  else if(c.type==='cch'){const T3=c.cm==='tri',P=err?0:(c.P||0),h=Math.min(1,P/4000),bars=[...Array(6)].map((_,i)=>`<rect x="${-72+i*24}" y="-28" width="16" height="48" rx="3" fill="rgb(${Math.round(90+165*h)},${Math.round(60+20*h)},${Math.round(50-30*h)})" stroke="#2b2b2b"/>`).join('');
-  s=`<rect x="-90" y="-50" width="180" height="100" rx="8" fill="#6d7780" stroke="#2f3a41" stroke-width="2"/><rect x="-80" y="-38" width="160" height="62" rx="4" fill="#2b3138"/>${bars}<rect x="-80" y="-38" width="160" height="62" rx="4" fill="rgba(255,120,0,${(h*.2).toFixed(2)})"/>${txt(-78,-43,'CAISSE DE CHARGE · '+(T3?'TRIPHASÉ':'MONO / DC'),7,'#eceff1','start')}${txt(86,-43,fmt(c.val,'W'),8,'#ffb74d','end')}${geo(c).t.map((t,i)=>txt(t[0],30,T3?'L'+(i+1):'~',7,'#eceff1')+jack(t[0],t[1],'#bdbdbd')).join('')}`}
+  s=`<rect x="-90" y="-50" width="180" height="100" rx="8" fill="#6d7780" stroke="#2f3a41" stroke-width="2"/><rect x="-80" y="-38" width="160" height="62" rx="4" fill="#2b3138"/>${bars}<rect x="-80" y="-38" width="160" height="62" rx="4" fill="rgba(255,120,0,${(h*.2).toFixed(2)})"/>${txt(-78,-43,'CAISSE DE CHARGE · '+(T3?'TRIPHASÉ':'MONO / DC'),7,'#eceff1','start')}${txt(86,-43,fmt(c.val,'W'),8,'#ffb74d','end')}${geo(c).t.map((t,i)=>{const act=(i<2)===!T3;return txt(t[0],30,i<2?'M'+(i+1):'L'+(i-1),7,act?'#eceff1':'#78828b')+jack(t[0],t[1],act?'#bdbdbd':'#5d666e')}).join('')}<path d="M-12 27V47" stroke="#cfd8dc" stroke-dasharray="2 2"/>`}
  else if(c.type==='m3'){const hot=!err&&c.Ur>0&&((c.cpl==='D'?c.Ur:c.Ur/Math.sqrt(3))>1.15*c.un),rps=c.rps||0,dur=rps>.02?(1/Math.min(rps,4)).toFixed(2):0,
   blades=[0,60,120,180,240,300].map(a=>`<path transform="rotate(${a})" d="M-3 -4L-4 -23H4L3 -4Z" fill="#9aa3ab" stroke="#4a525a"/>`).join(''),fins=[...Array(16)].map((_,i)=>`<path transform="translate(0 -14) rotate(${i*22.5})" d="M0 -32V-39" stroke="#3d566e" stroke-width="3"/>`).join('');
   s=`<rect x="-60" y="24" width="120" height="26" rx="4" fill="#3b4148" stroke="#1c2024" stroke-width="2"/>${fins}<circle cx="0" cy="-14" r="31" fill="#4f7396" stroke="#2c4660" stroke-width="3"/><circle cx="0" cy="-14" r="25" fill="#222a31"/><g transform="translate(0 -14)"><g>${dur?`<animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0" dur="${dur}s" repeatCount="indefinite"/>`:''}${blades}</g><circle r="5" fill="#9aa3ab" stroke="#444"/></g>${txt(0,-56,'3~ '+(c.cpl==='D'?'triangle':'étoile'),8,'var(--ink)')}${hot?txt(0,-66,'surtension ! couplage ?',9,'#d32f2f'):''}${['U','V','W'].map((l,i)=>txt(-40+i*40,29,l,7,'#cfd8dc')+jack(-40+i*40,38,'#bdbdbd')).join('')}`}
@@ -283,7 +283,7 @@ function panel(){
  if(c.type==='gbf')h+=`<label>Forme ${selH('wave',[['sin','Sinus'],['sq','Carré'],['tri','Triangle']],c.wave)}</label>`;
  if(c.type==='scope')h+=scopeCtl(c)+'<button id="zm">Écran agrandi + curseurs</button>';
  if(c.ana)h+=`<label>Calibre ${selH('rng',(c.type==='amp'?RA:RV).map(x=>[x,fmt(x,c.type==='amp'?'A':'V')]),c.rng)}</label>`;
- if(c.type==='cch')h+=`<label>Branchement ${selH('cm',[['mono','Monophasé / continu (2 bornes)'],['tri','Triphasé (3 bornes)']],c.cm)}</label>`;
+ if(c.type==='cch')h+=`<label>Branchement ${selH('cm',[['mono','Monophasé / continu (bornes M1, M2)'],['tri','Triphasé (bornes L1, L2, L3)']],c.cm)}</label>`;
  if(c.type==='m3')h+=`<label>Couplage ${selH('cpl',[['Y','Étoile (Y)'],['D','Triangle (Δ)']],c.cpl)}</label>`;
  if(c.type==='sv')h+=`<label>Rapport ${selH('ratio',[[10,'÷ 10'],[100,'÷ 100']],c.ratio)}</label>`;
  if(c.type==='sc')h+=`<label>Rapport ${selH('ratio',[[10,'÷ 10 (100 mV/A)'],[100,'÷ 100 (10 mV/A)'],[300,'÷ 300 (3,33 mV/A)']],c.ratio)}</label><button id="rv">Inverser le sens de la pince</button><span class="mut">Pose la sonde sur un câble.</span>`;
@@ -296,7 +296,7 @@ function panel(){
  if(c.type==='rel'||c.type==='ctc')h+=`<span class="mut">Contact : ${c.on?'collé (travail)':'repos'} · colle à 80 % de la tension bobine</span>`;
  h+=`<span id="ro" class="mut"></span><button id="dl">Supprimer</button>`;pn.innerHTML=h;
  bindP(pn,c,render);bindU(pn,c,render);
- const cmS=pn.querySelector('[data-p="cm"]');if(cmS)cmS.addEventListener('change',()=>{c.un=c.cm==='tri'?400:230;if(c.cm!=='tri')wires=wires.filter(w=>w.a!==c.id+':2'&&w.b!==c.id+':2');panel();render()});
+ const cmS=pn.querySelector('[data-p="cm"]');if(cmS)cmS.addEventListener('change',()=>{c.un=c.cm==='tri'?400:230;panel();render()});
  const md=document.getElementById('md');if(md)md.onclick=()=>{c.mode=c.mode==='AC'?'DC':'AC';panel();render()};
  const rv=document.getElementById('rv');if(rv)rv.onclick=()=>{c.rev=!c.rev;render()};
  const zm=document.getElementById('zm');if(zm)zm.onclick=()=>openOv(c);
@@ -337,11 +337,10 @@ const MENU=[['Alimentations',[['bat','Alimentation continue 0–30 V'],['ac','Al
  ['Appareils de mesure',[['amp','Multimètre – ampèremètre'],['volt','Multimètre – voltmètre'],['amp','Ampèremètre à aiguille',1],['volt','Voltmètre à aiguille',1],['watt','Wattmètre ISW8000'],['pince','Pince ampèremétrique'],['sv','Sonde de tension ÷10 / ÷100'],['sc','Sonde de courant ÷10 / ÷100 / ÷300'],['tach','Compte-tours'],['cpm','Couple-mètre'],['scope','Oscilloscope 2 voies']]],
  ['Repérage',[['#r','Rectangle pointillé'],['#t','Texte']]]];
 const menuEl=document.getElementById('menu'),side=document.getElementById('side');
-menuEl.innerHTML=MENU.map(([g,it],gi)=>`<h3>${g}</h3>`+it.map(([t,l],ii)=>`<button data-g="${gi}" data-i="${ii}">${l}</button>`).join('')).join('');
 function addNote(k){notes.push(k==='r'?{k,x:300,y:200,w:220,h:130,col:'#7c4dff',t:''}:{k,x:320,y:240,t:'Texte',s:16,col:'#1976d2'});sel=null;selW=null;selN=notes.length-1;panel();render()}
-menuEl.querySelectorAll('button').forEach(b=>b.onclick=()=>{const it=MENU[+b.dataset.g][1][+b.dataset.i],t=it[0];
+function menuClick(b){const it=MENU[+b.dataset.g][1][+b.dataset.i],t=it[0];
  if(t[0]==='#')addNote(t==='#r'?'r':'t');else{const n=comps.length,c=add(t,150+(n%5)*140,140+(Math.floor(n/5)%3)*150);if(it[2]){c.ana=1;panel();render()}}
- side.classList.remove('open')});
+ side.classList.remove('open')}
 cv.addEventListener('dblclick',e=>{const k=e.target.closest('[data-hk]');if(k&&k.dataset.hk[0]==='p'&&selW!==null){wires[selW].pts.splice(+k.dataset.hk.split(':')[1],1);render()}});
 document.getElementById('mb').onclick=()=>side.classList.toggle('open');
 document.getElementById('clr').onclick=()=>{comps=[];wires=[];notes=[];sel=selW=selN=pend=null;panel();render()};
@@ -421,7 +420,7 @@ const NOTICE=`<h4>Principes</h4><ul><li><b>Ajouter un appareil</b> : menu de gau
 <li><b>Moteur à courant continu</b> : borne rouge = +, noire = −. Régler tension nominale, résistance et inductance d’induit, courant et vitesse à vide, courant nominal et couple résistant. Le rotor tourne selon la tension (sens inversé si la polarité est inversée) ; vitesse en tr/min avec « Valeurs théoriques ». Il ne démarre pas si la tension est trop faible pour vaincre le couple résistant.</li>
 <li><b>Moteur monophasé</b> : 230 V / 50 Hz, cos φ = 0,82 par défaut (puissance utile et rendement réglables). Mesure P, Q, S et PF avec le wattmètre ISW8000 ou la pince.</li>
 <li><b>Moteur asynchrone triphasé 1,5 kW</b> (cos φ 0,84, rendement 80 %) : bornes U, V, W. Choisis le <b>couplage</b> : étoile sur 400 V entre phases, triangle sur 230 V ; un mauvais couplage donne « surtension ! ». Vitesse ≈ 1440 tr/min à 50 Hz (2 paires de pôles).</li>
-<li><b>Caisse de charge 0–4 kW</b> : résistances réglables par paliers de 200 W (curseur) ou valeur tapée. <i>Monophasé / continu</i> : 2 bornes ; <i>triphasé</i> : 3 bornes (charge équilibrée). La puissance réglée est celle obtenue à la tension nominale indiquée.</li></ul>
+<li><b>Caisse de charge 0–4 kW</b> : résistances réglables par paliers de 200 W (curseur) ou valeur tapée. Deux jeux de bornes : <b>M1/M2</b> (monophasé ou continu) et <b>L1/L2/L3</b> (triphasé, charge équilibrée) ; le réglage « Branchement » choisit le jeu en service, l’autre est hors circuit (bornes grisées). La puissance réglée est celle obtenue à la tension nominale indiquée.</li></ul>
 <h4>Commandes</h4><ul><li><b>Interrupteur</b> : clic sur l’appareil. <b>Commutateur</b> : C est le commun, A et B les deux voies ; clic pour basculer.</li>
 <li><b>Relais</b> : A1/A2 = bobine ; 11 = commun, 14 = contact travail (NO), 12 = contact repos (NC). Il colle quand la tension bobine atteint 80 % de sa valeur nominale, avec un « clac » (bouton 🔊 en haut pour couper le son).</li>
 <li><b>Contacteur</b> : A1/A2 = bobine ; contacts NO 13-14 et 23-24 (puissance).</li></ul>
@@ -437,13 +436,44 @@ Boutons W (P), VAr (Q), VA (S), PF, V, A : clique dessus ou choisis l’affichag
 <li><b>Sonde de tension</b> (÷10 ou ÷100) : deux cordons côté mesure, comme un voltmètre (rouge = +) ; sortie BNC vers l’oscilloscope, isolée du circuit. La tension réelle = lecture × rapport.</li>
 <li><b>Sonde de courant</b> (÷10, ÷100 ou ÷300) : mini-pince à poser sur un câble, sortie BNC vers l’oscilloscope ; elle délivre 1 V pour « rapport » ampères (÷100 : 10 mV/A). Courant réel = tension lue × rapport. « Inverser » change le sens.</li>
 <li><b>Compte-tours</b> et <b>couple-mètre</b> : à poser près d’un moteur (≈ 100 px) ; ils affichent la vitesse (tr/min) ou le couple utile (N·m) du moteur le plus proche.</li></ul>
+<h4>Étiquettes et filtre du matériel</h4><ul><li>Le bouton <b>🏷</b> (haut du menu de gauche) ouvre la gestion des étiquettes : crée, renomme ou supprime des étiquettes (TP ELEN, TP ENER, TP1, TP2, Projet…) puis coche les appareils concernés.</li><li>La liste déroulante du menu filtre le matériel : <i>Tout le matériel</i>, une étiquette, ou <i>Sans étiquette</i>. Les étiquettes s’affichent en petit sous chaque bouton.</li><li>La configuration est mémorisée dans le navigateur ; « Exporter » / « Importer » permettent de la partager. Sur un site GitHub Pages, un fichier <code>labosim-tags.json</code> placé à côté de <code>index.html</code> est chargé automatiquement.</li></ul>
 <h4>Sauvegarde d’un montage</h4><ul><li>« 💾 Enregistrer » télécharge un fichier <code>montage_labosim.json</code> (appareils, câbles, repérages) ; « 📂 Ouvrir » le recharge.</li></ul>
 <h4>Export PDF</h4><ul><li>« Export PDF » (en haut) : schéma de montage + champs NOM, PRÉNOM, GROUPE, RESSOURCE et notes libres. Le même bouton existe dans l’écran agrandi de l’oscilloscope : le PDF contient alors la copie d’écran, les mesures des curseurs et le texte libre.</li></ul>`;
 $('novb').innerHTML=NOTICE;$('nb').onclick=()=>{$('nov').style.display='block'};$('novc').onclick=()=>{$('nov').style.display='none'};
 $('snd').onclick=()=>{soundOn=!soundOn;$('snd').textContent=soundOn?'🔊':'🔇'};
+/* ---- Étiquettes du matériel (TP, projet…) et filtre du menu ---- */
+let TAGS={tags:['TP ELEN','TP ENER','TP1','TP2','Projet'],map:{}},tagFilter='*',tagsLocal=false;
+const itKey=it=>it[0]+(it[2]?':a':'');
+function normTags(d){const t=[...new Set((Array.isArray(d&&d.tags)?d.tags:[]).map(x=>String(x).trim()).filter(Boolean))],m={};Object.entries((d&&d.map)||{}).forEach(([k,v])=>{if(Array.isArray(v))m[k]=v.map(String).filter(x=>t.includes(x))});return{tags:t,map:m}}
+function saveTags(){try{localStorage.setItem('labosim_tags',JSON.stringify(TAGS));localStorage.setItem('labosim_filter',tagFilter)}catch(e){}}
+function initTags(){try{const o=JSON.parse(localStorage.getItem('labosim_tags')||'null');if(o&&o.tags){TAGS=normTags(o);tagsLocal=true}tagFilter=localStorage.getItem('labosim_filter')||'*'}catch(e){}
+ try{if(!tagsLocal&&typeof fetch==='function')fetch('labosim-tags.json').then(r=>r.ok?r.json():null).then(d=>{if(d&&d.tags){TAGS=normTags(d);buildMenu()}}).catch(()=>{})}catch(e){}}
+function buildMenu(){const tf=$('tf');if(tagFilter!=='*'&&tagFilter!=='-'&&!TAGS.tags.includes(tagFilter))tagFilter='*';
+ tf.innerHTML='<option value="*">Tout le matériel</option>'+TAGS.tags.map(t=>`<option value="${esc_(t)}">${esc_(t)}</option>`).join('')+'<option value="-">Sans étiquette</option>';tf.value=tagFilter;
+ const tg=it=>TAGS.map[itKey(it)]||[],show=it=>it[0][0]==='#'||tagFilter==='*'||(tagFilter==='-'?tg(it).length===0:tg(it).includes(tagFilter));let any=false;
+ menuEl.innerHTML=MENU.map(([g,items],gi)=>{const L=items.map((it,ii)=>show(it)?`<button data-g="${gi}" data-i="${ii}">${it[1]}${it[0][0]!=='#'&&tg(it).length?`<small class="mut"> · ${tg(it).map(esc_).join(' · ')}</small>`:''}</button>`:'').join('');if(L&&g!=='Repérage')any=true;return L?`<h3>${g}</h3>`+L:''}).join('')+(any?'':'<p class="mut" style="font-size:12px">Aucun matériel avec cette étiquette.</p>');
+ menuEl.querySelectorAll('button').forEach(b=>b.onclick=()=>menuClick(b))}
+function renderTags(){const n=TAGS.tags.length,ents=MENU.filter(([g])=>g!=='Repérage');
+ const rows=ents.map(([g,items])=>`<tr><th colspan="${n+1}" style="background:var(--bg)">${g}</th></tr>`+items.map(it=>`<tr><td>${it[1]}</td>${TAGS.tags.map((t,ti)=>`<td><input type="checkbox" data-ck="${itKey(it)}|${ti}"${(TAGS.map[itKey(it)]||[]).includes(t)?' checked':''}></td>`).join('')}</tr>`).join('')).join('');
+ $('tgb2').innerHTML=`<div>${TAGS.tags.map((t,i)=>`<span class="chip"><input type="text" data-tr="${i}" value="${esc_(t)}" size="${Math.max(6,t.length)}"><button data-td="${i}" title="Supprimer l’étiquette">×</button></span>`).join('')}<span class="chip"><input type="text" id="tnew" placeholder="Nouvelle étiquette" size="16"><button id="tadd">Ajouter</button></span></div>
+<div style="overflow:auto"><table><tr><th>Appareil</th>${TAGS.tags.map((t,i)=>`<th>${esc_(t)}<br><button data-ta="${i}" title="Tout cocher / tout décocher">☑</button></th>`).join('')}</tr>${rows}</table></div>
+<div style="display:flex;gap:8px;flex-wrap:wrap"><button id="texp">Exporter la configuration</button><button id="timp">Importer…</button><input type="file" id="tfl" accept=".json,application/json" style="display:none"><button id="trst">Décocher tout</button></div>`;
+ const keyOf=k=>ents.flatMap(([g,items])=>items).find(it=>itKey(it)===k),done=()=>{saveTags();buildMenu()};
+ $('tgb2').querySelectorAll('[data-ck]').forEach(i=>i.onchange=()=>{const[k,ti]=i.dataset.ck.split('|'),t=TAGS.tags[+ti],a=TAGS.map[k]||[];TAGS.map[k]=i.checked?[...new Set([...a,t])]:a.filter(x=>x!==t);done()});
+ $('tgb2').querySelectorAll('[data-tr]').forEach(i=>i.onchange=()=>{const old=TAGS.tags[+i.dataset.tr],nv=i.value.trim();if(!nv||TAGS.tags.includes(nv)){renderTags();return}TAGS.tags[+i.dataset.tr]=nv;Object.keys(TAGS.map).forEach(k=>{TAGS.map[k]=TAGS.map[k].map(x=>x===old?nv:x)});if(tagFilter===old)tagFilter=nv;done();renderTags()});
+ $('tgb2').querySelectorAll('[data-td]').forEach(b=>b.onclick=()=>{const old=TAGS.tags[+b.dataset.td];TAGS.tags.splice(+b.dataset.td,1);Object.keys(TAGS.map).forEach(k=>{TAGS.map[k]=TAGS.map[k].filter(x=>x!==old)});if(tagFilter===old)tagFilter='*';done();renderTags()});
+ $('tadd').onclick=()=>{const v=$('tnew').value.trim();if(v&&!TAGS.tags.includes(v)){TAGS.tags.push(v);done();renderTags()}};
+ $('tgb2').querySelectorAll('[data-ta]').forEach(b=>b.onclick=()=>{const t=TAGS.tags[+b.dataset.ta],all=ents.flatMap(([g,items])=>items).every(it=>(TAGS.map[itKey(it)]||[]).includes(t));ents.forEach(([g,items])=>items.forEach(it=>{const k=itKey(it),a=TAGS.map[k]||[];TAGS.map[k]=all?a.filter(x=>x!==t):[...new Set([...a,t])]}));done();renderTags()});
+ $('trst').onclick=()=>{TAGS.map={};done();renderTags()};
+ $('texp').onclick=()=>saveFile(new Blob([JSON.stringify(TAGS,null,1)],{type:'application/json'}),'etiquettes_labosim.json');
+ $('timp').onclick=()=>$('tfl').click();
+ $('tfl').onchange=e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{TAGS=normTags(JSON.parse(String(r.result)));done();renderTags()}catch(x){}};r.readAsText(f)}}
+$('tf').onchange=()=>{tagFilter=$('tf').value;saveTags();buildMenu()};
+$('tgb').onclick=()=>{renderTags();$('tgm').style.display='block'};$('tgx').onclick=()=>{$('tgm').style.display='none'};
 const SKIP=new Set(['cl','sig','ws','U','I','P','Q','Ur','Ir','Ua','Ia','rps','rpm','tgt','tv']);
 function serializeMontage(){return JSON.stringify({app:'LaboSim',version:VERSION,comps,wires,notes,pairId},(k,v)=>SKIP.has(k)?undefined:v,1)}
 function loadMontage(txt){let d;try{d=JSON.parse(txt);if(!d||!Array.isArray(d.comps))throw 0}catch(e){st.textContent='Fichier de montage invalide';return false}
+ if(String(d.version||'0')<'1.5'&&Array.isArray(d.wires)){const mg=new Set((d.comps||[]).filter(c=>c&&c.type==='cch'&&c.cm==='tri').map(c=>c.id));d.wires.forEach(w=>{['a','b'].forEach(k=>{const q=String(w[k]).split(':');if(mg.has(+q[0]))w[k]=q[0]+':'+(+q[1]+2)})})}
  comps=[];wires=[];notes=[];uid=1;(d.comps||[]).forEach(sc=>{if(sc&&INFO[sc.type]){const c=add(sc.type,sc.x,sc.y);Object.assign(c,sc)}});
  uid=Math.max(1,...comps.map(c=>c.id+1));wires=(d.wires||[]).filter(w=>{try{return w&&tp(w.a)&&tp(w.b)}catch(e){return false}});notes=Array.isArray(d.notes)?d.notes:[];pairId=d.pairId||Math.max(1,...wires.map(w=>(w.pair||0)+1));
  sel=selW=selN=pend=null;panel();render();return true}
@@ -477,4 +507,5 @@ document.getElementById('ex2').onclick=()=>{comps=[];wires=[];notes=[];selN=null
  const s=add('ac',200,300),r=add('res',520,140),a=add('amp',480,380),v=add('volt',790,300);s.val=24;a.mode=v.mode='AC';r.val=47;
  wire(s.id+':1',r.id+':0');wire(r.id+':1',a.id+':1');wire(a.id+':0',s.id+':0');wire(v.id+':1',r.id+':0');wire(v.id+':0',r.id+':1');
  sel=null;panel();render()};
+initTags();buildMenu();
 example();

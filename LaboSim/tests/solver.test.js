@@ -5,7 +5,7 @@ const el = () => ({ style: {}, dataset: {}, classList: { toggle() {}, remove() {
 const store = {};
 global.document = { getElementById: id => store[id] || (store[id] = el()), querySelectorAll: () => [] };
 global.window = { addEventListener() {} };
-const L = new Function(code + `;return{add,wire,connect,render,mkWave,bz,tp,wsamples,buildPdf,pdfWrap,serializeMontage,loadMontage,reset(){comps=[];wires=[];notes=[];uid=1;sel=selW=selN=pend=null},get err(){return err},get wires(){return wires},get comps(){return comps},get solve(){return solve}}`)();
+const L = new Function(code + `;return{add,wire,connect,render,mkWave,bz,tp,wsamples,buildPdf,pdfWrap,serializeMontage,loadMontage,buildMenu,setFilter(v){tagFilter=v},get TAGS(){return TAGS},menuHtml(){return menuEl.innerHTML},reset(){comps=[];wires=[];notes=[];uid=1;sel=selW=selN=pend=null},get err(){return err},get wires(){return wires},get comps(){return comps},get solve(){return solve}}`)();
 
 let fail = 0;
 const near = (name, got, want, tol) => { const ok = Math.abs(got - want) <= tol * Math.max(1, Math.abs(want)); if (!ok) fail++; console.log((ok ? 'ok   ' : 'FAIL ') + name + ' → ' + got.toPrecision(5) + ' (attendu ' + want + ')'); };
@@ -89,7 +89,8 @@ L.reset(); { const s = L.add('ac'), c = L.add('cch'); s.val = 230; c.val = 1000;
   L.wire(s.id + ':1', c.id + ':1'); L.wire(c.id + ':0', s.id + ':0'); L.render(); near('caisse mono : P (W)', c.P, 1000, 0.01);
   c.val = 0; L.render(); near('caisse à 0 W', c.P, 0, 0.01); }
 L.reset(); { const a = L.add('a3'), c = L.add('cch'); c.cm = 'tri'; c.un = 400; c.val = 4000;
-  L.wire(a.id + ':1', c.id + ':0'); L.wire(a.id + ':2', c.id + ':1'); L.wire(a.id + ':3', c.id + ':2'); L.render(); near('caisse tri : P (W)', c.P, 4000, 0.01); }
+  L.wire(a.id + ':1', c.id + ':2'); L.wire(a.id + ':2', c.id + ':3'); L.wire(a.id + ':3', c.id + ':4'); L.render(); near('caisse tri : P (W)', c.P, 4000, 0.01);
+  c.cm = 'mono'; L.render(); near('caisse en mono sur bornes tri : hors circuit (W)', c.P, 0, 0.01); }
 // 11e. Sondes : tension (÷10) et courant (÷100) vers l'oscilloscope
 L.reset(); { const s = L.add('ac'), sv = L.add('sv'), o = L.add('scope'); s.val = 230; sv.ratio = 10;
   L.wire(sv.id + ':3', s.id + ':1'); L.wire(sv.id + ':2', s.id + ':0'); L.connect(sv.id + ':1', o.id + ':1'); L.render();
@@ -104,6 +105,19 @@ L.reset(); { const g = L.add('gbf'), r = L.add('res'), c = L.add('cap'), o = L.a
 L.reset(); { const b = L.add('bat'), r = L.add('res'), a = L.add('amp'); b.val = 10; r.val = 100; L.wire(b.id + ':1', r.id + ':0'); L.wire(r.id + ':1', a.id + ':1'); L.wire(a.id + ':0', b.id + ':0'); L.render();
   const txt = L.serializeMontage(); yes('montage : JSON valide', JSON.parse(txt).comps.length === 3); L.reset(); yes('montage : rechargé', L.loadMontage(txt) === true);
   near('montage rechargé : I (A)', Math.abs(L.comps.find(c => c.type === 'amp').I), 0.1, 0.01); yes('montage invalide refusé', L.loadMontage('{pas du json') === false); }
+// 11h. Caisse de charge : bornes mono (M1, M2) et tri (L1, L2, L3) dédiées, sélecteur de branchement
+L.reset(); { const s = L.add('ac'), c = L.add('cch'), a3 = L.add('a3'); s.val = 230; c.val = 800; c.cm = 'mono';
+  L.wire(s.id + ':1', c.id + ':0'); L.wire(c.id + ':1', s.id + ':0'); L.wire(a3.id + ':1', c.id + ':2'); L.wire(a3.id + ':2', c.id + ':3'); L.wire(a3.id + ':3', c.id + ':4'); L.render();
+  near('mono actif : P (W)', c.P, 800, 0.01); c.cm = 'tri'; c.un = 400; L.render(); near('tri actif : P (W)', c.P, 800, 0.01); }
+// 11i. Migration d'un ancien montage (caisse tri sur bornes 0-2 -> 2-4)
+L.reset(); { const old = { version: '1.4', comps: [{ id: 1, type: 'a3', x: 190, y: 300, val: 400, f: 50 }, { id: 2, type: 'cch', x: 500, y: 300, cm: 'tri', un: 400, val: 2000 }], wires: [{ a: '1:1', b: '2:0', col: '#d32f2f' }, { a: '1:2', b: '2:1', col: '#d32f2f' }, { a: '1:3', b: '2:2', col: '#d32f2f' }], notes: [] };
+  yes('ancien montage chargé', L.loadMontage(JSON.stringify(old))); near('ancien montage migré : P (W)', L.comps.find(c => c.type === 'cch').P, 2000, 0.02); }
+// 11j. Étiquettes et filtre du matériel
+L.reset(); { L.TAGS.map.res = ['TP1']; L.TAGS.map.bat = ['TP1', 'Projet']; L.setFilter('TP1'); L.buildMenu(); let h = L.menuHtml();
+  yes('filtre TP1 : résistance et alimentation visibles', h.includes('Résistance') && h.includes('Alimentation continue')); yes('filtre TP1 : ampoule masquée', !h.includes('Ampoule'));
+  L.setFilter('Projet'); L.buildMenu(); h = L.menuHtml(); yes('filtre Projet : résistance masquée', !h.includes('Résistance') && h.includes('Alimentation continue'));
+  L.setFilter('-'); L.buildMenu(); h = L.menuHtml(); yes('sans étiquette : ampoule visible, résistance masquée', h.includes('Ampoule') && !h.includes('Résistance'));
+  L.setFilter('*'); L.buildMenu(); h = L.menuHtml(); yes('tout : tout visible', h.includes('Ampoule') && h.includes('Résistance')); yes('repérage toujours visible', h.includes('Rectangle pointillé')); }
 // 12. Dessin de tous les appareils
 L.reset(); ['bat', 'ac', 'gbf', 'res', 'bulb', 'cap', 'ind', 'sw', 'com', 'rel', 'ctc', 'mdc', 'mac', 'led', 'cfl', 'a3', 'm3', 'cch', 'sv', 'sc', 'tach', 'cpm', 'amp', 'volt', 'watt', 'pince', 'scope'].forEach(t => L.add(t));
 L.add('volt').ana = 1; L.add('amp').ana = 1; L.render(); yes('rendu complet', true);

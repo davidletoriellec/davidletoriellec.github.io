@@ -1,4 +1,4 @@
-# ⚡ LaboSim – laboratoire d'électricité virtuel (v1.4)
+# ⚡ LaboSim – laboratoire d'électricité virtuel (v1.5)
 
 Simulateur de travaux pratiques d'électricité qui tourne dans un navigateur, sans installation ni serveur.
 Les appareils sont dessinés comme en vrai et l'élève les **câble lui-même** avec des cordons banane ou BNC.
@@ -9,14 +9,21 @@ Une notice intégrée (bouton « Notice ») explique le câblage de chaque appar
 | Menu | Appareils |
 |---|---|
 | Alimentations | continue 0–30 V · alternative 0–230 V~ (tension et fréquence réglables) · triphasée 400 V (N, L1, L2, L3) · GBF 0–12 V, 10 Hz–1 MHz (sinus, carré, triangle, offset) |
-| Charges | résistance (code couleur) · ampoule (puissance et tension nominales) · lampe à LED · lampe fluocompacte · condensateur · bobine (avec résistance interne) · moteur à courant continu · moteur monophasé (cos φ 0,82) · moteur asynchrone triphasé 1,5 kW (cos φ 0,84, étoile/triangle) · caisse de charge 0–4 kW (mono/continu ou tri, paliers de 200 W) |
+| Charges | résistance (code couleur) · ampoule (puissance et tension nominales) · lampe à LED · lampe fluocompacte · condensateur · bobine (avec résistance interne) · moteur à courant continu · moteur monophasé (cos φ 0,82) · moteur asynchrone triphasé 1,5 kW (cos φ 0,84, étoile/triangle) · caisse de charge 0–4 kW (bornes M1/M2 mono ou continu et L1/L2/L3 tri, paliers de 200 W) |
 | Commandes | interrupteur · commutateur 2 voies (3 bornes) · relais (bobine et contact visibles) · contacteur (2 contacts NO) |
 | Appareils de mesure | multimètre numérique (A/V, DC ou AC efficace) · ampèremètre et voltmètre à aiguille (calibres) · wattmètre IeS ISW8000 (W, VAr, VA, PF, V, A) · pince ampèremétrique PROVA 21 (A, W, VAr, VA, PF, V) · sonde de tension (÷10, ÷100) · sonde de courant (÷10, ÷100, ÷300) · compte-tours · couple-mètre · oscilloscope 2 voies (mode XY, curseurs) |
 | Repérage | rectangles pointillés · textes |
 
 Autres fonctions : unités au choix pour chaque réglage (mΩ…MΩ, pF…mF, µH…H, Hz…MHz, mV…kV, mW…kW), câbles banane/BNC/coaxiaux
 à trois tracés au choix (courbe à points, droit, orthogonal), 9 couleurs de câbles, « clac » des relais et contacteurs, oscilloscope avec écran agrandi et curseurs (ΔT, 1/ΔT, ΔV, valeur max, déphasage),
-export PDF (NOM, PRÉNOM, GROUPE, RESSOURCE, notes libres) du schéma et de l'écran de l'oscilloscope, sauvegarde et ouverture des montages (fichier `.json`).
+export PDF (NOM, PRÉNOM, GROUPE, RESSOURCE, notes libres) du schéma et de l'écran de l'oscilloscope, sauvegarde et ouverture des montages (fichier `.json`), étiquettes (TP ELEN, TP ENER, TP1, TP2, Projet…) avec filtre du menu de matériel.
+
+## Étiquettes et filtre du matériel
+
+Le bouton 🏷 du menu ouvre la gestion des étiquettes : créer, renommer, supprimer, cocher les appareils concernés. La liste déroulante du menu
+affiche tout le matériel, une étiquette ou « Sans étiquette ». La configuration est mémorisée dans le navigateur et peut être exportée/importée.
+Pour un site GitHub Pages, le fichier `labosim-tags.json` (à côté de `index.html`) est chargé au démarrage si aucune configuration locale n'existe :
+format `{"tags":["TP1","TP2"],"map":{"res":["TP1"],"amp:a":["TP2"]}}` (`:a` = appareil à aiguille).
 
 ## Lancer en local
 
