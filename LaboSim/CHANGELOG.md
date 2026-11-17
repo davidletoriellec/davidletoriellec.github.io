@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.7
+- Moteurs asynchrones mono et triphasé : curseur de charge de l'à-vide à 1,2 × In (courant, cos φ, vitesse et couple varient ; courant et cos φ à vide réglables).
+- NE555, AOP LF356 et comparateur LM311 (collecteur ouvert en option) avec simulation temporelle.
+- Boîtes noires (dipôles et quadripôles) à caractériser : contenu défini par le professeur (netlist ou modèles), masqué à l'élève, code professeur facultatif.
+- Nouveaux exemples : NE555 astable, AOP inverseur, boîtes noires.
+
 ## v1.6
 - Étiquettes colorées : couleur modifiable par étiquette, simple point coloré dans le menu.
 - Plan de travail de 4000 × 3000 : zoom (molette, boutons, pincement), déplacement de la vue, ajustement au montage ; l'export PDF prend tout le montage.

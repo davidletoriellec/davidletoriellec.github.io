@@ -5,7 +5,7 @@ const el = () => ({ style: {}, dataset: {}, classList: { toggle() {}, remove() {
 const store = {};
 global.document = { getElementById: id => store[id] || (store[id] = el()), querySelectorAll: () => [] };
 global.window = { addEventListener() {} };
-const L = new Function(code + `;return{add,wire,connect,render,mkWave,bz,tp,wsamples,buildPdf,pdfWrap,serializeMontage,loadMontage,buildMenu,setFilter(v){tagFilter=v},get TAGS(){return TAGS},get view(){return view},fitView,zoomAt,contentBounds,menuHtml(){return menuEl.innerHTML},reset(){comps=[];wires=[];notes=[];uid=1;sel=selW=selN=pend=null},get err(){return err},get wires(){return wires},get comps(){return comps},get solve(){return solve}}`)();
+const L = new Function(code + `;return{add,wire,connect,render,mkWave,bz,tp,wsamples,buildPdf,pdfWrap,serializeMontage,loadMontage,buildMenu,setFilter(v){tagFilter=v},get TAGS(){return TAGS},get tranMode(){return tranMode},trFreq,bbEnc,bbDec,bbHash,bbParse,BBT,pv,get view(){return view},fitView,zoomAt,contentBounds,menuHtml(){return menuEl.innerHTML},reset(){comps=[];wires=[];notes=[];uid=1;sel=selW=selN=pend=null},get err(){return err},get wires(){return wires},get comps(){return comps},get solve(){return solve}}`)();
 
 let fail = 0;
 const near = (name, got, want, tol) => { const ok = Math.abs(got - want) <= tol * Math.max(1, Math.abs(want)); if (!ok) fail++; console.log((ok ? 'ok   ' : 'FAIL ') + name + ' → ' + got.toPrecision(5) + ' (attendu ' + want + ')'); };
@@ -131,7 +131,46 @@ L.reset(); { L.add('watt'); const v = L.add('volt'); v.ana = 1; v.rng = 10; L.re
   yes('ISW : plus de trait entre les bornes de droite', !svg.includes('M127 -26V16')); yes('ISW : fusible conservé', svg.includes('mesure I'));
   yes('aiguille : échelle 30 grisée (calibre 10)', svg.includes('#8c8c80')); const g1 = (svg.match(/#8c8c80/g) || []).length; v.rng = 3; L.render(); const g2 = (document.getElementById('cv')._h.match(/#8c8c80/g) || []).length;
   yes('aiguille : deux échelles tracées, l\'active change avec le calibre', g1 > 20 && g2 > 20); }
+// 13a. Moteurs : curseur de charge (à vide -> 1,2 In)
+L.reset(); { const s = L.add('ac'), w = L.add('watt'), m = L.add('mac'); s.val = 230;
+  L.wire(s.id + ':1', w.id + ':1'); L.wire(w.id + ':3', m.id + ':1'); L.wire(m.id + ':0', w.id + ':2'); L.wire(w.id + ':0', s.id + ':0');
+  const pf = () => w.P / (w.Ur * w.Ir), In = 370 / 0.7 / (230 * 0.82);
+  m.ml = 0; L.render(); near('mono à vide : courant (A)', w.Ir, 0.55 * In, 0.03); near('mono à vide : cos φ', pf(), 0.25, 0.04);
+  m.ml = 1; L.render(); near('mono nominal : courant (A)', w.Ir, In, 0.03); near('mono nominal : cos φ', pf(), 0.82, 0.03);
+  m.ml = 1.2; L.render(); yes('mono 1,2 : courant entre 1,1 et 1,3 In', w.Ir > 1.1 * In && w.Ir < 1.3 * In); }
+L.reset(); { const a = L.add('a3'), m = L.add('m3'); a.val = 400; L.wire(a.id + ':1', m.id + ':0'); L.wire(a.id + ':2', m.id + ':1'); L.wire(a.id + ':3', m.id + ':2');
+  m.ml = 0; L.render(); const pf0 = m.P / Math.hypot(m.P, m.Q), r0 = m.rpm; m.ml = 1.2; L.render(); const pf1 = m.P / Math.hypot(m.P, m.Q);
+  near('tri à vide : cos φ', pf0, 0.2, 0.05); yes('tri : cos φ augmente avec la charge', pf1 > 0.8); yes('tri : vitesse décroît avec la charge', m.rpm < r0 && r0 > 1450); }
+// 13b. Boîtes noires : netlist, masquage, phaseurs
+L.reset(); { const e = L.bbEnc('R1 A B 1k\nC1 A B 100n'); yes('netlist masquée (non lisible)', !e.includes('R1') && L.bbDec(e) === 'R1 A B 1k\nC1 A B 100n');
+  yes('code : même code, même empreinte', L.bbHash('prof') === L.bbHash('prof') && L.bbHash('prof') !== L.bbHash('autre'));
+  near('valeur 4.7k', L.pv('4.7k'), 4700, 1e-9); near('valeur 100n', L.pv('100n'), 1e-7, 1e-9); near('valeur 2meg', L.pv('2meg'), 2e6, 1e-9); near('valeur 10m', L.pv('10m'), 0.01, 1e-9); near('valeur 1M', L.pv('1M'), 1e6, 1e-9);
+  yes('netlist invalide signalée', L.bbParse('R1 A B', 'd').er !== '' && L.bbParse('Z1 A B 1', 'd').er !== '' && L.bbParse('', 'd').er !== ''); }
+L.reset(); { const b = L.add('bat'), bb = L.add('bb'), a = L.add('amp'); b.val = 10; bb.kind = 'd'; bb.name = 'BN2'; bb.net = L.bbEnc(L.BBT.d['R // C (1 kΩ ∥ 100 nF)']);
+  L.wire(b.id + ':1', bb.id + ':0'); L.wire(bb.id + ':1', a.id + ':1'); L.wire(a.id + ':0', b.id + ':0'); L.render(); near('boîte noire R // C en continu : I (A)', -a.I, 0.01, 0.01); }
+L.reset(); { const g = L.add('gbf'), bb = L.add('bb'), o = L.add('scope'); g.amp = 5; bb.kind = 'q'; bb.name = 'BN1'; bb.net = L.bbEnc(L.BBT.q['Passe-bas RC (fc ≈ 1,6 kHz)']);
+  L.wire(g.id + ':1', bb.id + ':0'); L.wire(g.id + ':0', bb.id + ':1'); L.wire(o.id + ':1', g.id + ':1'); L.wire(o.id + ':0', g.id + ':0'); L.wire(o.id + ':3', bb.id + ':2'); L.render();
+  near('quadripôle passe-bas : |H(1 kHz)|', Math.hypot(...o.sig[1][1]) / Math.hypot(...o.sig[0][1]), 1 / Math.hypot(1, 2 * Math.PI * 1000 * 1e-4), 0.02); }
+L.reset(); { const g = L.add('gbf'), bb = L.add('bb'), o = L.add('scope'); g.amp = 1; bb.kind = 'q'; bb.net = L.bbEnc(L.BBT.q['Amplificateur idéal ×10']);
+  L.wire(g.id + ':1', bb.id + ':0'); L.wire(g.id + ':0', bb.id + ':1'); L.wire(o.id + ':1', g.id + ':1'); L.wire(o.id + ':0', g.id + ':0'); L.wire(o.id + ':3', bb.id + ':2'); L.wire(bb.id + ':3', g.id + ':0'); L.render();
+  near('quadripôle amplificateur idéal : gain', Math.hypot(...o.sig[1][1]) / Math.hypot(...o.sig[0][1]), 10, 0.02); }
+// 13c. Simulation temporelle : NE555, AOP, comparateur
+L.reset(); { const b = L.add('bat'), ic = L.add('ne555'), r1 = L.add('res'), r2 = L.add('res'), cc = L.add('cap'), o = L.add('scope'); b.val = 12; r1.val = 1000; r2.val = 10000; cc.val = 0.1; o.td = 5e-4;
+  L.wire(b.id + ':1', ic.id + ':7'); L.wire(b.id + ':1', ic.id + ':3'); L.wire(b.id + ':1', r1.id + ':0'); L.wire(r1.id + ':1', ic.id + ':6'); L.wire(r1.id + ':1', r2.id + ':0'); L.wire(r2.id + ':1', ic.id + ':5'); L.wire(ic.id + ':5', ic.id + ':1'); L.wire(ic.id + ':5', cc.id + ':0'); L.wire(cc.id + ':1', b.id + ':0'); L.wire(ic.id + ':0', b.id + ':0');
+  L.wire(ic.id + ':2', o.id + ':1'); L.wire(o.id + ':0', b.id + ':0'); L.wire(o.id + ':3', ic.id + ':5'); L.render();
+  yes('mode temporel actif', L.tranMode); near('NE555 astable : fréquence (Hz)', L.trFreq(o, 0), 1.44 / ((1000 + 2 * 10000) * 1e-7), 0.06);
+  const y = o.tr.y[0], hi = y.filter(v => v > 6).length / y.length; near('NE555 astable : rapport cyclique', hi, 11 / 21, 0.1); yes('NE555 : sortie haute ≈ Vcc − 1,7 V', Math.max(...y) > 9.8 && Math.max(...y) < 10.8);
+  const yc = o.tr.y[1]; yes('condensateur oscille entre 1/3 et 2/3 Vcc', Math.min(...yc) > 3.7 && Math.min(...yc) < 4.4 && Math.max(...yc) > 7.6 && Math.max(...yc) < 8.3); }
+L.reset(); { const b1 = L.add('bat'), b2 = L.add('bat'), g = L.add('gbf'), r1 = L.add('res'), rf = L.add('res'), ic = L.add('aop'), o = L.add('scope'); b1.val = 15; b2.val = 15; g.amp = 1; r1.val = 1000; rf.val = 10000; o.td = 2e-4;
+  L.wire(b1.id + ':1', ic.id + ':3'); L.wire(b1.id + ':0', b2.id + ':1'); L.wire(b2.id + ':0', ic.id + ':4'); L.wire(g.id + ':1', r1.id + ':0'); L.wire(g.id + ':0', b1.id + ':0'); L.wire(r1.id + ':1', ic.id + ':1'); L.wire(rf.id + ':0', ic.id + ':1'); L.wire(rf.id + ':1', ic.id + ':2'); L.wire(ic.id + ':0', b1.id + ':0');
+  L.wire(o.id + ':1', g.id + ':1'); L.wire(o.id + ':3', ic.id + ':2'); L.wire(o.id + ':0', b1.id + ':0'); L.render();
+  const amp = a => (Math.max(...a) - Math.min(...a)) / 2; near('AOP inverseur : amplitude de sortie (V)', amp(o.tr.y[1]), 10, 0.03); near('AOP inverseur : fréquence conservée (Hz)', L.trFreq(o, 1), 1000, 0.03);
+  const y0 = o.tr.y[0], y1 = o.tr.y[1]; let ph = 0; for (let i = 0; i < y0.length; i++) ph += y0[i] * y1[i]; yes('AOP inverseur : sortie en opposition de phase', ph < 0);
+  g.amp = 2; L.render(); yes('AOP saturé à ≈ ±13,5 V', Math.max(...o.tr.y[1]) > 13 && Math.max(...o.tr.y[1]) < 13.8 && Math.min(...o.tr.y[1]) < -13 && Math.min(...o.tr.y[1]) > -13.8); }
+L.reset(); { const b = L.add('bat'), g = L.add('gbf'), ic = L.add('cmp'), o = L.add('scope'); b.val = 5; g.amp = 1; o.td = 2e-4;
+  L.wire(b.id + ':1', ic.id + ':3'); L.wire(b.id + ':0', ic.id + ':4'); L.wire(g.id + ':1', ic.id + ':0'); L.wire(g.id + ':0', b.id + ':0'); L.wire(ic.id + ':1', b.id + ':0'); L.wire(o.id + ':1', g.id + ':1'); L.wire(o.id + ':3', ic.id + ':2'); L.wire(o.id + ':0', b.id + ':0'); L.render();
+  const y = o.tr.y[1]; yes('comparateur : sortie 0 / ≈ 5 V', Math.max(...y) > 4.4 && Math.min(...y) < 0.3); near('comparateur : fréquence (Hz)', L.trFreq(o, 1), 1000, 0.03); }
 // 12. Dessin de tous les appareils
-L.reset(); ['bat', 'ac', 'gbf', 'res', 'bulb', 'cap', 'ind', 'sw', 'com', 'rel', 'ctc', 'mdc', 'mac', 'led', 'cfl', 'a3', 'm3', 'cch', 'sv', 'sc', 'tach', 'cpm', 'amp', 'volt', 'watt', 'pince', 'scope'].forEach(t => L.add(t));
+L.reset(); ['bat', 'ac', 'gbf', 'res', 'bulb', 'cap', 'ind', 'sw', 'com', 'rel', 'ctc', 'mdc', 'mac', 'led', 'cfl', 'a3', 'm3', 'cch', 'sv', 'sc', 'tach', 'cpm', 'amp', 'volt', 'watt', 'pince', 'scope', 'bb', 'ne555', 'aop', 'cmp'].forEach(t => L.add(t));
 L.add('volt').ana = 1; L.add('amp').ana = 1; L.render(); yes('rendu complet', true);
 console.log(fail ? `\n${fail} test(s) en échec` : '\nTous les tests passent'); process.exit(fail ? 1 : 0);

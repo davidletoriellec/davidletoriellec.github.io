@@ -5,14 +5,13 @@
 <link rel="stylesheet" href="css/style.css"></head><body>
 <header>
 <button id="mb" title="Matériel">☰</button>
-<h1>⚡ LaboSim <small class="mut">v1.6</small></h1>
-  <h1><small class="mut"><i>M. Carette & D. Le Toriellec</i> </small></h1>
+<h1>⚡ LaboSim <small class="mut">v1.7</small></h1>
 <span class="sp"></span>
 <label class="mut"><input type="checkbox" id="th"> Valeurs théoriques</label>
 <button id="sv_">💾 Enregistrer</button><button id="op_">📂 Ouvrir</button><input type="file" id="fl" accept=".json,application/json" style="display:none"><button id="snd" title="Son des relais">🔊</button><button id="nb">📖 Notice</button><button id="pb">📄 Export PDF</button><button id="clr">Vider</button>
 </header>
 <div id="wrap">
-<aside id="side"><div id="tfrow"><i id="tfd" class="dot"></i><select id="tf" title="Filtrer le matériel par étiquette"></select><button id="tgb" title="Gérer les étiquettes">🏷</button></div><div id="menu"></div><h3>Exemples</h3><button id="ex">Courant continu</button><button id="ex2">Alternatif + R</button><button id="ex3">Wattmètre R-L</button><button id="ex4">GBF + oscilloscope</button><button id="ex5">Pinces</button><button id="ex6">Relais</button><button id="ex7">Moteur monophasé</button><button id="ex8">Triphasé</button></aside>
+<aside id="side"><div id="tfrow"><i id="tfd" class="dot"></i><select id="tf" title="Filtrer le matériel par étiquette"></select><button id="tgb" title="Gérer les étiquettes">🏷</button></div><div id="menu"></div><h3>Exemples</h3><button id="ex">Courant continu</button><button id="ex2">Alternatif + R</button><button id="ex3">Wattmètre R-L</button><button id="ex4">GBF + oscilloscope</button><button id="ex5">Pinces</button><button id="ex6">Relais</button><button id="ex7">Moteur monophasé</button><button id="ex8">Triphasé</button><button id="ex9">NE555 astable</button><button id="ex10">AOP inverseur</button><button id="ex11">Boîtes noires</button></aside>
 <main>
 <svg id="cv" viewBox="0 0 900 600" preserveAspectRatio="xMidYMid meet"></svg>
 <div id="zc"><button id="zi" title="Zoom avant">+</button><button id="zo" title="Zoom arrière">−</button><button id="zf" title="Ajuster la vue au montage">⤢</button><span id="zl" class="mut"></span></div>
@@ -22,5 +21,6 @@
 <div id="ov"><div><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b>Oscilloscope – écran agrandi et curseurs</b><span><button id="ovp">📄 Export PDF</button> <button id="ovc">Fermer</button></span></div><div id="ovctl"></div><svg id="ovs" viewBox="0 0 640 520"></svg><div id="ovr" class="mut"></div></div></div>
 <div id="nov"><div><div style="display:flex;justify-content:space-between;align-items:center"><b>Notice d’utilisation</b><button id="novc">Fermer</button></div><div id="novb"></div></div></div>
 <div id="tgm"><div><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b>Étiquettes du matériel</b><button id="tgx">Fermer</button></div><div class="mut" style="font-size:13px">Associe chaque appareil à un ou plusieurs TP ou projets, puis choisis un filtre en haut du menu de gauche.</div><div id="tgb2"></div></div></div>
+<div id="bbm"><div id="bbb"></div></div>
 <div id="pdfm"><div><b>Export PDF</b><div class="g2"><label>NOM <input id="pf_nom"></label><label>PRÉNOM <input id="pf_pre"></label><label>GROUPE <input id="pf_grp"></label><label>RESSOURCE <input id="pf_res"></label></div><label>Notes / énoncé / questions<textarea id="pf_txt" rows="6"></textarea></label><div style="display:flex;gap:8px"><button id="pf_go" class="p">Générer le PDF</button><button id="pf_x">Annuler</button></div><div id="pf_msg" class="mut"></div></div></div>
 <script src="js/app.js"></script></body></html>
