@@ -1,51 +1,51 @@
 {
  "tags": [
-  "TP ELEN"
+  "TP ELEN MC"
  ],
  "map": {
   "bat": [
-   "TP ELEN"
+   "TP ELEN MC"
   ],
   "gbf": [
-   "TP ELEN"
+   "TP ELEN MC"
   ],
   "res": [
-   "TP ELEN"
+   "TP ELEN MC"
   ],
   "cap": [
-   "TP ELEN"
+   "TP ELEN MC"
   ],
   "ind": [
-   "TP ELEN"
+   "TP ELEN MC"
   ],
   "sw": [],
   "amp": [
-   "TP ELEN"
+   "TP ELEN MC"
   ],
   "volt": [
-   "TP ELEN"
+   "TP ELEN MC"
   ],
   "scope": [
-   "TP ELEN"
+   "TP ELEN MC"
   ],
   "ne555": [
-   "TP ELEN"
+   "TP ELEN MC"
   ],
   "aop": [
-   "TP ELEN"
+   "TP ELEN MC"
   ],
   "cmp": [
-   "TP ELEN"
+   "TP ELEN MC"
   ],
   "bb:d": [
-   "TP ELEN"
+   "TP ELEN MC"
   ],
   "bb:q": [
-   "TP ELEN"
+   "TP ELEN MC"
   ]
  },
  "colors": {
-  "TP ELEN MC": "#8e24aa5"
+  "TP ELEN MC MC": "#8e24aa5"
   
  }
 }
