@@ -5,7 +5,7 @@ const el = () => ({ style: {}, dataset: {}, classList: { toggle() {}, remove() {
 const store = {};
 global.document = { getElementById: id => store[id] || (store[id] = el()), querySelectorAll: () => [] };
 global.window = { addEventListener() {} };
-const L = new Function(code + `;return{add,wire,connect,render,mkWave,bz,tp,wsamples,buildPdf,pdfWrap,serializeMontage,loadMontage,buildMenu,setFilter(v){tagFilter=v},get TAGS(){return TAGS},get tranMode(){return tranMode},startCapture,capPick,get capt(){return capt},trFreq,bbEnc,bbDec,bbHash,bbParse,BBT,pv,get view(){return view},fitView,zoomAt,contentBounds,menuHtml(){return menuEl.innerHTML},reset(){comps=[];wires=[];notes=[];uid=1;sel=selW=selN=pend=null},get err(){return err},get wires(){return wires},get comps(){return comps},get solve(){return solve},geo,BX0,BP,BROW,BC,nearHole,snapPlug,plugSet(){return plugSet},DK,LC,gbfHarm,gbfWave,bridges,mergeTags,tagSlug}`)();
+const L = new Function(code + `;return{add,wire,connect,render,mkWave,bz,tp,wsamples,buildPdf,pdfWrap,serializeMontage,loadMontage,buildMenu,setFilter(v){tagFilter=v},get TAGS(){return TAGS},get tranMode(){return tranMode},startCapture,capPick,get capt(){return capt},trFreq,bbEnc,bbDec,bbHash,bbParse,BBT,pv,get view(){return view},fitView,zoomAt,contentBounds,menuHtml(){return menuEl.innerHTML},reset(){comps=[];wires=[];notes=[];uid=1;sel=selW=selN=pend=null},get err(){return err},get wires(){return wires},get comps(){return comps},get solve(){return solve},geo,BX0,BP,BROW,BC,nearHole,snapPlug,plugSet(){return plugSet},DK,LC,gbfHarm,gbfWave,bridges,mergeTags,tagSlug,ldrR}`)();
 
 let fail = 0;
 const near = (name, got, want, tol) => { const ok = Math.abs(got - want) <= tol * Math.max(1, Math.abs(want)); if (!ok) fail++; console.log((ok ? 'ok   ' : 'FAIL ') + name + ' → ' + got.toPrecision(5) + ' (attendu ' + want + ')'); };
@@ -238,7 +238,23 @@ L.reset(); { const old = { app: 'LaboSim', version: '1.8', comps: [{ id: 1, type
 yes('nom de fichier d’après l’étiquette', L.tagSlug('TP ELEN') === 'tp-elen' && L.tagSlug('Projet été') === 'projet-ete');
 { const m = L.mergeTags([{ tags: ['TP1'], map: { res: ['TP1'] }, colors: { TP1: '#ff0000' } }, { tags: ['TP2', 'TP1'], map: { res: ['TP2'], bat: ['TP2'] }, colors: { TP2: '#00ff00', TP1: '#0000ff' } }]);
   yes('fusion : étiquettes réunies', m.tags.join() === 'TP1,TP2'); yes('fusion : appareils additionnés', m.map.res.join() === 'TP1,TP2' && m.map.bat.join() === 'TP2'); yes('fusion : première couleur conservée', m.colors.TP1 === '#ff0000' && m.colors.TP2 === '#00ff00'); }
+
+// 19. Capteurs : photorésistance, infrarouge, ultrason
+L.reset(); { const b = L.add('bat'), r = L.add('res'), l = L.add('ldr'), v = L.add('volt'); b.val = 5; r.val = 10000; l.lux = 10;
+  L.wire(b.id + ':1', r.id + ':0'); L.wire(r.id + ':1', l.id + ':0'); L.wire(l.id + ':1', b.id + ':0'); L.wire(v.id + ':1', l.id + ':0'); L.wire(v.id + ':0', l.id + ':1'); L.render();
+  near('LDR 10 lx : résistance (Ω)', L.ldrR(l), 16000, 0.001); near('LDR 10 lx : tension du pont (V)', -v.U, 5 * 16000 / 26000, 0.01);
+  l.lux = 1000; L.render(); yes('LDR : plus de lumière → tension plus faible', -v.U < 1.5); l.lux = 0.1; L.render(); yes('LDR très faiblement éclairée : > 300 kΩ', L.ldrR(l) > 3e5); }
+const irSetup = (dx) => { L.reset(); const b = L.add('bat'), r1 = L.add('res'), d = L.add('dled', 600, 300), r2 = L.add('res'), t = L.add('irrx', 600 + dx, 300), v = L.add('volt'); b.val = 5; r1.val = 220; r2.val = 4700; d.lc = 'ir';
+  L.wire(b.id + ':1', r1.id + ':0'); L.wire(r1.id + ':1', d.id + ':0'); L.wire(d.id + ':1', b.id + ':0'); L.wire(b.id + ':1', r2.id + ':0'); L.wire(r2.id + ':1', t.id + ':0'); L.wire(t.id + ':1', b.id + ':0'); L.wire(v.id + ':1', t.id + ':0'); L.wire(v.id + ':0', t.id + ':1'); L.render(); return { d, t, v } };
+{ const { d, t, v } = irSetup(120); const Ie = (5 - 1.15) / (220 + 8); near('LED IR : courant (mA)', d.I * 1000, Ie * 1000, 0.03);
+  const g = 0.05 / (1 + (120 / 250) ** 2); near('phototransistor : photocourant (mA)', t.iph * 1000, g * Ie * 1000, 0.03); near('récepteur : tension de sortie (V)', -v.U, 5 - g * Ie * 4700, 0.04);
+  t.blk = true; L.render(); yes('obstacle sur le faisceau : sortie haute', -v.U > 4.5); t.blk = false; t.x = 600 + 600; L.render(); yes('plus loin : photocourant plus faible', t.iph < g * Ie * .5); }
+L.reset(); { const b = L.add('bat'), g = L.add('gbf'), h = L.add('hcsr'), o = L.add('scope'); b.val = 5; g.wave = 'sq'; g.f = 20; g.amp = 2.5; g.off = 2.5; g.duty = .1; o.td = 2e-3; h.dist = 100;
+  L.wire(h.id + ':0', b.id + ':1'); L.wire(h.id + ':3', b.id + ':0'); L.wire(h.id + ':1', g.id + ':1'); L.wire(g.id + ':0', b.id + ':0'); L.wire(o.id + ':1', g.id + ':1'); L.wire(o.id + ':3', h.id + ':2'); L.wire(o.id + ':0', b.id + ':0'); L.wire(o.id + ':2', b.id + ':0'); L.render();
+  const width = () => { const y = o.tr.y[1], dt = o.tr.dt; let u = -1; for (let k = 1; k < y.length; k++) { if (u < 0 && y[k] > 2.5 && y[k - 1] <= 2.5) u = k; else if (u >= 0 && y[k] <= 2.5) return (k - u) * dt * 1000 } return 0 };
+  near('ultrason 100 cm : durée de l’écho (ms)', width(), 2 * 100 / 34300 * 1000, 0.03); h.dist = 200; L.render(); near('ultrason 200 cm : durée de l’écho (ms)', width(), 2 * 200 / 34300 * 1000, 0.03); let hi = 0;
+  b.val = 0; L.render(); hi = 0; for (const v of o.tr.y[1]) if (v > 2.5) hi++; yes('ultrason non alimenté : pas d’écho', hi === 0); }
 // 12. Dessin de tous les appareils
-L.reset(); ['bat', 'ac', 'gbf', 'res', 'bulb', 'cap', 'ind', 'sw', 'com', 'rel', 'ctc', 'mdc', 'mac', 'led', 'cfl', 'a3', 'm3', 'cch', 'sv', 'sc', 'tach', 'cpm', 'amp', 'volt', 'watt', 'pince', 'scope', 'bb', 'ne555', 'aop', 'cmp', 'dio', 'dled', 'bread'].forEach(t => L.add(t));
+L.reset(); ['bat', 'ac', 'gbf', 'res', 'bulb', 'cap', 'ind', 'sw', 'com', 'rel', 'ctc', 'mdc', 'mac', 'led', 'cfl', 'a3', 'm3', 'cch', 'sv', 'sc', 'tach', 'cpm', 'amp', 'volt', 'watt', 'pince', 'scope', 'bb', 'ne555', 'aop', 'cmp', 'dio', 'dled', 'bread', 'ldr', 'irrx', 'hcsr'].forEach(t => L.add(t));
 L.add('volt').ana = 1; L.add('amp').ana = 1; L.render(); yes('rendu complet', true);
 console.log(fail ? `\n${fail} test(s) en échec` : '\nTous les tests passent'); process.exit(fail ? 1 : 0);

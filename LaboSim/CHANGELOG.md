@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.1
+- Capteurs : photorésistance (LDR, 0,1 à 10 000 lx), émetteur infrarouge (LED IR) et récepteur infrarouge (phototransistor couplé aux LED IR du plan selon courant et distance, obstacle possible), capteur ultrason HC-SR04 (TRIG / ECHO, distance réglable 2 à 400 cm).
+- Exemples : photorésistance, infrarouge, ultrason ; menu « Capteurs ».
+
 ## v2.0
 - Étiquettes : plusieurs fichiers combinés. « Exporter un fichier par étiquette » produit un fichier nommé d'après chaque étiquette (tp-elen.json…) et un labosim-tags-index.json ; le site fusionne les fichiers listés (dossier tags/). L'ancien labosim-tags.json reste pris en charge.
 
