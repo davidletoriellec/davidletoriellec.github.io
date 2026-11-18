@@ -1,4 +1,4 @@
-# ⚡ LaboSim – laboratoire d'électricité virtuel (v1.9)
+# ⚡ LaboSim – laboratoire d'électricité virtuel (v2.0)
 
 Simulateur de travaux pratiques d'électricité qui tourne dans un navigateur, sans installation ni serveur.
 Les appareils sont dessinés comme en vrai et l'élève les **câble lui-même** avec des cordons banane ou BNC.
@@ -29,6 +29,17 @@ Le bouton 🏷 du menu ouvre la gestion des étiquettes : créer, renommer, supp
 affiche tout le matériel, une étiquette ou « Sans étiquette ». Chaque étiquette a une couleur : un petit point coloré apparaît dans le menu à côté des appareils concernés. La configuration est mémorisée dans le navigateur et peut être exportée/importée.
 Pour un site GitHub Pages, le fichier `labosim-tags.json` (à côté de `index.html`) est chargé au démarrage si aucune configuration locale n'existe :
 format `{"tags":["TP1","TP2"],"colors":{"TP1":"#43a047","TP2":"#1e88e5"},"map":{"res":["TP1"],"amp:a":["TP2"]}}` (`:a` = appareil à aiguille).
+
+Plusieurs fichiers peuvent être combinés : « Exporter un fichier par étiquette » télécharge un fichier par étiquette, nommé d'après elle (`tp-elen.json`, `tp1.json`…), et un `labosim-tags-index.json`. Dépose les fichiers dans un dossier `tags/` et l'index à la racine :
+
+```
+index.html
+labosim-tags-index.json     {"files":["tags/tp-elen.json","tags/tp1.json"]}
+tags/tp-elen.json
+tags/tp1.json
+```
+
+Le site fusionne les fichiers listés (étiquettes de même nom regroupées, appareils additionnés).
 
 ## Lancer en local
 

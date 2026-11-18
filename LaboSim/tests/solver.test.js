@@ -5,7 +5,7 @@ const el = () => ({ style: {}, dataset: {}, classList: { toggle() {}, remove() {
 const store = {};
 global.document = { getElementById: id => store[id] || (store[id] = el()), querySelectorAll: () => [] };
 global.window = { addEventListener() {} };
-const L = new Function(code + `;return{add,wire,connect,render,mkWave,bz,tp,wsamples,buildPdf,pdfWrap,serializeMontage,loadMontage,buildMenu,setFilter(v){tagFilter=v},get TAGS(){return TAGS},get tranMode(){return tranMode},startCapture,capPick,get capt(){return capt},trFreq,bbEnc,bbDec,bbHash,bbParse,BBT,pv,get view(){return view},fitView,zoomAt,contentBounds,menuHtml(){return menuEl.innerHTML},reset(){comps=[];wires=[];notes=[];uid=1;sel=selW=selN=pend=null},get err(){return err},get wires(){return wires},get comps(){return comps},get solve(){return solve},geo,BX0,BP,BROW,BC,nearHole,snapPlug,plugSet(){return plugSet},DK,LC,gbfHarm,gbfWave,bridges}`)();
+const L = new Function(code + `;return{add,wire,connect,render,mkWave,bz,tp,wsamples,buildPdf,pdfWrap,serializeMontage,loadMontage,buildMenu,setFilter(v){tagFilter=v},get TAGS(){return TAGS},get tranMode(){return tranMode},startCapture,capPick,get capt(){return capt},trFreq,bbEnc,bbDec,bbHash,bbParse,BBT,pv,get view(){return view},fitView,zoomAt,contentBounds,menuHtml(){return menuEl.innerHTML},reset(){comps=[];wires=[];notes=[];uid=1;sel=selW=selN=pend=null},get err(){return err},get wires(){return wires},get comps(){return comps},get solve(){return solve},geo,BX0,BP,BROW,BC,nearHole,snapPlug,plugSet(){return plugSet},DK,LC,gbfHarm,gbfWave,bridges,mergeTags,tagSlug}`)();
 
 let fail = 0;
 const near = (name, got, want, tol) => { const ok = Math.abs(got - want) <= tol * Math.max(1, Math.abs(want)); if (!ok) fail++; console.log((ok ? 'ok   ' : 'FAIL ') + name + ' → ' + got.toPrecision(5) + ' (attendu ' + want + ')'); };
@@ -234,6 +234,10 @@ L.reset(); { const bd = L.add('bread', 600, 400), ic = L.add('aop'), b1 = L.add(
 // 17. Ouverture d'un ancien montage (AOP à 5 bornes)
 L.reset(); { const old = { app: 'LaboSim', version: '1.8', comps: [{ id: 1, type: 'bat', x: 100, y: 100 }, { id: 2, type: 'aop', x: 300, y: 300 }], wires: [{ a: '1:1', b: '2:3', col: '#d32f2f' }, { a: '1:0', b: '2:4', col: '#111' }, { a: '1:0', b: '2:0', col: '#111' }, { a: '2:2', b: '1:0', col: '#111' }], notes: [] };
   L.loadMontage(JSON.stringify(old)); const w = L.wires.map(x => x.a + '>' + x.b); yes('migration AOP : V+ → broche 7, V− → broche 4, + → 3, S → 6', w[0] === '1:1>2:6' && w[1] === '1:0>2:3' && w[2] === '1:0>2:2' && w[3] === '2:5>1:0'); }
+// 18. Étiquettes : fichiers multiples fusionnés, noms de fichiers
+yes('nom de fichier d’après l’étiquette', L.tagSlug('TP ELEN') === 'tp-elen' && L.tagSlug('Projet été') === 'projet-ete');
+{ const m = L.mergeTags([{ tags: ['TP1'], map: { res: ['TP1'] }, colors: { TP1: '#ff0000' } }, { tags: ['TP2', 'TP1'], map: { res: ['TP2'], bat: ['TP2'] }, colors: { TP2: '#00ff00', TP1: '#0000ff' } }]);
+  yes('fusion : étiquettes réunies', m.tags.join() === 'TP1,TP2'); yes('fusion : appareils additionnés', m.map.res.join() === 'TP1,TP2' && m.map.bat.join() === 'TP2'); yes('fusion : première couleur conservée', m.colors.TP1 === '#ff0000' && m.colors.TP2 === '#00ff00'); }
 // 12. Dessin de tous les appareils
 L.reset(); ['bat', 'ac', 'gbf', 'res', 'bulb', 'cap', 'ind', 'sw', 'com', 'rel', 'ctc', 'mdc', 'mac', 'led', 'cfl', 'a3', 'm3', 'cch', 'sv', 'sc', 'tach', 'cpm', 'amp', 'volt', 'watt', 'pince', 'scope', 'bb', 'ne555', 'aop', 'cmp', 'dio', 'dled', 'bread'].forEach(t => L.add(t));
 L.add('volt').ana = 1; L.add('amp').ana = 1; L.render(); yes('rendu complet', true);

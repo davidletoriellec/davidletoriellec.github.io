@@ -1,0 +1,67 @@
+{
+ "tags": [
+  "TP ENER"
+ ],
+ "map": {
+  "ac": [
+   "TP ENER"
+  ],
+  "a3": [
+   "TP ENER"
+  ],
+  "bulb": [
+   "TP ENER"
+  ],
+  "res": [
+   "TP ENER"
+  ],
+  "led": [
+   "TP ENER"
+  ],
+  "cfl": [
+   "TP ENER"
+  ],
+  "cap": [
+   "TP ENER"
+  ],
+  "ind": [
+   "TP ENER"
+  ],
+  "cch": [
+   "TP ENER"
+  ],
+  "com": [
+   "TP ENER"
+  ],
+  "sw": [
+   "TP ENER"
+  ],
+  "rel": [
+   "TP ENER"
+  ],
+  "amp": [
+   "TP ENER"
+  ],
+  "volt": [
+   "TP ENER"
+  ],
+  "amp:a": [
+   "TP ENER"
+  ],
+  "volt:a": [
+   "TP ENER"
+  ],
+  "watt": [
+   "TP ENER"
+  ],
+  "pince": [
+   "TP ENER"
+  ],
+  "sv": [
+   "TP ENER"
+  ]
+ },
+ "colors": {
+  "TP ENER": "#006cfa"
+ }
+}

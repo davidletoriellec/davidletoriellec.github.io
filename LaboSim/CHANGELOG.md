@@ -1,5 +1,8 @@
 # Changelog
 
+## v2.0
+- Étiquettes : plusieurs fichiers combinés. « Exporter un fichier par étiquette » produit un fichier nommé d'après chaque étiquette (tp-elen.json…) et un labosim-tags-index.json ; le site fusionne les fichiers listés (dossier tags/). L'ancien labosim-tags.json reste pris en charge.
+
 ## v1.9
 - Nouveaux composants : diodes (1N4148, 1N4007, Zener 3,3 / 5,1 / 9,1 V) et LED de 6 couleurs (luminosité selon le courant, alerte de surintensité), en simulation temporelle.
 - Platine d'essai (breadboard) : les composants (R, C, L, diodes, LED, circuits intégrés) s'enfichent par accrochage ; colonnes et rails reliés ; la platine emporte les composants enfichés.
