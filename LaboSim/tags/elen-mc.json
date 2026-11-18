@@ -1,0 +1,58 @@
+{
+ "tags": [
+  "TP ELEN",
+  "TP ENER",
+  "TP1",
+  "TP2",
+  "Projet"
+ ],
+ "map": {
+  "bat": [
+   "TP ELEN"
+  ],
+  "gbf": [
+   "TP ELEN"
+  ],
+  "res": [
+   "TP ELEN"
+  ],
+  "cap": [
+   "TP ELEN"
+  ],
+  "ind": [
+   "TP ELEN"
+  ],
+  "sw": [],
+  "amp": [
+   "TP ELEN"
+  ],
+  "volt": [
+   "TP ELEN"
+  ],
+  "scope": [
+   "TP ELEN"
+  ],
+  "ne555": [
+   "TP ELEN"
+  ],
+  "aop": [
+   "TP ELEN"
+  ],
+  "cmp": [
+   "TP ELEN"
+  ],
+  "bb:d": [
+   "TP ELEN"
+  ],
+  "bb:q": [
+   "TP ELEN"
+  ]
+ },
+ "colors": {
+  "TP ELEN": "#e53935",
+  "TP ENER": "#fb8c00",
+  "TP1": "#43a047",
+  "TP2": "#1e88e5",
+  "Projet": "#8e24aa"
+ }
+}
