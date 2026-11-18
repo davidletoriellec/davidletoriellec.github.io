@@ -1,67 +1,61 @@
 {
  "tags": [
-  "TP ENER"
+  "TP ELEN"
  ],
  "map": {
-  "ac": [
-   "TP ENER"
-  ],
-  "a3": [
-   "TP ENER"
-  ],
-  "bulb": [
-   "TP ENER"
-  ],
   "res": [
-   "TP ENER"
-  ],
-  "led": [
-   "TP ENER"
-  ],
-  "cfl": [
-   "TP ENER"
+   "TP ELEN"
   ],
   "cap": [
-   "TP ENER"
+   "TP ELEN"
   ],
   "ind": [
-   "TP ENER"
-  ],
-  "cch": [
-   "TP ENER"
-  ],
-  "com": [
-   "TP ENER"
+   "TP ELEN"
   ],
   "sw": [
-   "TP ENER"
-  ],
-  "rel": [
-   "TP ENER"
+   "TP ELEN"
   ],
   "amp": [
-   "TP ENER"
+   "TP ELEN"
   ],
   "volt": [
-   "TP ENER"
+   "TP ELEN"
   ],
-  "amp:a": [
-   "TP ENER"
+  "bat": [
+   "TP ELEN"
   ],
-  "volt:a": [
-   "TP ENER"
+  "gbf": [
+   "TP ELEN"
   ],
-  "watt": [
-   "TP ENER"
+  "dled": [
+   "TP ELEN"
   ],
-  "pince": [
-   "TP ENER"
+  "bread": [
+   "TP ELEN"
   ],
-  "sv": [
-   "TP ENER"
+  "dio": [
+   "TP ELEN"
+  ],
+  "scope": [
+   "TP ELEN"
+  ],
+  "ne555": [
+   "TP ELEN"
+  ],
+  "cmp": [
+   "TP ELEN"
+  ],
+  "aop": [
+   "TP ELEN"
+  ],
+  "bb:d": [
+   "TP ELEN"
+  ],
+  "bb:q": [
+   "TP ELEN"
   ]
  },
  "colors": {
-  "TP ENER": "#006cfa"
+  "TP ELEN": "#fa00b7"
  }
 }
