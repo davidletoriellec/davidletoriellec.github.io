@@ -1,6 +1,6 @@
 {
  "tags": [
-  "TP ELEN MC"
+  "TP ELEN"
  ],
  "map": {
   "bat": [
@@ -45,7 +45,7 @@
   ]
  },
  "colors": {
-  "TP ELEN MC": "#8e24aa"
-
+  "TP ELEN MC": "#8e24aa5"
+  
  }
 }
