@@ -1,11 +1,12 @@
 // Tests du solveur de LaboSim (Node >= 16, sans dépendance) : `npm test`
 const fs = require('fs'), path = require('path');
+global.LaboArduino = require('../js/arduino.js');
 const code = fs.readFileSync(path.join(__dirname, '..', 'js', 'app.js'), 'utf8').replace(/example\(\);\s*$/, '');
-const el = () => ({ style: {}, dataset: {}, classList: { toggle() {}, remove() {} }, addEventListener() {}, querySelectorAll: () => [], querySelector: () => null, set innerHTML(v) { this._h = v }, get innerHTML() { return this._h }, set textContent(v) {}, value: '', onclick: null, createSVGPoint: () => ({}), setAttribute() {}, getBoundingClientRect: () => ({ left: 0, top: 0, width: 900, height: 600 }), clientWidth: 900, clientHeight: 600 });
+const el = () => ({ style: {}, dataset: {}, classList: { toggle() {}, remove() {}, add() {} }, addEventListener() {}, querySelectorAll: () => [], querySelector: () => null, set innerHTML(v) { this._h = v }, get innerHTML() { return this._h }, set textContent(v) {}, value: '', onclick: null, createSVGPoint: () => ({}), setAttribute() {}, getBoundingClientRect: () => ({ left: 0, top: 0, width: 900, height: 600 }), clientWidth: 900, clientHeight: 600 });
 const store = {};
 global.document = { getElementById: id => store[id] || (store[id] = el()), querySelectorAll: () => [] };
 global.window = { addEventListener() {} };
-const L = new Function(code + `;return{add,wire,connect,render,mkWave,bz,tp,wsamples,buildPdf,pdfWrap,serializeMontage,loadMontage,buildMenu,setFilter(v){tagFilter=v},get TAGS(){return TAGS},get tranMode(){return tranMode},startCapture,capPick,get capt(){return capt},trFreq,bbEnc,bbDec,bbHash,bbParse,BBT,pv,get view(){return view},fitView,zoomAt,contentBounds,menuHtml(){return menuEl.innerHTML},reset(){comps=[];wires=[];notes=[];uid=1;sel=selW=selN=pend=null},get err(){return err},get wires(){return wires},get comps(){return comps},get solve(){return solve},geo,BX0,BP,BROW,BC,nearHole,snapPlug,plugSet(){return plugSet},DK,LC,gbfHarm,gbfWave,bridges,mergeTags,tagSlug,ldrR}`)();
+const L = new Function(code + `;return{add,wire,connect,render,mkWave,bz,tp,wsamples,buildPdf,pdfWrap,serializeMontage,loadMontage,buildMenu,setFilter(v){tagFilter=v},get TAGS(){return TAGS},get tranMode(){return tranMode},startCapture,capPick,get capt(){return capt},trFreq,bbEnc,bbDec,bbHash,bbParse,BBT,pv,get view(){return view},fitView,zoomAt,contentBounds,menuHtml(){return menuEl.innerHTML},reset(){comps=[];wires=[];notes=[];uid=1;sel=selW=selN=pend=null},get err(){return err},get wires(){return wires},get comps(){return comps},get solve(){return solve},geo,BX0,BP,BROW,BC,nearHole,snapPlug,plugSet(){return plugSet},DK,LC,gbfHarm,gbfWave,bridges,mergeTags,tagSlug,ldrR,liveStart,liveStop,liveAdvance,liveDrop,liveSync,liveResetAll,get live(){return live},engOf,UNO,tranModel,dockUpload,exUno}`)();
 
 let fail = 0;
 const near = (name, got, want, tol) => { const ok = Math.abs(got - want) <= tol * Math.max(1, Math.abs(want)); if (!ok) fail++; console.log((ok ? 'ok   ' : 'FAIL ') + name + ' → ' + got.toPrecision(5) + ' (attendu ' + want + ')'); };
@@ -256,5 +257,37 @@ L.reset(); { const b = L.add('bat'), g = L.add('gbf'), h = L.add('hcsr'), o = L.
   b.val = 0; L.render(); hi = 0; for (const v of o.tr.y[1]) if (v > 2.5) hi++; yes('ultrason non alimenté : pas d’écho', hi === 0); }
 // 12. Dessin de tous les appareils
 L.reset(); ['bat', 'ac', 'gbf', 'res', 'bulb', 'cap', 'ind', 'sw', 'com', 'rel', 'ctc', 'mdc', 'mac', 'led', 'cfl', 'a3', 'm3', 'cch', 'sv', 'sc', 'tach', 'cpm', 'amp', 'volt', 'watt', 'pince', 'scope', 'bb', 'ne555', 'aop', 'cmp', 'dio', 'dled', 'bread', 'ldr', 'irrx', 'hcsr'].forEach(t => L.add(t));
+// 13. Arduino Uno : exécution en temps réel couplée au solveur temporel
+{ const run = (T, dt = 0.05) => { const t1 = L.live.vt + T; while (L.live.vt < t1 - 1e-9) L.liveAdvance(L.live.vt + dt, 1e9); L.render(); };
+  const find = t => L.comps.filter(c => c.type === t), ser = () => L.engOf(find('uno')[0]).ser, last = () => ser().trim().split('\r\n').pop();
+  // Blink : LED + 220 Ω sur D8
+  store['ex18'].onclick(); { const d = find('dled')[0]; const I = []; for (let k = 0; k < 24; k++) { run(0.1); I.push(d.I * 1000); }
+    near('Blink : courant LED allumée (mA)', I[2], (5 - 1.88) / 245 * 1000, 0.03); yes('Blink : LED allumée 0–0,5 s', I[0] > 10 && I[3] > 10 && I[4] > 10); yes('Blink : LED éteinte 0,5–1 s', I[6] < 0.1 && I[8] < 0.1); yes('Blink : rallumée à 1 s', I[11] > 10 && I[12] > 10); }
+  // Veilleuse LDR → analogRead
+  store['ex19'].onclick(); { run(0.6); const ldr = find('ldr')[0], led = find('dled')[0], expect = lux => Math.floor(5 * 10000 / (10000 + L.ldrR({ lux })) / 5 * 1024);
+    near('analogRead (100 lx)', +last().split(':')[1], expect(100), 0.01); yes('LED éteinte de jour', led.I < 1e-4); ldr.lux = 1; L.render(); run(0.6);
+    near('analogRead (1 lx)', +last().split(':')[1], expect(1), 0.01); yes('LED allumée de nuit', led.I > 0.01); }
+  // Radar HC-SR04 : pulseIn
+  store['ex20'].onclick(); { run(1); const h = find('hcsr')[0]; near('pulseIn → distance 100 cm', +last().match(/[\d.]+/)[0], 100, 0.01); h.dist = 15; L.render(); run(1);
+    near('pulseIn → distance 15 cm', +last().match(/[\d.]+/)[0], 15, 0.02); yes('alerte < 20 cm', find('dled')[0].I > 0.01); h.dist = 300; L.render(); run(1); near('pulseIn → distance 300 cm', +last().match(/[\d.]+/)[0], 300, 0.01); }
+  // PWM + potentiomètre + oscilloscope
+  store['ex21'].onclick(); { run(0.4); const sc = find('scope')[0], pot = find('pot')[0], led = find('dled')[0];
+    near('analogRead potentiomètre à 50 %', +last().split(' ')[0], 511, 0.01); near('fréquence PWM (Hz)', L.trFreq(sc, 0), 490, 0.02);
+    pot.pos = 1; L.render(); run(0.3); yes('PWM ≈ 100 % : sortie presque toujours haute', Array.from(sc.tr.y[0]).filter(v => v > 2.5).length / sc.tr.y[0].length > 0.95); near('courant LED à 100 %', led.I * 1000, (4.68 - 1.88) / 220 * 1000, 0.12);
+    pot.pos = 0.25; L.render(); run(0.4); const y = sc.tr.y[0], hi = Array.from(y).filter(v => v > 2.5).length / y.length; near('rapport cyclique PWM (0,25)', hi, 0.25, 0.1); }
+  // Bouton poussoir + INPUT_PULLUP + Serial
+  store['ex22'].onclick(); { run(0.5); const b = find('pb')[0]; yes('pas d’appui fantôme au démarrage', ser().indexOf('Appuis') < 0);
+    b.closed = true; L.render(); run(0.3); b.closed = false; L.render(); run(0.3); b.closed = true; L.render(); run(0.3); near('compteur d’appuis', +last().split(':')[1], 2, 0.01); }
+  // Feu tricolore : fonctions, long, delay
+  store['ex23'].onclick(); { run(0.5); let I = find('dled').map(d => d.I); yes('feu : rouge', I[0] > 0.01 && I[1] < 1e-4 && I[2] < 1e-4); run(3); I = find('dled').map(d => d.I); yes('feu : vert à 3,5 s', I[2] > 0.01 && I[0] < 1e-4); run(3); I = find('dled').map(d => d.I); yes('feu : orange à 6,5 s', I[1] > 0.01 && I[0] < 1e-4 && I[2] < 1e-4); }
+  // Pause / reprise / reset
+  { const t = L.live.vt; L.liveStop(); yes('pause : temps figé', L.live.vt === t && !L.live.on); L.liveStart(); run(0.2); yes('reprise', L.live.vt > t); L.liveResetAll(); run(0.5); yes('reset : redémarre à zéro', L.live.vt < 0.6 && find('dled')[0].I > 0.01); }
+  // Erreur de compilation signalée
+  { const u = find('uno')[0]; u.code = 'void setup(){ int x = ; }\nvoid loop(){}'; L.liveDrop(); yes('erreur de compilation : démarrage refusé', L.liveStart() === false); }
+  // sauvegarde / chargement du code
+  { const u = find('uno')[0]; u.code = LaboArduino.EXAMPLES[1].code; const js = L.serializeMontage(); yes('le code est sauvegardé', js.indexOf('analogRead') > 0); L.loadMontage(js); yes('le code est rechargé', find('uno')[0].code === LaboArduino.EXAMPLES[1].code); }
+}
+// 12 bis. Sans Uno : le mode temps réel s'arrête
+L.reset(); L.liveDrop(); L.add('bat'); L.render(); yes('pas de Uno : pas de temps réel', !L.live);
 L.add('volt').ana = 1; L.add('amp').ana = 1; L.render(); yes('rendu complet', true);
 console.log(fail ? `\n${fail} test(s) en échec` : '\nTous les tests passent'); process.exit(fail ? 1 : 0);

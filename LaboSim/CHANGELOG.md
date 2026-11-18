@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.2
+- **Arduino Uno programmable** : carte câblable (D0–D13, A0–A5, 5 V, 3,3 V, GND), éditeur de code avec moniteur série, exemples. Compilateur « Arduino simplifié » (`js/arduino.js`) : types C (int 16 bits…), fonctions, tableaux, String, if/for/while/do/switch, `#define`, entrées/sorties numériques et analogiques, PWM, `delay`, `millis`, `pulseIn`, `tone`, Serial.
+- Exécution en **temps réel** couplée au solveur temporel (pas variable, événements exacts pour le PWM et le HC-SR04), pause / reset / vitesse. Les valeurs des multimètres sont moyennées, l'oscilloscope affiche les derniers instants.
+- Nouveaux composants : **potentiomètre** et **bouton poussoir** (maintenir le clic).
+- Exemples : LED qui clignote, veilleuse (LDR), radar HC-SR04, variateur PWM, bouton + compteur, feu tricolore.
+
 ## v2.1
 - Capteurs : photorésistance (LDR, 0,1 à 10 000 lx), émetteur infrarouge (LED IR) et récepteur infrarouge (phototransistor couplé aux LED IR du plan selon courant et distance, obstacle possible), capteur ultrason HC-SR04 (TRIG / ECHO, distance réglable 2 à 400 cm).
 - Exemples : photorésistance, infrarouge, ultrason ; menu « Capteurs ».

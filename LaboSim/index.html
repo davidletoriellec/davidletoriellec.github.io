@@ -5,22 +5,28 @@
 <link rel="stylesheet" href="css/style.css"></head><body>
 <header>
 <button id="mb" title="Matériel">☰</button>
-<h1>⚡ LaboSim <small class="mut">v2.1</small></h1>
+<h1>⚡ LaboSim <small class="mut">v2.2</small></h1>
 <span class="sp"></span>
 <label class="mut"><input type="checkbox" id="th"> Valeurs théoriques</label>
 <button id="sv_">💾 Enregistrer</button><button id="op_">📂 Ouvrir</button><input type="file" id="fl" accept=".json,application/json" style="display:none"><button id="snd" title="Son des relais">🔊</button><button id="nb">📖 Notice</button><button id="pb">📄 Export PDF</button><button id="clr">Vider</button>
 </header>
 <div id="wrap">
-<aside id="side"><div id="tfrow"><i id="tfd" class="dot"></i><select id="tf" title="Filtrer le matériel par étiquette"></select><button id="tgb" title="Gérer les étiquettes">🏷</button></div><div id="menu"></div><h3>Exemples</h3><button id="ex">Courant continu</button><button id="ex2">Alternatif + R</button><button id="ex3">Wattmètre R-L</button><button id="ex4">GBF + oscilloscope</button><button id="ex5">Pinces</button><button id="ex6">Relais</button><button id="ex7">Moteur monophasé</button><button id="ex8">Triphasé</button><button id="ex9">NE555 astable</button><button id="ex10">AOP inverseur</button><button id="ex11">Boîtes noires</button><button id="ex12">LED sur platine</button><button id="ex13">Redressement (diode)</button><button id="ex14">NE555 sur platine</button><button id="ex15">Photorésistance</button><button id="ex16">Infrarouge émetteur/récepteur</button><button id="ex17">Ultrason HC-SR04</button></aside>
+<aside id="side"><div id="tfrow"><i id="tfd" class="dot"></i><select id="tf" title="Filtrer le matériel par étiquette"></select><button id="tgb" title="Gérer les étiquettes">🏷</button></div><div id="menu"></div><h3>Exemples</h3><button id="ex">Courant continu</button><button id="ex2">Alternatif + R</button><button id="ex3">Wattmètre R-L</button><button id="ex4">GBF + oscilloscope</button><button id="ex5">Pinces</button><button id="ex6">Relais</button><button id="ex7">Moteur monophasé</button><button id="ex8">Triphasé</button><button id="ex9">NE555 astable</button><button id="ex10">AOP inverseur</button><button id="ex11">Boîtes noires</button><button id="ex12">LED sur platine</button><button id="ex13">Redressement (diode)</button><button id="ex14">NE555 sur platine</button><button id="ex15">Photorésistance</button><button id="ex16">Infrarouge émetteur/récepteur</button><button id="ex17">Ultrason HC-SR04</button><button id="ex18">Arduino : LED qui clignote</button><button id="ex19">Arduino : veilleuse (LDR)</button><button id="ex20">Arduino : radar HC-SR04</button><button id="ex21">Arduino : variateur PWM</button><button id="ex22">Arduino : bouton + compteur</button><button id="ex23">Arduino : feu tricolore</button></aside>
 <main>
 <svg id="cv" viewBox="0 0 900 600" preserveAspectRatio="xMidYMid meet"></svg>
 <div id="zc"><button id="zi" title="Zoom avant">+</button><button id="zo" title="Zoom arrière">−</button><button id="zf" title="Ajuster la vue au montage">⤢</button><span id="zl" class="mut"></span></div>
 <footer><span id="st"></span><div id="pn" class="mut"></div></footer>
 </main>
+<aside id="adock"><div class="ah"><b id="aht">💻 Arduino Uno</b><span class="sp"></span><button id="ahx" title="Fermer le volet">✕</button></div>
+<div class="ab"><button id="ago" class="p" title="Compiler et démarrer le programme">▶ Téléverser et démarrer</button><button id="apa">⏸ Pause</button><button id="are" title="Redémarrer le programme à zéro">↺ Reset</button></div>
+<div class="ab"><label>Vitesse <select id="asp"><option value=".1">×0,1</option><option value=".5">×0,5</option><option value="1" selected>×1</option><option value="2">×2</option><option value="5">×5</option><option value="10">×10</option></select></label><select id="aex" title="Charger un exemple"></select><span id="atm" class="mut"></span></div>
+<textarea id="acode" spellcheck="false" wrap="off" autocapitalize="off" autocomplete="off"></textarea><div id="aerr"></div>
+<div class="ah"><b>Moniteur série</b><span class="sp"></span><button id="acl">Effacer</button></div>
+<pre id="aser"></pre><div class="ab"><input id="ain" type="text" placeholder="Envoyer au programme (Serial.read…)"><button id="asd">Envoyer</button></div></aside>
 </div>
 <div id="ov"><div><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b>Oscilloscope – écran agrandi et curseurs</b><span><button id="ovp">📄 Export PDF</button> <button id="ovc">Fermer</button></span></div><div id="ovctl"></div><svg id="ovs" viewBox="0 0 640 520"></svg><div id="ovr" class="mut"></div></div></div>
 <div id="nov"><div><div style="display:flex;justify-content:space-between;align-items:center"><b>Notice d’utilisation</b><button id="novc">Fermer</button></div><div id="novb"></div></div></div>
 <div id="tgm"><div><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b>Étiquettes du matériel</b><button id="tgx">Fermer</button></div><div class="mut" style="font-size:13px">Associe chaque appareil à un ou plusieurs TP ou projets, puis choisis un filtre en haut du menu de gauche.</div><div id="tgb2"></div></div></div>
 <div id="bbm"><div id="bbb"></div></div>
 <div id="pdfm"><div><b>Export PDF</b><div class="g2"><label>NOM <input id="pf_nom"></label><label>PRÉNOM <input id="pf_pre"></label><label>GROUPE <input id="pf_grp"></label><label>RESSOURCE <input id="pf_res"></label></div><label>Notes / énoncé / questions<textarea id="pf_txt" rows="6"></textarea></label><div style="display:flex;gap:8px"><button id="pf_go" class="p">Générer le PDF</button><button id="pf_x">Annuler</button></div><div id="pf_msg" class="mut"></div></div></div>
-<script src="js/app.js"></script></body></html>
+<script src="js/arduino.js"></script><script src="js/app.js"></script></body></html>

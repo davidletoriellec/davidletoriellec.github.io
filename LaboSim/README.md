@@ -1,4 +1,4 @@
-# ⚡ LaboSim – laboratoire d'électricité virtuel (v2.1)
+# ⚡ LaboSim – laboratoire d'électricité virtuel (v2.2)
 
 Simulateur de travaux pratiques d'électricité qui tourne dans un navigateur, sans installation ni serveur.
 Les appareils sont dessinés comme en vrai et l'élève les **câble lui-même** avec des cordons banane ou BNC.
@@ -22,6 +22,14 @@ export PDF (NOM, PRÉNOM, GROUPE, RESSOURCE, notes libres) du schéma et de l'é
 
 - **NE555, AOP LF356, comparateur LM311** : dès qu'un de ces circuits est présent, la simulation passe en **mode temporel** (schéma d'Euler implicite, itération pour les saturations et les bascules). Les signaux de l'oscilloscope sont calculés à partir de la mise sous tension ; les multimètres donnent la moyenne (DC) ou l'efficace de la composante alternative (AC). Moteurs, relais, wattmètre, pinces et sondes ne sont pas pris en charge dans ce mode.
 - **Boîtes noires** : le professeur définit le contenu soit en **assemblant de vrais composants** (résistances, condensateurs, bobines câblés sur le plan, puis menu « Créer un dipôle / quadripôle depuis un montage… » et clic sur les bornes A, B ou E+, E−, S+, S−), soit par une netlist (`R1 A n1 1k`, `C1 n1 B 100n`, `L`, `W` = fil, `E` = source commandée) ou un modèle prêt à l'emploi ; l'élève ne voit que le nom (BN1, BN2…) et les bornes. Le contenu peut aussi être **construit avec de vrais composants** : on pose et câble des résistances, condensateurs et bobines sur le plan, puis on choisit « Créer un dipôle / quadripôle depuis un montage… » et on clique les bornes dans l'ordre demandé ; le montage est converti en netlist et remplacé par la boîte noire. Le contenu est enregistré de façon masquée (base64 + XOR) dans le fichier de montage et protégé par un code à l'écran : c'est une protection de commodité, pas un chiffrement.
+
+## Arduino Uno programmable (v2.2)
+
+- **Carte Arduino Uno** (menu « Arduino ») : D0–D13, A0–A5, 5 V, 3,3 V, GND câblables ; alimentée par l'USB ; LED « L » sur la broche 13. Avec un **potentiomètre** et un **bouton poussoir** (maintenir le clic).
+- **Éditeur de code** (volet à droite) avec **moniteur série**, exemples (Blink, veilleuse LDR, radar HC-SR04, variateur PWM, bouton + compteur, feu tricolore) et erreurs signalées avec le numéro de ligne.
+- Langage : sous-ensemble d'Arduino/C++ compilé vers JavaScript (`js/arduino.js`) : `setup`/`loop`, fonctions, variables globales/locales, tableaux 1-2 D, `String`, `if`/`for`/`while`/`do`/`switch`, `#define`, `pinMode`, `digitalWrite/Read`, `analogRead/Write`, `delay`, `delayMicroseconds`, `millis`, `micros`, `pulseIn`, `tone`, `map`, `constrain`, `random`, `Serial.print/println/read/parseInt/available…`. Types C respectés (int 16 bits, long 32 bits, division entière, débordements).
+- Non géré : `#include`/bibliothèques, struct/class, pointeurs, interruptions, I²C/SPI, Servo.
+- Le programme s'exécute en **temps réel** (vitesse ×0,1 à ×10, pause, reset), couplé au solveur temporel : sorties 5 V (≈ 25 Ω), entrées haute impédance, convertisseur 10 bits (0–5 V), PWM 490/980 Hz, `pulseIn` exact pour le HC-SR04. Le temps du programme est virtuel (aucun blocage possible, même avec `while(1){}`).
 
 ## Étiquettes et filtre du matériel
 
@@ -51,7 +59,7 @@ Ouvrir `index.html` dans un navigateur. Pour un serveur local : `npm start`.
 npm test
 ```
 
-Les tests (Node ≥ 16, sans dépendance) vérifient le solveur : loi d'Ohm, filtre RC, puissances P/Q/S de l'ISW8000 (câblages 3 et 4 fils),
+Les tests (Node ≥ 16, sans dépendance) vérifient le solveur, le compilateur Arduino (types, débordements, Serial, temps virtuel, erreurs) et l'exécution couplée au circuit (Blink, LDR, HC-SR04, PWM, bouton) : loi d'Ohm, filtre RC, puissances P/Q/S de l'ISW8000 (câblages 3 et 4 fils),
 pince, commutateur, relais et contacteur, tracés de câbles, moteurs (CC, mono, tri), caisse de charge, sondes, XY, sauvegarde, génération PDF, dessin de tous les appareils.
 
 ## Publier sur GitHub Pages
@@ -72,7 +80,7 @@ pince, commutateur, relais et contacteur, tracés de câbles, moteurs (CC, mono,
 - Sources alternatives de même fréquence : supposées en phase.
 - L'export PDF est écrit sans bibliothèque (image JPEG du schéma + texte).
 
-Organisation : `js/app.js` (solveur, dessin, interactions, PDF), `css/style.css`, `index.html`, `tests/`.
+Organisation : `js/app.js` (solveur, dessin, interactions, PDF), `js/arduino.js` (compilateur + moteur Arduino), `css/style.css`, `index.html`, `tests/`.
 
 ## Pistes d'évolution
 
