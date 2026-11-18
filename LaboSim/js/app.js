@@ -19,7 +19,7 @@ const FIELDS={bat:[['val','Tension',UNITS.V,{min:0,max:30,sl:[0,30,0.5]}]],
  m3:[['ml','Charge (0 = à vide · 1 = nominale · 1,2 max)',UNITS.NU,{min:0,max:1.2,sl:[0,1.2,0.01]}],['pn','Puissance utile',UNITS.W,{min:1}],['un','Tension d’enroulement',UNITS.V,{min:1}],['i0r','Courant à vide (% de In)',UNITS.PCT,{min:0.05,max:1}],['cos0','cos φ à vide',UNITS.NU,{min:0.05,max:0.9}],['cosphi','cos φ',UNITS.NU,{min:0.1,max:1}],['eta','Rendement',UNITS.PCT,{min:0.1,max:1}]],
  aop:[['vm','Marge de saturation (V)',UNITS.V,{min:0,max:5}]],cmp:[['vm','Marge de saturation (V)',UNITS.V,{min:0,max:5}]]};
 const selH=(p,o,v)=>`<select data-p="${p}">${o.map(([a,l])=>`<option value="${a}"${String(a)===String(v)?' selected':''}>${l}</option>`).join('')}</select>`;
-const COLS=['#d32f2f','#1b1b1b','#1976d2','#2e7d32','#f9a825','#fb8c00','#8e24aa','#6d4c41','#9e9e9e'];const VERSION='1.7';
+const COLS=['#d32f2f','#1b1b1b','#1976d2','#2e7d32','#f9a825','#fb8c00','#8e24aa','#6d4c41','#9e9e9e'];const VERSION='1.8';
 let comps=[],wires=[],sel=null,selW=null,pend=null,mouse={x:0,y:0},drag=null,wd=null,notes=[],selN=null,uid=1,err='',theory=false;
 const cv=document.getElementById('cv'),st=document.getElementById('st'),pn=document.getElementById('pn');
 const T=(c,i)=>{const t=geo(c).t[i];return{x:c.x+t[0],y:c.y+t[1]}};
@@ -158,6 +158,25 @@ function openBB(c){const m=$('bbm'),b=$('bbb');m.style.display='block';
  if(c.lk){b.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center"><b>Code professeur</b><button id="bbx">Fermer</button></div><label>Code <input id="bbc2" type="password" autocomplete="off"></label><div id="bbm2" style="color:var(--bad)"></div><div><button id="bbo" class="p">Valider</button></div>`;
   $('bbx').onclick=()=>{m.style.display='none'};$('bbo').onclick=()=>{if(bbHash($('bbc2').value)===c.lk)edit();else $('bbm2').textContent='Code incorrect'}}
  else edit()}
+/* ---- Boîte noire créée à partir d'un montage (R, C, L et fils) ---- */
+let capt=null;
+const capMsg=()=>'Boîte noire : clique la borne « '+BBN[capt.kind][capt.picked.length]+' » (Échap pour annuler)';
+function startCapture(kind){capt={kind,picked:[]};pend=null;sel=selW=selN=null;panel();render()}
+function capPick(k){capt.picked.push(k);if(capt.picked.length<BBN[capt.kind].length){render();return}finishCapture()}
+function finishCapture(){const kind=capt.kind,picked=capt.picked,names=BBN[kind];capt=null;
+ const par={},f=k=>{if(par[k]===undefined)par[k]=k;return par[k]===k?k:(par[k]=f(par[k]))};wires.forEach(w=>{par[f(w.a)]=f(w.b)});
+ const RCL=['res','cap','ind'],roots=picked.map(f),seen=new Set(roots),queue=[...roots],S=[];
+ while(queue.length){const r=queue.shift();comps.forEach(c=>{if(!RCL.includes(c.type)||S.includes(c))return;const a=f(c.id+':0'),b=f(c.id+':1');if(a===r||b===r){S.push(c);[a,b].forEach(x=>{if(!seen.has(x)){seen.add(x);queue.push(x)}})}})}
+ const fail=m=>{render();st.textContent='Boîte noire : '+m};
+ if(!S.length)return fail('les bornes choisies doivent appartenir à des résistances, condensateurs ou bobines câblés entre eux');
+ const nm={};let first={};roots.forEach((r,i)=>{if(nm[r]===undefined){nm[r]=names[i];first[r]=names[i]}});let ni=0;const nameOf=r=>nm[r]!==undefined?nm[r]:(nm[r]='n'+(++ni)),L=[];
+ let ie=0;S.forEach(c=>{const a=nameOf(f(c.id+':0')),b=nameOf(f(c.id+':1')),i=++ie,v=x=>String(+x.toPrecision(6));
+  if(c.type==='res')L.push(`R${i} ${a} ${b} ${v(c.val)}`);else if(c.type==='cap')L.push(`C${i} ${a} ${b} ${v(c.val*1e-6)}`);else{L.push(`R${i}b ${a} x${i} ${v(c.r)}`);L.push(`L${i} x${i} ${b} ${v(c.val*1e-3)}`)}});
+ roots.forEach((r,i)=>{if(first[r]!==names[i])L.push(`W${i+1} ${first[r]} ${names[i]}`)});
+ const cx=Math.round(S.reduce((t,c)=>t+c.x,0)/S.length/20)*20,cy=Math.round(S.reduce((t,c)=>t+c.y,0)/S.length/20)*20;
+ wires=wires.filter(w=>!S.some(c=>w.a.startsWith(c.id+':')||w.b.startsWith(c.id+':')));comps=comps.filter(c=>!S.includes(c));
+ const bb=add('bb',cx,cy);bb.kind=kind;bb.name='BN'+comps.filter(x=>x.type==='bb').length;bb.net=bbEnc(L.join('\n'));sel=bb.id;panel();render();
+ st.textContent='Boîte noire '+bb.name+' créée : '+S.length+' composant(s) convertis. Reconnecte-la au montage ; « 🔒 Édition » permet de vérifier la netlist.'}
 /* ---- Simulation temporelle (circuits intégrés : NE555, AOP, comparateur) ---- */
 const ACTIVE=new Set(['ne555','aop','cmp']);let tranMode=false,tranNote='',tranCache=null;
 const TSKIP=new Set(['x','y','v1','v2','cp1','cp2','on1','on2','trig','pos1','pos2','cur','cch','xy','u','tgt','tv','cl','sig','tr','ws','U','I','P','Q','Ur','Ir','Ua','Ia','rps','rpm','mode','disp','rev','rng','ana','bbp']);
@@ -368,7 +387,7 @@ function render(){
  comps.forEach(c=>geo(c).t.forEach((tt,i)=>{const p=T(c,i),k=c.id+':'+i,cl=pend===k?'':'hj';
   if(tt[2]==='b')s+=i%2?`<circle class="${cl}" cx="${p.x}" cy="${p.y}" r="6" data-t="${k}" fill="rgba(25,118,210,.3)" stroke="#1976d2" stroke-width="2" style="cursor:crosshair"/>`:`<circle class="${cl}" cx="${p.x}" cy="${p.y-15}" r="14" data-t="${k}" fill="none" stroke="rgba(25,118,210,.35)" stroke-width="14" style="cursor:crosshair"/>`;
   else s+=`<circle class="${cl}" cx="${p.x}" cy="${p.y}" r="12" data-t="${k}" fill="rgba(25,118,210,.18)" stroke="#1976d2" stroke-width="2" style="cursor:crosshair"/>`}));
- cv.innerHTML=s;st.textContent=err||(comps.length?(pend?'Clique sur une autre prise pour finir le câble':('Simulation '+(tranMode?'temporelle ':'')+'en cours ✓'+tranNote)):'Ajoute des appareils pour commencer');st.className=err?'err':'';
+ cv.innerHTML=s;st.textContent=capt?capMsg():err||(comps.length?(pend?'Clique sur une autre prise pour finir le câble':('Simulation '+(tranMode?'temporelle ':'')+'en cours ✓'+tranNote)):'Ajoute des appareils pour commencer');st.className=err?'err':'';
  const o=document.getElementById('ro'),c=comps.find(c=>c.id===sel);if(o&&c)o.textContent=(theory&&!err)?`U = ${fmt(c.Ur,'V')} · I = ${fmt(c.Ir,'A')} · P = ${fmt(c.P,'W')} (valeurs efficaces)`:'';
 }
 const esc_=x=>String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -451,6 +470,7 @@ window.addEventListener('resize',applyView);
 cv.addEventListener('pointerdown',e=>{const X=e.target,t=X.closest('[data-t]'),hk=X.closest('[data-hk]'),ho=X.closest('[data-ho]'),rzz=X.closest('[data-rz]'),c=X.closest('[data-c]'),w=X.closest('[data-w]'),nt=X.closest('[data-nt]');mouse=pt(e);
  ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});if(ptrs.size===2){drag=wd=hd=ndrag=rz=pan=null;pend=null;pinch=pinfo();return}
  if(e.button===1){e.preventDefault();pan={cx:e.clientX,cy:e.clientY,vx:view.x,vy:view.y};return}
+ if(t&&capt){capPick(t.dataset.t);return}
  if(t){const k=t.dataset.t;if(!pend)pend=k;else{if(pend!==k&&!wires.some(x=>(x.a===pend&&x.b===k)||(x.a===k&&x.b===pend)))connect(pend,k);pend=null}render();return}
  if(hk&&selW!==null){const w2=wires[selW],pr=hk.dataset.hk.split(':'),i=+pr[1];if(pr[0]==='g'){w2.pts=w2.pts||[];w2.pts.splice(i,0,{x:mouse.x,y:mouse.y})}hd={w:w2,t:'p',i};return}
  if(ho&&selW!==null){hd={w:wires[selW],t:'o',k:+ho.dataset.ho};return}
@@ -476,18 +496,18 @@ window.addEventListener('pointerup',e=>{ptrs.delete(e.pointerId);if(ptrs.size<2)
   else if(c.type==='watt'){const h=[['W',-124],['VAr',-96],['VA',-68],['PF',-40],['V',-4],['A',24]].find(([l,x])=>drag.dx>=x&&drag.dx<=x+24&&drag.dy>=22&&drag.dy<=40);if(h){c.disp=h[0];panel();render()}}}
  else if(c.type==='pince'||c.type==='sc'){const k=clampOf(c);if(k){c.x=k.pt.x;c.y=k.pt.y;render()}}}
  drag=null});
-window.addEventListener('keydown',e=>{if((e.key==='Delete'||e.key==='Backspace')&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName))delSel();if(e.key==='Escape'){pend=null;render()}});
+window.addEventListener('keydown',e=>{if((e.key==='Delete'||e.key==='Backspace')&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName))delSel();if(e.key==='Escape'){pend=null;capt=null;render()}});
 const MENU=[['Alimentations',[['bat','Alimentation continue 0–30 V'],['ac','Alimentation alternative 0–230 V'],['gbf','GBF (générateur de fonctions)'],['a3','Alimentation triphasée 400 V']]],
  ['Charges',[['res','Résistance'],['bulb','Ampoule'],['led','Lampe à LED'],['cfl','Lampe fluocompacte'],['cap','Condensateur'],['ind','Bobine'],['mdc','Moteur à courant continu'],['mac','Moteur monophasé (cos φ 0,82)'],['m3','Moteur asynchrone triphasé 1,5 kW'],['cch','Caisse de charge 0–4 kW']]],
  ['Commandes',[['sw','Interrupteur'],['com','Commutateur 2 voies'],['rel','Relais (bobine + contact)'],['ctc','Contacteur (2 contacts NO)']]],
  ['Appareils de mesure',[['amp','Multimètre – ampèremètre'],['volt','Multimètre – voltmètre'],['amp','Ampèremètre à aiguille',1],['volt','Voltmètre à aiguille',1],['watt','Wattmètre ISW8000'],['pince','Pince ampèremétrique'],['sv','Sonde de tension ÷10 / ÷100'],['sc','Sonde de courant ÷10 / ÷100 / ÷300'],['tach','Compte-tours'],['cpm','Couple-mètre'],['scope','Oscilloscope 2 voies']]],
  ['Circuits intégrés',[['ne555','NE555 (timer)'],['aop','AOP LF356'],['cmp','Comparateur LM311']]],
- ['Boîtes noires',[['bb','Boîte noire – dipôle','d'],['bb','Boîte noire – quadripôle','q']]],
+ ['Boîtes noires',[['bb','Boîte noire – dipôle','d'],['bb','Boîte noire – quadripôle','q'],['#cd','Créer un dipôle depuis un montage…'],['#cq','Créer un quadripôle depuis un montage…']]],
  ['Repérage',[['#r','Rectangle pointillé'],['#t','Texte']]]];
 const menuEl=document.getElementById('menu'),side=document.getElementById('side');
 function addNote(k){const vx=Math.round((view.x+(cv.clientWidth||900)/2/view.z)/10)*10,vy=Math.round((view.y+(cv.clientHeight||600)/2/view.z)/10)*10;notes.push(k==='r'?{k,x:vx-110,y:vy-65,w:220,h:130,col:'#7c4dff',t:''}:{k,x:vx-30,y:vy,t:'Texte',s:16,col:'#1976d2'});sel=null;selW=null;selN=notes.length-1;panel();render()}
 function menuClick(b){const it=MENU[+b.dataset.g][1][+b.dataset.i],t=it[0];
- if(t[0]==='#')addNote(t==='#r'?'r':'t');else{const n=comps.length,vx=view.x+(cv.clientWidth||900)/2/view.z,vy=view.y+(cv.clientHeight||600)/2/view.z,c=add(t,Math.round((vx+((n%5)-2)*30)/20)*20,Math.round((vy+((n%5)-2)*30)/20)*20);if(it[2]===1){c.ana=1;panel();render()}else if(t==='bb'){c.kind=it[2];c.name='BN'+comps.filter(x=>x.type==='bb').length;panel();render()}}
+ if(t==='#cd'||t==='#cq')startCapture(t==='#cq'?'q':'d');else if(t[0]==='#')addNote(t==='#r'?'r':'t');else{const n=comps.length,vx=view.x+(cv.clientWidth||900)/2/view.z,vy=view.y+(cv.clientHeight||600)/2/view.z,c=add(t,Math.round((vx+((n%5)-2)*30)/20)*20,Math.round((vy+((n%5)-2)*30)/20)*20);if(it[2]===1){c.ana=1;panel();render()}else if(t==='bb'){c.kind=it[2];c.name='BN'+comps.filter(x=>x.type==='bb').length;panel();render()}}
  side.classList.remove('open')}
 cv.addEventListener('dblclick',e=>{const k=e.target.closest('[data-hk]');if(k&&k.dataset.hk[0]==='p'&&selW!==null){wires[selW].pts.splice(+k.dataset.hk.split(':')[1],1);render()}});
 document.getElementById('mb').onclick=()=>side.classList.toggle('open');
@@ -591,6 +611,7 @@ Boutons W (P), VAr (Q), VA (S), PF, V, A : clique dessus ou choisis l’affichag
 <li><b>Comparateur LM311</b> : même brochage ; sortie à collecteur ouvert en option (résistance de rappel à ajouter).</li>
 <li>Dès qu’un de ces circuits est présent, la simulation passe en mode temporel : les signaux de l’oscilloscope sont calculés à partir de la mise sous tension (≈ 75 divisions de simulation avant l’affichage). Choisir une base de temps adaptée à la fréquence. Les multimètres affichent la moyenne (DC) ou la valeur efficace de la composante alternative (AC). Les moteurs, relais, wattmètre, pinces et sondes ne sont pas pris en charge dans ce mode.</li></ul>
 <h4>Boîtes noires (dipôles et quadripôles à caractériser)</h4><ul><li>Le professeur place une boîte noire (menu « Boîtes noires »), puis « 🔒 Édition (professeur)… » : nom (BN1, BN2…), type (dipôle A-B ou quadripôle E+, E−, S+, S−), modèle prêt à l’emploi ou netlist libre (R, C, L, W, E), code professeur facultatif.</li>
+<li><b>Construire l’intérieur avec de vrais composants</b> : pose des résistances, condensateurs et bobines sur le plan et câble-les entre eux ; puis, dans le menu « Boîtes noires », choisis « Créer un dipôle depuis un montage… » ou « …un quadripôle… » et clique les bornes dans l’ordre demandé dans la barre d’état (A, B ou E+, E−, S+, S−). Plusieurs bornes peuvent être posées sur le même nœud (par exemple E− et S−). Les composants convertis disparaissent du plan (enregistre le montage avant pour en garder une copie) ; il reste à brancher la boîte noire comme n’importe quel appareil. La netlist produite reste modifiable via « 🔒 Édition ».</li>
 <li>L’élève ne voit que le nom et les bornes ; il doit déterminer le contenu par des mesures (voltmètre, ampèremètre, GBF + oscilloscope).</li>
 <li>Le contenu est enregistré de façon masquée dans le fichier de montage et protégé par le code à l’écran. C’est une protection de commodité, pas un chiffrement : un élève déterminé pourrait l’extraire du fichier.</li></ul>
 <h4>Étiquettes et filtre du matériel</h4><ul><li>Le bouton <b>🏷</b> (haut du menu de gauche) ouvre la gestion des étiquettes : crée, renomme ou supprime des étiquettes (TP ELEN, TP ENER, TP1, TP2, Projet…) puis coche les appareils concernés.</li><li>La liste déroulante du menu filtre le matériel : <i>Tout le matériel</i>, une étiquette, ou <i>Sans étiquette</i>. Chaque étiquette a une couleur (modifiable) : un petit point de cette couleur apparaît à droite des appareils concernés dans le menu.</li><li>La configuration est mémorisée dans le navigateur ; « Exporter » / « Importer » permettent de la partager. Sur un site GitHub Pages, un fichier <code>labosim-tags.json</code> placé à côté de <code>index.html</code> est chargé automatiquement.</li></ul>
@@ -613,7 +634,7 @@ function buildMenu(){const tf=$('tf');if(tagFilter!=='*'&&tagFilter!=='-'&&!TAGS
  const tg=it=>TAGS.map[itKey(it)]||[],show=it=>it[0][0]==='#'||tagFilter==='*'||(tagFilter==='-'?tg(it).length===0:tg(it).includes(tagFilter));let any=false;
  menuEl.innerHTML=MENU.map(([g,items],gi)=>{const L=items.map((it,ii)=>show(it)?`<button data-g="${gi}" data-i="${ii}"><span>${it[1]}</span>${it[0][0]!=='#'&&tg(it).length?`<span class="dots">${tg(it).map(t=>`<i style="background:${tcol(t)}" title="${esc_(t)}"></i>`).join('')}</span>`:''}</button>`:'').join('');if(L&&g!=='Repérage')any=true;return L?`<h3>${g}</h3>`+L:''}).join('')+(any?'':'<p class="mut" style="font-size:12px">Aucun matériel avec cette étiquette.</p>');
  menuEl.querySelectorAll('button').forEach(b=>b.onclick=()=>menuClick(b))}
-function renderTags(){const n=TAGS.tags.length,ents=MENU.filter(([g])=>g!=='Repérage');
+function renderTags(){const n=TAGS.tags.length,ents=MENU.filter(([g])=>g!=='Repérage').map(([g,it])=>[g,it.filter(x=>x[0][0]!=='#')]);
  const rows=ents.map(([g,items])=>`<tr><th colspan="${n+1}" style="background:var(--bg)">${g}</th></tr>`+items.map(it=>`<tr><td>${it[1]}</td>${TAGS.tags.map((t,ti)=>`<td><input type="checkbox" data-ck="${itKey(it)}|${ti}"${(TAGS.map[itKey(it)]||[]).includes(t)?' checked':''}></td>`).join('')}</tr>`).join('')).join('');
  $('tgb2').innerHTML=`<div>${TAGS.tags.map((t,i)=>`<span class="chip"><input type="color" data-tc="${i}" value="${tcol(t)}" title="Couleur de l’étiquette"><input type="text" data-tr="${i}" value="${esc_(t)}" size="${Math.max(6,t.length)}"><button data-td="${i}" title="Supprimer l’étiquette">×</button></span>`).join('')}<span class="chip"><input type="text" id="tnew" placeholder="Nouvelle étiquette" size="16"><button id="tadd">Ajouter</button></span></div>
 <div style="overflow:auto"><table><tr><th>Appareil</th>${TAGS.tags.map((t,i)=>`<th><i class="dot" style="background:${tcol(t)}"></i> ${esc_(t)}<br><button data-ta="${i}" title="Tout cocher / tout décocher">☑</button></th>`).join('')}</tr>${rows}</table></div>

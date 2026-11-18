@@ -1,4 +1,4 @@
-# ⚡ LaboSim – laboratoire d'électricité virtuel (v1.7)
+# ⚡ LaboSim – laboratoire d'électricité virtuel (v1.8)
 
 Simulateur de travaux pratiques d'électricité qui tourne dans un navigateur, sans installation ni serveur.
 Les appareils sont dessinés comme en vrai et l'élève les **câble lui-même** avec des cordons banane ou BNC.
@@ -21,7 +21,7 @@ export PDF (NOM, PRÉNOM, GROUPE, RESSOURCE, notes libres) du schéma et de l'é
 ## Circuits intégrés et boîtes noires
 
 - **NE555, AOP LF356, comparateur LM311** : dès qu'un de ces circuits est présent, la simulation passe en **mode temporel** (schéma d'Euler implicite, itération pour les saturations et les bascules). Les signaux de l'oscilloscope sont calculés à partir de la mise sous tension ; les multimètres donnent la moyenne (DC) ou l'efficace de la composante alternative (AC). Moteurs, relais, wattmètre, pinces et sondes ne sont pas pris en charge dans ce mode.
-- **Boîtes noires** : le professeur définit le contenu par une netlist (`R1 A n1 1k`, `C1 n1 B 100n`, `L`, `W` = fil, `E` = source commandée) ou un modèle prêt à l'emploi ; l'élève ne voit que le nom (BN1, BN2…) et les bornes. Le contenu est enregistré de façon masquée (base64 + XOR) dans le fichier de montage et protégé par un code à l'écran : c'est une protection de commodité, pas un chiffrement.
+- **Boîtes noires** : le professeur définit le contenu soit en **assemblant de vrais composants** (résistances, condensateurs, bobines câblés sur le plan, puis menu « Créer un dipôle / quadripôle depuis un montage… » et clic sur les bornes A, B ou E+, E−, S+, S−), soit par une netlist (`R1 A n1 1k`, `C1 n1 B 100n`, `L`, `W` = fil, `E` = source commandée) ou un modèle prêt à l'emploi ; l'élève ne voit que le nom (BN1, BN2…) et les bornes. Le contenu peut aussi être **construit avec de vrais composants** : on pose et câble des résistances, condensateurs et bobines sur le plan, puis on choisit « Créer un dipôle / quadripôle depuis un montage… » et on clique les bornes dans l'ordre demandé ; le montage est converti en netlist et remplacé par la boîte noire. Le contenu est enregistré de façon masquée (base64 + XOR) dans le fichier de montage et protégé par un code à l'écran : c'est une protection de commodité, pas un chiffrement.
 
 ## Étiquettes et filtre du matériel
 

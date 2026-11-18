@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.8
+- Boîtes noires : création à partir d'un montage de vrais composants (résistances, condensateurs, bobines et fils) — menu « Créer un dipôle / quadripôle depuis un montage… », sélection des bornes en cliquant ; la netlist est générée automatiquement et reste modifiable.
+
 ## v1.7
 - Moteurs asynchrones mono et triphasé : curseur de charge de l'à-vide à 1,2 × In (courant, cos φ, vitesse et couple varient ; courant et cos φ à vide réglables).
 - NE555, AOP LF356 et comparateur LM311 (collecteur ouvert en option) avec simulation temporelle.

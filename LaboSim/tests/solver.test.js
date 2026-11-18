@@ -5,7 +5,7 @@ const el = () => ({ style: {}, dataset: {}, classList: { toggle() {}, remove() {
 const store = {};
 global.document = { getElementById: id => store[id] || (store[id] = el()), querySelectorAll: () => [] };
 global.window = { addEventListener() {} };
-const L = new Function(code + `;return{add,wire,connect,render,mkWave,bz,tp,wsamples,buildPdf,pdfWrap,serializeMontage,loadMontage,buildMenu,setFilter(v){tagFilter=v},get TAGS(){return TAGS},get tranMode(){return tranMode},trFreq,bbEnc,bbDec,bbHash,bbParse,BBT,pv,get view(){return view},fitView,zoomAt,contentBounds,menuHtml(){return menuEl.innerHTML},reset(){comps=[];wires=[];notes=[];uid=1;sel=selW=selN=pend=null},get err(){return err},get wires(){return wires},get comps(){return comps},get solve(){return solve}}`)();
+const L = new Function(code + `;return{add,wire,connect,render,mkWave,bz,tp,wsamples,buildPdf,pdfWrap,serializeMontage,loadMontage,buildMenu,setFilter(v){tagFilter=v},get TAGS(){return TAGS},get tranMode(){return tranMode},startCapture,capPick,get capt(){return capt},trFreq,bbEnc,bbDec,bbHash,bbParse,BBT,pv,get view(){return view},fitView,zoomAt,contentBounds,menuHtml(){return menuEl.innerHTML},reset(){comps=[];wires=[];notes=[];uid=1;sel=selW=selN=pend=null},get err(){return err},get wires(){return wires},get comps(){return comps},get solve(){return solve}}`)();
 
 let fail = 0;
 const near = (name, got, want, tol) => { const ok = Math.abs(got - want) <= tol * Math.max(1, Math.abs(want)); if (!ok) fail++; console.log((ok ? 'ok   ' : 'FAIL ') + name + ' → ' + got.toPrecision(5) + ' (attendu ' + want + ')'); };
@@ -170,6 +170,17 @@ L.reset(); { const b1 = L.add('bat'), b2 = L.add('bat'), g = L.add('gbf'), r1 = 
 L.reset(); { const b = L.add('bat'), g = L.add('gbf'), ic = L.add('cmp'), o = L.add('scope'); b.val = 5; g.amp = 1; o.td = 2e-4;
   L.wire(b.id + ':1', ic.id + ':3'); L.wire(b.id + ':0', ic.id + ':4'); L.wire(g.id + ':1', ic.id + ':0'); L.wire(g.id + ':0', b.id + ':0'); L.wire(ic.id + ':1', b.id + ':0'); L.wire(o.id + ':1', g.id + ':1'); L.wire(o.id + ':3', ic.id + ':2'); L.wire(o.id + ':0', b.id + ':0'); L.render();
   const y = o.tr.y[1]; yes('comparateur : sortie 0 / ≈ 5 V', Math.max(...y) > 4.4 && Math.min(...y) < 0.3); near('comparateur : fréquence (Hz)', L.trFreq(o, 1), 1000, 0.03); }
+// 13d. Boîte noire construite à partir de vrais composants
+L.reset(); { const r = L.add('res', 300, 300), c = L.add('cap', 500, 300); r.val = 1000; c.val = 0.1; L.wire(r.id + ':1', c.id + ':0');
+  L.startCapture('q'); yes('capture démarrée', L.capt !== null); L.capPick(r.id + ':0'); L.capPick(c.id + ':1'); L.capPick(r.id + ':1'); L.capPick(c.id + ':1');
+  const bb = L.comps.find(x => x.type === 'bb'); yes('composants remplacés par une boîte noire', L.comps.length === 1 && bb && bb.kind === 'q' && L.capt === null);
+  const P = L.bbParse(L.bbDec(bb.net), 'q'); yes('netlist valide (R, C, W)', P.er === '' && P.els.length === 3);
+  const g = L.add('gbf'), o = L.add('scope'); g.amp = 5; L.wire(g.id + ':1', bb.id + ':0'); L.wire(g.id + ':0', bb.id + ':1'); L.wire(o.id + ':1', g.id + ':1'); L.wire(o.id + ':0', g.id + ':0'); L.wire(o.id + ':3', bb.id + ':2'); L.render();
+  near('quadripôle capturé : |H(1 kHz)|', Math.hypot(...o.sig[1][1]) / Math.hypot(...o.sig[0][1]), 1 / Math.hypot(1, 2 * Math.PI * 1000 * 1e-4), 0.02); }
+L.reset(); { const r = L.add('res', 300, 300), l = L.add('ind', 500, 300), b = L.add('bat'), a = L.add('amp'); r.val = 100; l.val = 10; l.r = 5; L.wire(r.id + ':1', l.id + ':0');
+  L.startCapture('d'); L.capPick(r.id + ':0'); L.capPick(l.id + ':1'); const bb = L.comps.find(x => x.type === 'bb'); yes('dipôle capturé', bb && bb.kind === 'd' && L.bbParse(L.bbDec(bb.net), 'd').er === '');
+  b.val = 10; L.wire(b.id + ':1', bb.id + ':0'); L.wire(bb.id + ':1', a.id + ':1'); L.wire(a.id + ':0', b.id + ':0'); L.render(); near('dipôle R + (L, r) : courant continu (A)', -a.I, 10 / 105, 0.01); }
+L.reset(); { const b = L.add('bat'); L.startCapture('d'); L.capPick(b.id + ':0'); L.capPick(b.id + ':1'); yes('capture sur un composant non convertible : refus', L.comps.every(x => x.type !== 'bb')); }
 // 12. Dessin de tous les appareils
 L.reset(); ['bat', 'ac', 'gbf', 'res', 'bulb', 'cap', 'ind', 'sw', 'com', 'rel', 'ctc', 'mdc', 'mac', 'led', 'cfl', 'a3', 'm3', 'cch', 'sv', 'sc', 'tach', 'cpm', 'amp', 'volt', 'watt', 'pince', 'scope', 'bb', 'ne555', 'aop', 'cmp'].forEach(t => L.add(t));
 L.add('volt').ana = 1; L.add('amp').ana = 1; L.render(); yes('rendu complet', true);
