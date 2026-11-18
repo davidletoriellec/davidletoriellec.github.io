@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.9
+- Nouveaux composants : diodes (1N4148, 1N4007, Zener 3,3 / 5,1 / 9,1 V) et LED de 6 couleurs (luminosité selon le courant, alerte de surintensité), en simulation temporelle.
+- Platine d'essai (breadboard) : les composants (R, C, L, diodes, LED, circuits intégrés) s'enfichent par accrochage ; colonnes et rails reliés ; la platine emporte les composants enfichés.
+- NE555, LF356, LM311 en boîtier DIP-8 vu de dessus (encoche, broche 1, broches nommées). Brochage réel ; les anciens montages sont migrés à l'ouverture.
+- GBF : rapport cyclique pour les signaux carré et triangle.
+- Oscilloscope : voies CH1 et CH2 alignées sous la base de temps.
+- Boîte noire quadripôle : entrée E à gauche, sortie S à droite, deux bornes chacune.
+- Exemples : LED sur platine, redressement, NE555 sur platine.
+
 ## v1.8
 - Boîtes noires : création à partir d'un montage de vrais composants (résistances, condensateurs, bobines et fils) — menu « Créer un dipôle / quadripôle depuis un montage… », sélection des bornes en cliquant ; la netlist est générée automatiquement et reste modifiable.
 

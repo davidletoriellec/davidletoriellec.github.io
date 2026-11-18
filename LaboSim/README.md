@@ -1,4 +1,4 @@
-# ⚡ LaboSim – laboratoire d'électricité virtuel (v1.8)
+# ⚡ LaboSim – laboratoire d'électricité virtuel (v1.9)
 
 Simulateur de travaux pratiques d'électricité qui tourne dans un navigateur, sans installation ni serveur.
 Les appareils sont dessinés comme en vrai et l'élève les **câble lui-même** avec des cordons banane ou BNC.

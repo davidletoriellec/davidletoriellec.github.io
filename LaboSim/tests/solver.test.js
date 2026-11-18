@@ -5,7 +5,7 @@ const el = () => ({ style: {}, dataset: {}, classList: { toggle() {}, remove() {
 const store = {};
 global.document = { getElementById: id => store[id] || (store[id] = el()), querySelectorAll: () => [] };
 global.window = { addEventListener() {} };
-const L = new Function(code + `;return{add,wire,connect,render,mkWave,bz,tp,wsamples,buildPdf,pdfWrap,serializeMontage,loadMontage,buildMenu,setFilter(v){tagFilter=v},get TAGS(){return TAGS},get tranMode(){return tranMode},startCapture,capPick,get capt(){return capt},trFreq,bbEnc,bbDec,bbHash,bbParse,BBT,pv,get view(){return view},fitView,zoomAt,contentBounds,menuHtml(){return menuEl.innerHTML},reset(){comps=[];wires=[];notes=[];uid=1;sel=selW=selN=pend=null},get err(){return err},get wires(){return wires},get comps(){return comps},get solve(){return solve}}`)();
+const L = new Function(code + `;return{add,wire,connect,render,mkWave,bz,tp,wsamples,buildPdf,pdfWrap,serializeMontage,loadMontage,buildMenu,setFilter(v){tagFilter=v},get TAGS(){return TAGS},get tranMode(){return tranMode},startCapture,capPick,get capt(){return capt},trFreq,bbEnc,bbDec,bbHash,bbParse,BBT,pv,get view(){return view},fitView,zoomAt,contentBounds,menuHtml(){return menuEl.innerHTML},reset(){comps=[];wires=[];notes=[];uid=1;sel=selW=selN=pend=null},get err(){return err},get wires(){return wires},get comps(){return comps},get solve(){return solve},geo,BX0,BP,BROW,BC,nearHole,snapPlug,plugSet(){return plugSet},DK,LC,gbfHarm,gbfWave,bridges}`)();
 
 let fail = 0;
 const near = (name, got, want, tol) => { const ok = Math.abs(got - want) <= tol * Math.max(1, Math.abs(want)); if (!ok) fail++; console.log((ok ? 'ok   ' : 'FAIL ') + name + ' → ' + got.toPrecision(5) + ' (attendu ' + want + ')'); };
@@ -162,13 +162,13 @@ L.reset(); { const b = L.add('bat'), ic = L.add('ne555'), r1 = L.add('res'), r2 
   const y = o.tr.y[0], hi = y.filter(v => v > 6).length / y.length; near('NE555 astable : rapport cyclique', hi, 11 / 21, 0.1); yes('NE555 : sortie haute ≈ Vcc − 1,7 V', Math.max(...y) > 9.8 && Math.max(...y) < 10.8);
   const yc = o.tr.y[1]; yes('condensateur oscille entre 1/3 et 2/3 Vcc', Math.min(...yc) > 3.7 && Math.min(...yc) < 4.4 && Math.max(...yc) > 7.6 && Math.max(...yc) < 8.3); }
 L.reset(); { const b1 = L.add('bat'), b2 = L.add('bat'), g = L.add('gbf'), r1 = L.add('res'), rf = L.add('res'), ic = L.add('aop'), o = L.add('scope'); b1.val = 15; b2.val = 15; g.amp = 1; r1.val = 1000; rf.val = 10000; o.td = 2e-4;
-  L.wire(b1.id + ':1', ic.id + ':3'); L.wire(b1.id + ':0', b2.id + ':1'); L.wire(b2.id + ':0', ic.id + ':4'); L.wire(g.id + ':1', r1.id + ':0'); L.wire(g.id + ':0', b1.id + ':0'); L.wire(r1.id + ':1', ic.id + ':1'); L.wire(rf.id + ':0', ic.id + ':1'); L.wire(rf.id + ':1', ic.id + ':2'); L.wire(ic.id + ':0', b1.id + ':0');
-  L.wire(o.id + ':1', g.id + ':1'); L.wire(o.id + ':3', ic.id + ':2'); L.wire(o.id + ':0', b1.id + ':0'); L.render();
+  L.wire(b1.id + ':1', ic.id + ':6'); L.wire(b1.id + ':0', b2.id + ':1'); L.wire(b2.id + ':0', ic.id + ':3'); L.wire(g.id + ':1', r1.id + ':0'); L.wire(g.id + ':0', b1.id + ':0'); L.wire(r1.id + ':1', ic.id + ':1'); L.wire(rf.id + ':0', ic.id + ':1'); L.wire(rf.id + ':1', ic.id + ':5'); L.wire(ic.id + ':2', b1.id + ':0');
+  L.wire(o.id + ':1', g.id + ':1'); L.wire(o.id + ':3', ic.id + ':5'); L.wire(o.id + ':0', b1.id + ':0'); L.render();
   const amp = a => (Math.max(...a) - Math.min(...a)) / 2; near('AOP inverseur : amplitude de sortie (V)', amp(o.tr.y[1]), 10, 0.03); near('AOP inverseur : fréquence conservée (Hz)', L.trFreq(o, 1), 1000, 0.03);
   const y0 = o.tr.y[0], y1 = o.tr.y[1]; let ph = 0; for (let i = 0; i < y0.length; i++) ph += y0[i] * y1[i]; yes('AOP inverseur : sortie en opposition de phase', ph < 0);
   g.amp = 2; L.render(); yes('AOP saturé à ≈ ±13,5 V', Math.max(...o.tr.y[1]) > 13 && Math.max(...o.tr.y[1]) < 13.8 && Math.min(...o.tr.y[1]) < -13 && Math.min(...o.tr.y[1]) > -13.8); }
 L.reset(); { const b = L.add('bat'), g = L.add('gbf'), ic = L.add('cmp'), o = L.add('scope'); b.val = 5; g.amp = 1; o.td = 2e-4;
-  L.wire(b.id + ':1', ic.id + ':3'); L.wire(b.id + ':0', ic.id + ':4'); L.wire(g.id + ':1', ic.id + ':0'); L.wire(g.id + ':0', b.id + ':0'); L.wire(ic.id + ':1', b.id + ':0'); L.wire(o.id + ':1', g.id + ':1'); L.wire(o.id + ':3', ic.id + ':2'); L.wire(o.id + ':0', b.id + ':0'); L.render();
+  L.wire(b.id + ':1', ic.id + ':7'); L.wire(b.id + ':0', ic.id + ':3'); L.wire(g.id + ':1', ic.id + ':1'); L.wire(g.id + ':0', b.id + ':0'); L.wire(ic.id + ':2', b.id + ':0'); L.wire(o.id + ':1', g.id + ':1'); L.wire(o.id + ':3', ic.id + ':6'); L.wire(o.id + ':0', b.id + ':0'); L.render();
   const y = o.tr.y[1]; yes('comparateur : sortie 0 / ≈ 5 V', Math.max(...y) > 4.4 && Math.min(...y) < 0.3); near('comparateur : fréquence (Hz)', L.trFreq(o, 1), 1000, 0.03); }
 // 13d. Boîte noire construite à partir de vrais composants
 L.reset(); { const r = L.add('res', 300, 300), c = L.add('cap', 500, 300); r.val = 1000; c.val = 0.1; L.wire(r.id + ':1', c.id + ':0');
@@ -181,7 +181,60 @@ L.reset(); { const r = L.add('res', 300, 300), l = L.add('ind', 500, 300), b = L
   L.startCapture('d'); L.capPick(r.id + ':0'); L.capPick(l.id + ':1'); const bb = L.comps.find(x => x.type === 'bb'); yes('dipôle capturé', bb && bb.kind === 'd' && L.bbParse(L.bbDec(bb.net), 'd').er === '');
   b.val = 10; L.wire(b.id + ':1', bb.id + ':0'); L.wire(bb.id + ':1', a.id + ':1'); L.wire(a.id + ':0', b.id + ':0'); L.render(); near('dipôle R + (L, r) : courant continu (A)', -a.I, 10 / 105, 0.01); }
 L.reset(); { const b = L.add('bat'); L.startCapture('d'); L.capPick(b.id + ':0'); L.capPick(b.id + ':1'); yes('capture sur un composant non convertible : refus', L.comps.every(x => x.type !== 'bb')); }
+
+// 14. Diodes, LED, Zener (simulation temporelle)
+L.reset(); { const b = L.add('bat'), r = L.add('res'), d = L.add('dled'), a = L.add('amp'); b.val = 5; r.val = 330; d.lc = 'rouge';
+  L.wire(b.id + ':1', r.id + ':0'); L.wire(r.id + ':1', d.id + ':0'); L.wire(d.id + ':1', a.id + ':1'); L.wire(a.id + ':0', b.id + ':0'); L.render();
+  yes('LED : mode temporel actif', L.tranMode); near('LED rouge + 330 Ω sous 5 V : courant (mA)', d.I * 1000, (5 - 1.75) / (330 + 10) * 1000, 0.03);
+  near('LED rouge : tension aux bornes (V)', d.U, 1.75 + 10 * (5 - 1.75) / 340, 0.03);
+  d.lc = 'bleu'; L.render(); near('LED bleue : courant plus faible (mA)', d.I * 1000, (5 - 2.9) / 340 * 1000, 0.03);
+  d.lc = 'rouge'; r.val = 10; L.render(); yes('LED sans résistance suffisante : surintensité (> 35 mA)', d.I > 0.035);
+  const x = L.wires.pop(); L.wires.pop(); b.val = 0; L.render(); }
+L.reset(); { const b = L.add('bat'), d = L.add('dio'), r = L.add('res'); b.val = 5; r.val = 1000; d.dk = 'd4007';
+  L.wire(b.id + ':1', d.id + ':1'); L.wire(d.id + ':0', r.id + ':0'); L.wire(r.id + ':1', b.id + ':0'); L.render();   /* diode polarisée en inverse */
+  near('diode en inverse : courant ≈ 0 (µA)', Math.abs(d.I) * 1e6, 0, 0.5); }
+L.reset(); { const b = L.add('bat'), d = L.add('dio'), r = L.add('res'); b.val = 5; r.val = 1000; d.dk = 'd4007';
+  L.wire(b.id + ':1', d.id + ':0'); L.wire(d.id + ':1', r.id + ':0'); L.wire(r.id + ':1', b.id + ':0'); L.render();
+  near('diode 1N4007 en direct : courant (mA)', d.I * 1000, (5 - .65) / 1000.25 * 1000, 0.01); near('diode 1N4007 : chute (V)', d.U, .65 + .25 * 4.35 / 1000.25, 0.01); }
+L.reset(); { const b = L.add('bat'), d = L.add('dio'), r = L.add('res'); b.val = 12; r.val = 1000; d.dk = 'z51';
+  L.wire(b.id + ':1', r.id + ':0'); L.wire(r.id + ':1', d.id + ':1'); L.wire(d.id + ':0', b.id + ':0'); L.render();   /* Zener en inverse : régulation */
+  near('Zener 5,1 V : tension régulée (V)', -d.U, 5.1 + 8 * 6.9 / 1008, 0.02); }
+L.reset(); { const a = L.add('ac'), d = L.add('dio'), r = L.add('res'), o = L.add('scope'); a.val = 8; r.val = 1000; d.dk = 'd4007'; o.td = 5e-3; o.v1 = 5;
+  L.wire(a.id + ':1', d.id + ':0'); L.wire(d.id + ':1', r.id + ':0'); L.wire(r.id + ':1', a.id + ':0'); L.wire(o.id + ':1', d.id + ':1'); L.wire(o.id + ':0', a.id + ':0'); L.render();
+  const y = o.tr.y[0], mx = Math.max(...y), mn = Math.min(...y); near('redressement simple alternance : crête (V)', mx, 8 * Math.SQRT2 - .66, 0.04); yes('redressement : alternance négative supprimée', mn > -0.05);
+  near('redressement : valeur moyenne (V)', mean(y), (8 * Math.SQRT2 - .66) / Math.PI, 0.06); }
+function mean(a) { let t = 0; for (const v of a) t += v; return t / a.length; }
+// 15. GBF : rapport cyclique (phaseurs = forme temporelle)
+L.reset(); { const g = L.add('gbf'), r = L.add('res'), o = L.add('scope'); g.f = 1000; g.amp = 5; r.val = 1000; o.td = 2e-4;
+  L.wire(g.id + ':1', r.id + ':0'); L.wire(r.id + ':1', g.id + ':0'); L.wire(o.id + ':1', g.id + ':1'); L.wire(o.id + ':0', g.id + ':0');
+  const cmp = (name, tol) => { L.render(); const H = L.gbfHarm(g); let worst = 0; const N = 4000;
+    for (let k = 1; k <= 8; k++) { let a = 0, b = 0; for (let n = 0; n < N; n++) { const t = (n + .5) / N * 1e-3, v = L.gbfWave(g, t) - g.off; a += 2 * v * Math.cos(2 * Math.PI * k * 1000 * t) / N; b += -2 * v * Math.sin(2 * Math.PI * k * 1000 * t) / N }
+      const h = H.find(x => x[0] === k) || [k, 0, 0]; worst = Math.max(worst, Math.abs(a - 5 * h[1]), Math.abs(b - 5 * h[2])) }
+    near(name + ' : harmoniques 1-8 = projection de la forme d’onde (écart max, V)', worst, 0, tol) };
+  g.wave = 'sq'; g.duty = .5; cmp('carré 50 %', .01); near('carré 50 % : composante continue nulle', o.sig[0][0][0], 0, 0.001);
+  g.duty = .2; L.render(); near('carré 20 % : composante continue (V)', o.sig[0][0][0], 5 * (2 * .2 - 1), 0.001); cmp('carré 20 %', .01);
+  let hi = 0; for (let k = 0; k < 1000; k++) if (L.gbfWave(g, k / 1000 * 1e-3) > 0) hi++; near('carré 20 % : temps à l’état haut', hi / 1000, .2, 0.01);
+  g.wave = 'tri'; g.duty = .5; cmp('triangle symétrique', .01); g.duty = .8; cmp('triangle 80 %', .01); near('triangle : valeur moyenne nulle', o.sig[0][0][0], 0, 0.001);
+  near('triangle 80 % : minimum au début de la montée (V)', L.gbfWave(g, .5e-3), -5, 0.001); near('triangle 80 % : sommet après 80 % de la période (V)', L.gbfWave(g, .3e-3), 5, 0.001); }
+// 16. Platine d'essai et boîtier DIP-8
+L.reset(); { const bd = L.add('bread', 600, 400), r = L.add('res', 0, 0), r2 = L.add('res', 0, 0), b = L.add('bat'), a = L.add('amp');
+  const plugOn = (c, ci, ri, t) => { const q = L.geo(c).t[t || 0]; c.x = bd.x + L.BX0 + ci * L.BP - q[0]; c.y = bd.y + L.BROW[ri] - q[1] };
+  plugOn(r, 3, 6); plugOn(r2, 7, 6); b.val = 10; r.val = 100; r2.val = 100;               /* R (col 3→7), R2 (col 7→11) : en série par la colonne 7 */
+  L.wire(b.id + ':1', bd.id + ':' + (3 * 10 + 9)); L.wire(a.id + ':1', bd.id + ':' + (11 * 10 + 9)); L.wire(a.id + ':0', b.id + ':0'); L.render();
+  yes('platine : composants enfichés détectés', L.plugSet().has(r.id) && L.plugSet().has(r2.id)); near('platine : deux résistances en série (A)', -a.I, 10 / 200, 0.01);
+  r2.x += 13; r2.y += 7; L.render(); yes('composant décalé : non enfiché', !L.plugSet().has(r2.id));
+  r2.x += 3; L.snapPlug(r2); const q = L.geo(r2).t[0]; yes('accrochage : la borne retombe sur un trou', L.nearHole(bd, r2.x + q[0], r2.y + q[1], 1e-6) !== null || L.nearHole(bd, r2.x + q[0], r2.y + q[1], .01) !== null); }
+L.reset(); { const bd = L.add('bread', 600, 400), ic = L.add('aop'), b1 = L.add('bat'), b2 = L.add('bat'), g = L.add('gbf'), r1 = L.add('res'), rf = L.add('res'), o = L.add('scope'), q = L.geo(ic).t[0];
+  ic.x = bd.x + L.BX0 + 8 * L.BP - q[0]; ic.y = bd.y + L.BROW[5] - q[1]; b1.val = 15; b2.val = 15; g.amp = 1; r1.val = 1000; rf.val = 10000; o.td = 2e-4;
+  const H = (c, r) => bd.id + ':' + (c * 10 + r), p = (c, t) => { const z = L.geo(c).t[t]; c.x = bd.x + 0; return z };
+  /* AOP LF356 sur platine : broche 2 (−) col 9 bas, 3 (+) col 10 bas, 4 (V−) col 11 bas, 6 (OUT) col 10 haut, 7 (V+) col 9 haut */
+  L.wire(b1.id + ':1', H(9, 0)); L.wire(b1.id + ':0', b2.id + ':1'); L.wire(b2.id + ':0', H(11, 9)); L.wire(g.id + ':1', r1.id + ':0'); L.wire(g.id + ':0', b1.id + ':0'); L.wire(r1.id + ':1', H(9, 9)); L.wire(rf.id + ':0', H(9, 8)); L.wire(rf.id + ':1', H(10, 0)); L.wire(H(10, 8), b1.id + ':0');
+  L.wire(o.id + ':1', g.id + ':1'); L.wire(o.id + ':3', H(10, 1)); L.wire(o.id + ':0', b1.id + ':0'); L.render();
+  const amp = a => (Math.max(...a) - Math.min(...a)) / 2; yes('AOP sur platine : simulation temporelle', L.tranMode); near('AOP sur platine : gain inverseur (sortie, V)', amp(o.tr.y[1]), 10, 0.04); }
+// 17. Ouverture d'un ancien montage (AOP à 5 bornes)
+L.reset(); { const old = { app: 'LaboSim', version: '1.8', comps: [{ id: 1, type: 'bat', x: 100, y: 100 }, { id: 2, type: 'aop', x: 300, y: 300 }], wires: [{ a: '1:1', b: '2:3', col: '#d32f2f' }, { a: '1:0', b: '2:4', col: '#111' }, { a: '1:0', b: '2:0', col: '#111' }, { a: '2:2', b: '1:0', col: '#111' }], notes: [] };
+  L.loadMontage(JSON.stringify(old)); const w = L.wires.map(x => x.a + '>' + x.b); yes('migration AOP : V+ → broche 7, V− → broche 4, + → 3, S → 6', w[0] === '1:1>2:6' && w[1] === '1:0>2:3' && w[2] === '1:0>2:2' && w[3] === '2:5>1:0'); }
 // 12. Dessin de tous les appareils
-L.reset(); ['bat', 'ac', 'gbf', 'res', 'bulb', 'cap', 'ind', 'sw', 'com', 'rel', 'ctc', 'mdc', 'mac', 'led', 'cfl', 'a3', 'm3', 'cch', 'sv', 'sc', 'tach', 'cpm', 'amp', 'volt', 'watt', 'pince', 'scope', 'bb', 'ne555', 'aop', 'cmp'].forEach(t => L.add(t));
+L.reset(); ['bat', 'ac', 'gbf', 'res', 'bulb', 'cap', 'ind', 'sw', 'com', 'rel', 'ctc', 'mdc', 'mac', 'led', 'cfl', 'a3', 'm3', 'cch', 'sv', 'sc', 'tach', 'cpm', 'amp', 'volt', 'watt', 'pince', 'scope', 'bb', 'ne555', 'aop', 'cmp', 'dio', 'dled', 'bread'].forEach(t => L.add(t));
 L.add('volt').ana = 1; L.add('amp').ana = 1; L.render(); yes('rendu complet', true);
 console.log(fail ? `\n${fail} test(s) en échec` : '\nTous les tests passent'); process.exit(fail ? 1 : 0);
