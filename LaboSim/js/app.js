@@ -42,7 +42,7 @@ const FIELDS={bat:[['val','Tension',UNITS.V,{min:0,max:30,sl:[0,30,0.5]}]],
  m3:[['ml','Charge (0 = à vide · 1 = nominale · 1,2 max)',UNITS.NU,{min:0,max:1.2,sl:[0,1.2,0.01]}],['pn','Puissance utile',UNITS.W,{min:1}],['un','Tension d’enroulement',UNITS.V,{min:1}],['i0r','Courant à vide (% de In)',UNITS.PCT,{min:0.05,max:1}],['cos0','cos φ à vide',UNITS.NU,{min:0.05,max:0.9}],['cosphi','cos φ',UNITS.NU,{min:0.1,max:1}],['eta','Rendement',UNITS.PCT,{min:0.1,max:1}]],
  aop:[['vm','Marge de saturation (V)',UNITS.V,{min:0,max:5}]],cmp:[['vm','Marge de saturation (V)',UNITS.V,{min:0,max:5}]]};
 const selH=(p,o,v)=>`<select data-p="${p}">${o.map(([a,l])=>`<option value="${a}"${String(a)===String(v)?' selected':''}>${l}</option>`).join('')}</select>`;
-const COLS=['#d32f2f','#1b1b1b','#1976d2','#2e7d32','#f9a825','#fb8c00','#8e24aa','#6d4c41','#9e9e9e'];const VERSION='2.2';
+const COLS=['#d32f2f','#1b1b1b','#1976d2','#2e7d32','#f9a825','#fb8c00','#8e24aa','#6d4c41','#9e9e9e'];const VERSION='3.0.1';
 let comps=[],wires=[],sel=null,selW=null,pend=null,mouse={x:0,y:0},drag=null,wd=null,notes=[],selN=null,uid=1,err='',theory=false;
 const cv=document.getElementById('cv'),st=document.getElementById('st'),pn=document.getElementById('pn');
 const T=(c,i)=>{const t=geo(c).t[i];return{x:c.x+t[0],y:c.y+t[1]}};
@@ -816,15 +816,16 @@ let TAGS={tags:['TP ELEN','TP ENER','TP1','TP2','Projet'],map:{},colors:{'TP ELE
 const itKey=it=>it[0]+(it[2]===1?':a':it[2]?':'+it[2]:''),tcol=t=>TAGS.colors[t]||'#888';
 function normTags(d){const t=[...new Set((Array.isArray(d&&d.tags)?d.tags:[]).map(x=>String(x).trim()).filter(Boolean))],m={},co={};Object.entries((d&&d.map)||{}).forEach(([k,v])=>{if(Array.isArray(v))m[k]=v.map(String).filter(x=>t.includes(x))});
  t.forEach((x,i)=>{const c=d&&d.colors&&d.colors[x];co[x]=/^#[0-9a-f]{6}$/i.test(c)?c:TCOL[i%TCOL.length]});return{tags:t,map:m,colors:co}}
-function saveTags(){try{localStorage.setItem('labosim_tags',JSON.stringify(TAGS));localStorage.setItem('labosim_filter',tagFilter)}catch(e){}}
+function saveTags(){try{localStorage.setItem('labosim_tags',JSON.stringify({...TAGS,edited:true}));localStorage.setItem('labosim_filter',tagFilter)}catch(e){}}
+function saveFilter(){try{localStorage.setItem('labosim_filter',tagFilter)}catch(e){}}
 const tagSlug=t=>String(t).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'etiquette';
 /* fusion de plusieurs fichiers d'étiquettes : étiquettes réunies, appareils additionnés, première couleur conservée */
 function mergeTags(list){const o={tags:[],map:{},colors:{}};list.forEach(d=>{const n=normTags(d);n.tags.forEach(t=>{if(!o.tags.includes(t))o.tags.push(t);if(!o.colors[t]&&n.colors[t])o.colors[t]=n.colors[t]});Object.entries(n.map).forEach(([k,v])=>{o.map[k]=[...new Set([...(o.map[k]||[]),...v])]})});return normTags(o)}
-function loadTagFiles(){const j=u=>fetch(u).then(r=>r.ok?r.json():null).catch(()=>null);
+function loadTagFiles(){const j=u=>fetch(u,{cache:'no-cache'}).then(r=>r.ok?r.json():null).catch(()=>null);
  return j('labosim-tags-index.json').then(ix=>{const fl=Array.isArray(ix)?ix:ix&&Array.isArray(ix.files)?ix.files:null;
   const main=j('labosim-tags.json');if(!fl||!fl.length)return main.then(d=>d&&d.tags?[d]:[]);
   return Promise.all([main,...fl.map(j)]).then(r=>r.filter(d=>d&&d.tags))})}
-function initTags(){try{const o=JSON.parse(localStorage.getItem('labosim_tags')||'null');if(o&&o.tags){TAGS=normTags(o);tagsLocal=true}tagFilter=localStorage.getItem('labosim_filter')||'*'}catch(e){}
+function initTags(){try{const o=JSON.parse(localStorage.getItem('labosim_tags')||'null');if(o&&o.tags&&o.edited){TAGS=normTags(o);tagsLocal=true}tagFilter=localStorage.getItem('labosim_filter')||'*'}catch(e){}
  try{if(!tagsLocal&&typeof fetch==='function')loadTagFiles().then(l=>{if(l.length){TAGS=mergeTags(l);buildMenu()}}).catch(()=>{})}catch(e){}}
 function buildMenu(){const tf=$('tf');if(tagFilter!=='*'&&tagFilter!=='-'&&!TAGS.tags.includes(tagFilter))tagFilter='*';
  tf.innerHTML='<option value="*">Tout le matériel</option>'+TAGS.tags.map(t=>`<option value="${esc_(t)}">${esc_(t)}</option>`).join('')+'<option value="-">Sans étiquette</option>';tf.value=tagFilter;
@@ -836,8 +837,8 @@ function renderTags(){const n=TAGS.tags.length,ents=MENU.filter(([g])=>g!=='Rep�
  const rows=ents.map(([g,items])=>`<tr><th colspan="${n+1}" style="background:var(--bg)">${g}</th></tr>`+items.map(it=>`<tr><td>${it[1]}</td>${TAGS.tags.map((t,ti)=>`<td><input type="checkbox" data-ck="${itKey(it)}|${ti}"${(TAGS.map[itKey(it)]||[]).includes(t)?' checked':''}></td>`).join('')}</tr>`).join('')).join('');
  $('tgb2').innerHTML=`<div>${TAGS.tags.map((t,i)=>`<span class="chip"><input type="color" data-tc="${i}" value="${tcol(t)}" title="Couleur de l’étiquette"><input type="text" data-tr="${i}" value="${esc_(t)}" size="${Math.max(6,t.length)}"><button data-td="${i}" title="Supprimer l’étiquette">×</button></span>`).join('')}<span class="chip"><input type="text" id="tnew" placeholder="Nouvelle étiquette" size="16"><button id="tadd">Ajouter</button></span></div>
 <div style="overflow:auto"><table><tr><th>Appareil</th>${TAGS.tags.map((t,i)=>`<th><i class="dot" style="background:${tcol(t)}"></i> ${esc_(t)}<br><button data-ta="${i}" title="Tout cocher / tout décocher">☑</button></th>`).join('')}</tr>${rows}</table></div>
-<div style="display:flex;gap:8px;flex-wrap:wrap"><button id="texp">Exporter la configuration</button><button id="texf" title="Un fichier par étiquette, nommé d’après l’étiquette, plus la liste à déposer sur GitHub">Exporter un fichier par étiquette</button><button id="timp">Importer…</button><input type="file" id="tfl" accept=".json,application/json" style="display:none"><button id="trst">Décocher tout</button></div>`;
- const done=()=>{saveTags();buildMenu()};
+<div style="display:flex;gap:8px;flex-wrap:wrap"><button id="texp">Exporter la configuration</button><button id="tweb" title="Oublier les étiquettes modifiées sur cet ordinateur et recharger celles des fichiers en ligne">Revenir aux fichiers en ligne</button><button id="texf" title="Un fichier par étiquette, nommé d’après l’étiquette, plus la liste à déposer sur GitHub">Exporter un fichier par étiquette</button><button id="timp">Importer…</button><input type="file" id="tfl" accept=".json,application/json" style="display:none"><button id="trst">Décocher tout</button></div>`;
+ const done=()=>{saveTags();buildMenu()};{const w=$('tweb');if(w)w.onclick=()=>{try{localStorage.removeItem('labosim_tags')}catch(e){}location.reload()}}
  $('tgb2').querySelectorAll('[data-ck]').forEach(i=>i.onchange=()=>{const[k,ti]=i.dataset.ck.split('|'),t=TAGS.tags[+ti],a=TAGS.map[k]||[];TAGS.map[k]=i.checked?[...new Set([...a,t])]:a.filter(x=>x!==t);done()});
  $('tgb2').querySelectorAll('[data-tc]').forEach(i=>i.onchange=()=>{TAGS.colors[TAGS.tags[+i.dataset.tc]]=i.value;done();renderTags()});
  $('tgb2').querySelectorAll('[data-tr]').forEach(i=>i.onchange=()=>{const old=TAGS.tags[+i.dataset.tr],nv=i.value.trim();if(!nv||TAGS.tags.includes(nv)){renderTags();return}TAGS.tags[+i.dataset.tr]=nv;TAGS.colors[nv]=TAGS.colors[old];delete TAGS.colors[old];Object.keys(TAGS.map).forEach(k=>{TAGS.map[k]=TAGS.map[k].map(x=>x===old?nv:x)});if(tagFilter===old)tagFilter=nv;done();renderTags()});
@@ -850,7 +851,7 @@ function renderTags(){const n=TAGS.tags.length,ents=MENU.filter(([g])=>g!=='Rep�
  $('texp').onclick=()=>saveFile(new Blob([JSON.stringify(TAGS,null,1)],{type:'application/json'}),'etiquettes_labosim.json');
  $('timp').onclick=()=>$('tfl').click();
  $('tfl').onchange=e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{TAGS=normTags(JSON.parse(String(r.result)));done();renderTags()}catch(x){}};r.readAsText(f)}}
-$('tf').onchange=()=>{tagFilter=$('tf').value;saveTags();buildMenu()};
+$('tf').onchange=()=>{tagFilter=$('tf').value;saveFilter();buildMenu()};
 $('tgb').onclick=()=>{renderTags();$('tgm').style.display='block'};$('tgx').onclick=()=>{$('tgm').style.display='none'};
 const SKIP=new Set(['tr','bbp','cl','sig','ws','U','I','P','Q','Ur','Ir','Ua','Ia','rps','rpm','tgt','tv']);
 function serializeMontage(){return JSON.stringify({app:'LaboSim',version:VERSION,comps,wires,notes,pairId},(k,v)=>SKIP.has(k)?undefined:v,1)}
