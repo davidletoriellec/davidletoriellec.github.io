@@ -1,6 +1,9 @@
 # Changelog
 
-## v2.2
+## v3.0.1
+- Étiquettes : choisir un filtre ne fige plus la liste d'étiquettes dans le navigateur (cause des étiquettes en ligne qui n'apparaissaient pas après mise à jour). Seules les modifications faites dans la fenêtre des étiquettes sont conservées localement ; bouton « Revenir aux fichiers en ligne » ; les fichiers sont rechargés sans cache.
+
+## v3.0 (Arduino)
 - **Arduino Uno programmable** : carte câblable (D0–D13, A0–A5, 5 V, 3,3 V, GND), éditeur de code avec moniteur série, exemples. Compilateur « Arduino simplifié » (`js/arduino.js`) : types C (int 16 bits…), fonctions, tableaux, String, if/for/while/do/switch, `#define`, entrées/sorties numériques et analogiques, PWM, `delay`, `millis`, `pulseIn`, `tone`, Serial.
 - Exécution en **temps réel** couplée au solveur temporel (pas variable, événements exacts pour le PWM et le HC-SR04), pause / reset / vitesse. Les valeurs des multimètres sont moyennées, l'oscilloscope affiche les derniers instants.
 - Nouveaux composants : **potentiomètre** et **bouton poussoir** (maintenir le clic).
