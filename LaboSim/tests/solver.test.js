@@ -6,7 +6,7 @@ const el = () => ({ style: {}, dataset: {}, classList: { toggle() {}, remove() {
 const store = {};
 global.document = { getElementById: id => store[id] || (store[id] = el()), querySelectorAll: () => [] };
 global.window = { addEventListener() {} };
-const L = new Function(code + `;return{add,wire,connect,render,mkWave,bz,tp,wsamples,buildPdf,pdfWrap,serializeMontage,loadMontage,buildMenu,setFilter(v){tagFilter=v},get TAGS(){return TAGS},get tranMode(){return tranMode},startCapture,capPick,get capt(){return capt},trFreq,bbEnc,bbDec,bbHash,bbParse,BBT,pv,get view(){return view},fitView,zoomAt,contentBounds,menuHtml(){return menuEl.innerHTML},reset(){comps=[];wires=[];notes=[];uid=1;sel=selW=selN=pend=null},get err(){return err},get wires(){return wires},get comps(){return comps},get solve(){return solve},geo,BX0,BP,BROW,BC,nearHole,snapPlug,plugSet(){return plugSet},DK,LC,gbfHarm,gbfWave,bridges,mergeTags,tagSlug,ldrR,liveStart,liveStop,liveAdvance,liveDrop,liveSync,liveResetAll,get live(){return live},engOf,UNO,tranModel,dockUpload,exUno}`)();
+const L = new Function(code + `;return{T,add,wire,connect,render,mkWave,bz,tp,wsamples,buildPdf,pdfWrap,serializeMontage,loadMontage,buildMenu,setFilter(v){tagFilter=v},get TAGS(){return TAGS},get tranMode(){return tranMode},startCapture,capPick,get capt(){return capt},trFreq,bbEnc,bbDec,bbHash,bbParse,BBT,pv,get view(){return view},fitView,zoomAt,contentBounds,menuHtml(){return menuEl.innerHTML},reset(){comps=[];wires=[];notes=[];uid=1;sel=selW=selN=pend=null},get err(){return err},get wires(){return wires},get comps(){return comps},get solve(){return solve},geo,BX0,BP,BROW,BC,nearHole,snapPlug,plugSet(){return plugSet},DK,LC,gbfHarm,gbfWave,bridges,mergeTags,tagSlug,ldrR,liveStart,liveStop,liveAdvance,liveDrop,liveSync,liveResetAll,get live(){return live},engOf,UNO,tranModel,dockUpload,exUno}`)();
 
 let fail = 0;
 const near = (name, got, want, tol) => { const ok = Math.abs(got - want) <= tol * Math.max(1, Math.abs(want)); if (!ok) fail++; console.log((ok ? 'ok   ' : 'FAIL ') + name + ' → ' + got.toPrecision(5) + ' (attendu ' + want + ')'); };
@@ -296,6 +296,8 @@ const tsopRig = (fGen, wave, fc, opt = {}) => { L.reset();
 // Exemples fournis
 store['ex25'].onclick(); { const t = L.comps.find(c => c.type === 'tsop'); yes('exemple TSOP + GBF : porteuse détectée', t.det === true && !L.err); }
 store['ex26'].onclick(); { const b = L.comps.find(c => c.type === 'bat2'), a = L.comps.find(c => c.type === 'amp'); yes('exemple alim limitée : CH1 en CC', b.cc === true && !L.err); near('exemple alim limitée : I (A)', -a.I, 0.02, 0.02); yes('exemple alim limitée : CH2 en CV', b.cc2 === false); near('exemple alim limitée : I CH2 (A)', b.I2, 0.05, 0.02); }
+// Rotation des composants
+L.reset(); { const r = L.add('res', 100, 100); const p0 = L.T(r, 0); r.rot = 90; const p1 = L.T(r, 0); near('rotation 90° : x', p1.x - 100, -(p0.y - 100), 0.001); near('rotation 90° : y', p1.y - 100, p0.x - 100, 0.001); r.rot = 180; near('rotation 180°', L.T(r, 0).x - 100, -(p0.x - 100), 0.001); }
 // 13. Arduino Uno : exécution en temps réel couplée au solveur temporel
 { const run = (T, dt = 0.05) => { const t1 = L.live.vt + T; while (L.live.vt < t1 - 1e-9) L.liveAdvance(L.live.vt + dt, 1e9); L.render(); };
   const find = t => L.comps.filter(c => c.type === t), ser = () => L.engOf(find('uno')[0]).ser, last = () => ser().trim().split('\r\n').pop();

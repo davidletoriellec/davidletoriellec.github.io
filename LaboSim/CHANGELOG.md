@@ -1,5 +1,8 @@
 # Changelog
 
+## v3.1.1
+- **Rotation des composants** : bouton « ⟳ Pivoter 90° » dans le panneau ou touche **R** (composant sélectionné). Les bornes et les fils suivent ; la rotation est enregistrée avec le montage. Non disponible pour la platine, la pince et le capteur de courant à pince.
+
 ## v3.1
 - **Récepteur infrarouge TSOP** : nouveau module à 3 bornes (OUT, GND, VS) avec **fréquence de porteuse réglable** (20–70 kHz, boutons 30 / 33 / 36 / 38 / 40 / 56 kHz) pour que chaque groupe ait sa propre fréquence. Il ne détecte que la lumière IR **modulée** à sa fréquence (filtre passe-bande par démodulation synchrone) : la lumière continue (soleil, ampoule), le 100 Hz du secteur et les autres fréquences sont ignorés. Sortie à l’état haut au repos, **basse** quand la porteuse est détectée (≈ 15 périodes nécessaires). Obstacle sur le faisceau et curseur « lumière ambiante parasite ». Fonctionne avec un GBF carré ou `tone()` de l’Arduino. Le phototransistor garde son rôle de comparaison : la lumière ambiante s’y ajoute au signal.
 - **Alimentation continue à limite de courant** : chaque alim 0–30 V a maintenant un réglage « Limite de courant » (0,01–10 A). Au-delà, passage en régulation de courant (voyant **CC**, la tension s’effondre) ; en dessous, régulation de tension (CV). Un court-circuit d’alim n’est plus une erreur : le courant est plafonné. Valable en simulation continue, temporelle et temps réel.

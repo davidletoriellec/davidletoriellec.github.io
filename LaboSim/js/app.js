@@ -42,10 +42,11 @@ const FIELDS={bat:[['val','Tension',UNITS.V,{min:0,max:30,sl:[0,30,0.5]}],['il',
  m3:[['ml','Charge (0 = à vide · 1 = nominale · 1,2 max)',UNITS.NU,{min:0,max:1.2,sl:[0,1.2,0.01]}],['pn','Puissance utile',UNITS.W,{min:1}],['un','Tension d’enroulement',UNITS.V,{min:1}],['i0r','Courant à vide (% de In)',UNITS.PCT,{min:0.05,max:1}],['cos0','cos φ à vide',UNITS.NU,{min:0.05,max:0.9}],['cosphi','cos φ',UNITS.NU,{min:0.1,max:1}],['eta','Rendement',UNITS.PCT,{min:0.1,max:1}]],
  aop:[['vm','Marge de saturation (V)',UNITS.V,{min:0,max:5}]],cmp:[['vm','Marge de saturation (V)',UNITS.V,{min:0,max:5}]]};
 const selH=(p,o,v)=>`<select data-p="${p}">${o.map(([a,l])=>`<option value="${a}"${String(a)===String(v)?' selected':''}>${l}</option>`).join('')}</select>`;
-const COLS=['#d32f2f','#1b1b1b','#1976d2','#2e7d32','#f9a825','#fb8c00','#8e24aa','#6d4c41','#9e9e9e'];const VERSION='3.1';
+const COLS=['#d32f2f','#1b1b1b','#1976d2','#2e7d32','#f9a825','#fb8c00','#8e24aa','#6d4c41','#9e9e9e'];const VERSION='3.1.1';
 let comps=[],wires=[],sel=null,selW=null,pend=null,mouse={x:0,y:0},drag=null,wd=null,notes=[],selN=null,uid=1,err='',theory=false;
 const cv=document.getElementById('cv'),st=document.getElementById('st'),pn=document.getElementById('pn');
-const T=(c,i)=>{const t=geo(c).t[i];return{x:c.x+t[0],y:c.y+t[1]}};
+const NOROT=new Set(['bread','pince','sc']);
+const T=(c,i)=>{const t=geo(c).t[i],r=(c.rot||0)*Math.PI/180,co=Math.round(Math.cos(r)),si=Math.round(Math.sin(r));return{x:c.x+t[0]*co-t[1]*si,y:c.y+t[0]*si+t[1]*co}};
 const tp=k=>{const[id,i]=k.split(':');const c=comps.find(c=>c.id==id);return c?T(c,+i):null};
 function add(type,x,y){const c={id:uid++,type,x:x??450,y:y??300,val:INFO[type].v,f:type==='gbf'?1000:50,un:({rel:12,ctc:24,mdc:12,mac:230,led:230,cfl:230,m3:230,cch:230})[type]||6,cm:'mono',cpl:'Y',ratio:type==='sc'?100:10,xy:false,ml:1,i0r:({mac:.55,m3:.4})[type]||.5,cos0:({mac:.25,m3:.2})[type]||.2,vm:type==='cmp'?.3:1.5,oc:false,name:'',kind:'d',net:'',lk:'',rc:type==='ctc'?100:120,on:false,run:0,ra:2,la:5,i0:.15,n0:3000,inom:1.5,load:0,pn:({led:8,cfl:11,mac:370,m3:1500})[type]||0,cosphi:({led:.6,cfl:.55,mac:.82,m3:.84})[type]||1,eta:({m3:.8})[type]||.7,r:5,mode:type==='pince'?'AC':'DC',lux:100,dist:100,blk:false,wave:'sin',duty:.5,dk:'d4148',lc:'rouge',amp:5,off:0,td:1e-3,v1:1,v2:1,cp1:'DC',cp2:'DC',on1:true,on2:true,trig:1,pos1:0,pos2:0,cur:{x1:2,x2:6,y1:2,y2:-2},cch:1,rng:type==='amp'?1:10,disp:type==='pince'?'A':'W',rev:false,il:10,val2:9,il2:10,fc:38000,amb:0,pos:type==='pot'?.5:0,code:type==='uno'?LaboArduino.EXAMPLES[0].code:'',closed:type==='sw'?false:undefined};comps.push(c);sel=c.id;selW=null;panel();render();return c}
 function defCol(a,b){for(const k of[a,b]){const c=comps.find(c=>c.id==k.split(':')[0]),i=k.split(':')[1];if(c&&c.type==='ac')return i==='1'?COLS[0]:COLS[2];if(c&&c.type==='watt')return[COLS[2],COLS[0],COLS[1],COLS[0]][+i];if(c&&c.type==='bb')return[COLS[0],COLS[1],COLS[0],COLS[1]][+i];if(c&&c.type==='a3')return[COLS[2],COLS[4],COLS[3],COLS[0]][+i];if(c&&['bat','amp','volt','pince','gbf','scope','sv','sc'].includes(c.type))return(+i)%2?COLS[0]:COLS[1]}return COLS[2]}
@@ -574,7 +575,7 @@ function render(){
  const ord=[...comps].sort((a,b)=>(b.type==='bread')-(a.type==='bread'));
  ord.forEach(c=>{const[bx,by,bw,bh]=geo(c).b,on=sel===c.id;let lab='';
   if(theory&&c.U!==undefined&&!err&&c.type!=='amp'&&!['watt','gbf','scope','pince','com','rel','ctc','a3','sv','sc','tach','cpm','bb','ne555','aop','cmp'].includes(c.type))lab=c.type==='sw'?'':(c.type==='cch'||c.type==='m3')?fmt(c.P,'W')+(c.type==='m3'?' · '+Math.round(c.rpm||0)+' tr/min':''):`${fmt(c.Ur,'V')} · ${fmt(c.Ir,'A')}`+((c.type==='mdc'||c.type==='mac')?' · '+Math.round(c.rpm||0)+' tr/min':'');
-  s+=`<g transform="translate(${c.x} ${c.y})" data-c="${c.id}" style="cursor:grab">${body(c)}<rect x="${bx-4}" y="${by-4}" width="${bw+8}" height="${bh+8}" rx="10" fill="transparent" stroke="${on?'var(--acc)':'none'}" stroke-dasharray="5 4" stroke-width="2"/>${txt(0,by+bh+20,lab,12,'var(--ink)')}</g>`});
+  s+=`<g transform="translate(${c.x} ${c.y})${c.rot?` rotate(${c.rot})`:''}" data-c="${c.id}" style="cursor:grab">${body(c)}<rect x="${bx-4}" y="${by-4}" width="${bw+8}" height="${bh+8}" rx="10" fill="transparent" stroke="${on?'var(--acc)':'none'}" stroke-dasharray="5 4" stroke-width="2"/>${txt(0,by+bh+20,lab,12,'var(--ink)')}</g>`});
  const plug=(k,p,colr)=>{const[id,ii]=k.split(':'),c=comps.find(c=>c.id==id);if(c&&geo(c).t[+ii][2]==='b'){const y=(+ii)%2?p.y:p.y-15;return`<circle cx="${p.x}" cy="${y}" r="14" fill="#23272d" stroke="#9aa0a8" stroke-width="3"/><circle cx="${p.x}" cy="${y}" r="7" fill="${colr}"/>`}return`<circle cx="${p.x}" cy="${p.y}" r="7" fill="${colr}" stroke="rgba(120,120,120,.7)" stroke-width="1.5"/>`};
  wires.forEach((w,i)=>{if(w.hide)return;const a=tp(w.a),b=tp(w.b);if(!a||!b)return;const d=cable(a,b,w),on=selW===i,sw=w.coax?7:5;
   s+=`<path d="${d}" fill="none" stroke="${on?'var(--acc)':'rgba(120,120,120,.55)'}" stroke-width="${sw+3}" stroke-linecap="round"/><path d="${d}" fill="none" stroke="${w.col}" stroke-width="${sw}" stroke-linecap="round"/><path d="${d}" data-w="${i}" fill="none" stroke="transparent" stroke-width="16"/>`+plug(w.a,a,w.col)+plug(w.b,b,w.col)});
@@ -646,7 +647,7 @@ function panel(){
  if(c.type==='sw')h+=`<button id="tg">${c.closed?'Ouvrir':'Fermer'}</button>`;
  if(c.type==='com')h+=`<button id="tg">Basculer (position ${c.pos?'B':'A'})</button>`;
  if(c.type==='rel'||c.type==='ctc')h+=`<span class="mut">Contact : ${c.on?'collé (travail)':'repos'} · colle à 80 % de la tension bobine</span>`;
- h+=`<span id="ro" class="mut"></span><button id="dl">Supprimer</button>`;pn.innerHTML=h;
+ h+=`<span id="ro" class="mut"></span>${NOROT.has(c.type)?'':'<button id="rt" title="Raccourci : touche R">⟳ Pivoter 90°</button>'}<button id="dl">Supprimer</button>`;pn.innerHTML=h;
  bindP(pn,c,render);bindU(pn,c,render);
  const wvS=pn.querySelector('[data-p="wave"]');if(wvS)wvS.addEventListener('change',()=>{panel();render()});const cmS=pn.querySelector('[data-p="cm"]');if(cmS)cmS.addEventListener('change',()=>{c.un=c.cm==='tri'?400:230;panel();render()});
  const md=document.getElementById('md');if(md)md.onclick=()=>{c.mode=c.mode==='AC'?'DC':'AC';panel();render()};
@@ -655,7 +656,8 @@ function panel(){
  const uc=document.getElementById('ucode');if(uc){uc.onclick=()=>openDock(c.id);document.getElementById('urun').onclick=()=>{liveToggle();panel()};document.getElementById('ures').onclick=()=>{liveResetAll();panel()}}
  const zm=document.getElementById('zm');if(zm)zm.onclick=()=>openOv(c);const bbe=document.getElementById('bbe');if(bbe)bbe.onclick=()=>openBB(c);
  const tg=document.getElementById('tg');if(tg)tg.onclick=()=>{if(c.type==='com')c.pos=c.pos?0:1;else c.closed=!c.closed;panel();render()};
- document.getElementById('dl').onclick=delSel;render()}
+ document.getElementById('dl').onclick=delSel;const rt=document.getElementById('rt');if(rt)rt.onclick=()=>rotSel();render()}
+function rotSel(){const c=comps.find(o=>o.id===sel);if(!c||NOROT.has(c.type))return;c.rot=((c.rot||0)+90)%360;render()}
 function delSel(){if(sel!==null){wires=wires.filter(w=>!w.a.startsWith(sel+':')&&!w.b.startsWith(sel+':'));comps=comps.filter(c=>c.id!==sel);sel=null}
  else if(selW!==null){const w0=wires[selW];wires=wires.filter(x=>x!==w0&&!(w0.pair&&x.pair===w0.pair));selW=null}
  else if(selN!==null){notes.splice(selN,1);selN=null}pend=null;panel();render()}
@@ -705,7 +707,7 @@ window.addEventListener('pointerup',e=>{ptrs.delete(e.pointerId);if(ptrs.size<2)
   else if(c.type==='watt'){const h=[['W',-124],['VAr',-96],['VA',-68],['PF',-40],['V',-4],['A',24]].find(([l,x])=>drag.dx>=x&&drag.dx<=x+24&&drag.dy>=22&&drag.dy<=40);if(h){c.disp=h[0];panel();render()}}}
  else if(c.type==='pince'||c.type==='sc'){const k=clampOf(c);if(k){c.x=k.pt.x;c.y=k.pt.y;render()}}}
  drag=null});
-window.addEventListener('keydown',e=>{if((e.key==='Delete'||e.key==='Backspace')&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName))delSel();if(e.key==='Escape'){pend=null;capt=null;render()}});
+window.addEventListener('keydown',e=>{if((e.key==='Delete'||e.key==='Backspace')&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName))delSel();if(e.key==='Escape'){pend=null;capt=null;render()}if((e.key==='r'||e.key==='R')&&!e.ctrlKey&&!e.metaKey&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName))rotSel()});
 const MENU=[['Alimentations',[['bat','Alimentation continue 0–30 V (limite en courant)'],['bat2','Alimentation continue double 2×(0–30 V)'],['ac','Alimentation alternative 0–230 V'],['gbf','GBF (générateur de fonctions)'],['a3','Alimentation triphasée 400 V']]],
  ['Charges',[['res','Résistance'],['bulb','Ampoule'],['led','Lampe à LED'],['cfl','Lampe fluocompacte'],['cap','Condensateur'],['ind','Bobine'],['mdc','Moteur à courant continu'],['mac','Moteur monophasé (cos φ 0,82)'],['m3','Moteur asynchrone triphasé 1,5 kW'],['cch','Caisse de charge 0–4 kW']]],
  ['Composants',[['dio','Diode (1N4148, 1N4007, Zener)'],['dled','LED (rouge, jaune, vert, bleu…)'],['bread','Platine d’essai (breadboard)']]],
