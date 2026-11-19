@@ -1,5 +1,14 @@
 # Changelog
 
+## v3.1
+- **Récepteur infrarouge TSOP** : nouveau module à 3 bornes (OUT, GND, VS) avec **fréquence de porteuse réglable** (20–70 kHz, boutons 30 / 33 / 36 / 38 / 40 / 56 kHz) pour que chaque groupe ait sa propre fréquence. Il ne détecte que la lumière IR **modulée** à sa fréquence (filtre passe-bande par démodulation synchrone) : la lumière continue (soleil, ampoule), le 100 Hz du secteur et les autres fréquences sont ignorés. Sortie à l’état haut au repos, **basse** quand la porteuse est détectée (≈ 15 périodes nécessaires). Obstacle sur le faisceau et curseur « lumière ambiante parasite ». Fonctionne avec un GBF carré ou `tone()` de l’Arduino. Le phototransistor garde son rôle de comparaison : la lumière ambiante s’y ajoute au signal.
+- **Alimentation continue à limite de courant** : chaque alim 0–30 V a maintenant un réglage « Limite de courant » (0,01–10 A). Au-delà, passage en régulation de courant (voyant **CC**, la tension s’effondre) ; en dessous, régulation de tension (CV). Un court-circuit d’alim n’est plus une erreur : le courant est plafonné. Valable en simulation continue, temporelle et temps réel.
+- **Alimentation double 2×(0–30 V)** : deux voies indépendantes et flottantes (CH1, CH2), chacune avec sa tension et sa limite de courant, affichage de U et I par voie ; mise en série (60 V) ou alim symétrique ± par câblage.
+- Les alimentations affichent maintenant la tension et le courant réellement délivrés.
+- Correction : le diviseur interne du NE555 était simulé avec 5 kS au lieu de 5 kΩ (les tensions étaient justes mais le courant d’alimentation absurde).
+- Exemples : télécommande IR Arduino (tone + TSOP), TSOP + GBF + oscilloscope, alim à limite de courant.
+- Tests : limite de courant (CV/CC, série, symétrique, temporel), détection TSOP (fréquence, DC, ambiante, obstacle), exemples.
+
 ## v3.0.1
 - Étiquettes : choisir un filtre ne fige plus la liste d'étiquettes dans le navigateur (cause des étiquettes en ligne qui n'apparaissaient pas après mise à jour). Seules les modifications faites dans la fenêtre des étiquettes sont conservées localement ; bouton « Revenir aux fichiers en ligne » ; les fichiers sont rechargés sans cache.
 

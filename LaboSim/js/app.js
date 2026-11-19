@@ -1,7 +1,7 @@
-const INFO={bat:{n:'Alimentation continue 0–30 V',v:9,u:'V',max:30},ac:{n:'Alimentation alternative 0–230 V~',v:12,max:230},res:{n:'Résistance',v:100,u:'Ω'},bulb:{n:'Ampoule',v:5,u:'W',lab:'Puissance nominale'},cap:{n:'Condensateur',v:10,u:'µF',lab:'Capacité'},ind:{n:'Bobine',v:100,u:'mH',lab:'Inductance'},watt:{n:'Wattmètre ISW8000'},pince:{n:'Pince ampèremétrique (PROVA 21)'},rel:{n:'Relais'},ctc:{n:'Contacteur 2 NO'},mdc:{n:'Moteur à courant continu'},mac:{n:'Moteur asynchrone monophasé'},led:{n:'Lampe à LED'},cfl:{n:'Lampe fluocompacte'},a3:{n:'Alimentation triphasée',v:400},cch:{n:'Caisse de charge',v:1000},m3:{n:'Moteur asynchrone triphasé'},sv:{n:'Sonde de tension'},sc:{n:'Sonde de courant'},tach:{n:'Compte-tours'},cpm:{n:'Couple-mètre'},bb:{n:'Boîte noire'},dio:{n:'Diode'},ldr:{n:'Photorésistance (LDR)'},irrx:{n:'Récepteur infrarouge (phototransistor)'},hcsr:{n:'Capteur ultrason HC-SR04'},uno:{n:'Arduino Uno'},pot:{n:'Potentiomètre',v:10000,u:'Ω'},pb:{n:'Bouton poussoir'},dled:{n:'LED'},bread:{n:'Platine d’essai (breadboard)'},ne555:{n:'NE555'},aop:{n:'AOP LF356'},cmp:{n:'Comparateur LM311'},com:{n:'Commutateur 2 voies (3 bornes)'},gbf:{n:'GBF (générateur de fonctions)'},scope:{n:'Oscilloscope 2 voies'},sw:{n:'Interrupteur'},amp:{n:'Multimètre (ampèremètre)'},volt:{n:'Multimètre (voltmètre)'}};
+const INFO={bat:{n:'Alimentation continue 0–30 V',v:9,u:'V',max:30},bat2:{n:'Alimentation continue double 2×(0–30 V)',v:9,u:'V',max:30},tsop:{n:'Récepteur infrarouge TSOP (porteuse filtrée)'},ac:{n:'Alimentation alternative 0–230 V~',v:12,max:230},res:{n:'Résistance',v:100,u:'Ω'},bulb:{n:'Ampoule',v:5,u:'W',lab:'Puissance nominale'},cap:{n:'Condensateur',v:10,u:'µF',lab:'Capacité'},ind:{n:'Bobine',v:100,u:'mH',lab:'Inductance'},watt:{n:'Wattmètre ISW8000'},pince:{n:'Pince ampèremétrique (PROVA 21)'},rel:{n:'Relais'},ctc:{n:'Contacteur 2 NO'},mdc:{n:'Moteur à courant continu'},mac:{n:'Moteur asynchrone monophasé'},led:{n:'Lampe à LED'},cfl:{n:'Lampe fluocompacte'},a3:{n:'Alimentation triphasée',v:400},cch:{n:'Caisse de charge',v:1000},m3:{n:'Moteur asynchrone triphasé'},sv:{n:'Sonde de tension'},sc:{n:'Sonde de courant'},tach:{n:'Compte-tours'},cpm:{n:'Couple-mètre'},bb:{n:'Boîte noire'},dio:{n:'Diode'},ldr:{n:'Photorésistance (LDR)'},irrx:{n:'Récepteur infrarouge (phototransistor)'},hcsr:{n:'Capteur ultrason HC-SR04'},uno:{n:'Arduino Uno'},pot:{n:'Potentiomètre',v:10000,u:'Ω'},pb:{n:'Bouton poussoir'},dled:{n:'LED'},bread:{n:'Platine d’essai (breadboard)'},ne555:{n:'NE555'},aop:{n:'AOP LF356'},cmp:{n:'Comparateur LM311'},com:{n:'Commutateur 2 voies (3 bornes)'},gbf:{n:'GBF (générateur de fonctions)'},scope:{n:'Oscilloscope 2 voies'},sw:{n:'Interrupteur'},amp:{n:'Multimètre (ampèremètre)'},volt:{n:'Multimètre (voltmètre)'}};
 const DIP8={t:[[-39,39],[-13,39],[13,39],[39,39],[39,-39],[13,-39],[-13,-39],[-39,-39]],b:[-62,-62,124,124]};
 const GEO={gbf:{t:[[62,43,'b'],[62,28,'b']],b:[-100,-55,200,110]},scope:{t:[[-90,103,'b'],[-90,88,'b'],[-30,103,'b'],[-30,88,'b']],b:[-150,-110,300,220]},cap:{t:[[-52,0],[52,0]],b:[-70,-20,140,40]},ind:{t:[[-52,0],[52,0]],b:[-70,-20,140,40]},watt:{t:[[75,16],[75,-26],[115,16],[115,-26]],b:[-130,-60,260,120]},pince:{t:[[194,18],[194,-16]],b:[-45,-45,257,90]},rel:{t:[[-60,44],[-30,44],[20,44],[50,44],[80,44]],b:[-90,-60,180,120]},ctc:{t:[[-90,44],[-60,44],[-20,44],[10,44],[45,44],[75,44]],b:[-110,-60,220,120]},mdc:{t:[[-25,37],[25,37]],b:[-50,-50,100,100]},mac:{t:[[-25,37],[25,37]],b:[-50,-50,100,100]},led:{t:[[-26,40],[26,40]],b:[-45,-70,90,125]},cfl:{t:[[-26,40],[26,40]],b:[-45,-70,90,125]},a3:{t:[[-75,36],[-25,36],[25,36],[75,36]],b:[-110,-55,220,110]},cch:{t:[[-70,38],[-40,38],[10,38],[40,38],[70,38]],b:[-90,-50,180,100]},m3:{t:[[-40,37],[0,37],[40,37]],b:[-60,-52,120,102]},
- sv:{t:[[45,7,'b'],[45,-8,'b'],[-50,16],[-50,-16]],b:[-75,-35,150,70]},sc:{t:[[100,9,'b'],[100,-6,'b']],b:[-45,-45,175,90]},tach:{t:[],b:[-48,-40,96,78]},cpm:{t:[],b:[-72,-44,144,72]},bb:{t:[[-25,36],[25,36]],b:[-60,-34,120,82]},bbQ:{t:[[-92,-30],[-92,30],[92,-30],[92,30]],b:[-112,-58,224,116]},ne555:DIP8,aop:DIP8,cmp:DIP8,dio:{t:[[-52,0],[52,0]],b:[-70,-20,140,40]},ldr:{t:[[-13,46],[13,46]],b:[-40,-50,80,116]},irrx:{t:[[-13,46],[13,46]],b:[-40,-50,80,116]},hcsr:{t:[[-39,64],[-13,64],[13,64],[39,64]],b:[-90,-62,180,148]},dled:{t:[[-13,46],[13,46]],b:[-40,-44,80,112]},com:{t:[[-45,24],[0,24],[45,24]],b:[-65,-32,130,66]},ac:{t:[[-40,34],[40,34]],b:[-95,-50,190,100]},bat:{t:[[-35,34],[35,34]],b:[-85,-50,170,100]},res:{t:[[-52,0],[52,0]],b:[-70,-20,140,40]},bulb:{t:[[-26,40],[26,40]],b:[-45,-55,90,110]},sw:{t:[[-42,22],[42,22]],b:[-60,-30,120,64]},amp:{t:[[-24,62],[24,62]],b:[-48,-75,96,150]}};/* platine d'essai : 20 colonnes x (5+5) trous + 4 rails ; trou = [x,y,'h',bande] */
+ sv:{t:[[45,7,'b'],[45,-8,'b'],[-50,16],[-50,-16]],b:[-75,-35,150,70]},sc:{t:[[100,9,'b'],[100,-6,'b']],b:[-45,-45,175,90]},tach:{t:[],b:[-48,-40,96,78]},cpm:{t:[],b:[-72,-44,144,72]},bb:{t:[[-25,36],[25,36]],b:[-60,-34,120,82]},bbQ:{t:[[-92,-30],[-92,30],[92,-30],[92,30]],b:[-112,-58,224,116]},ne555:DIP8,aop:DIP8,cmp:DIP8,dio:{t:[[-52,0],[52,0]],b:[-70,-20,140,40]},ldr:{t:[[-13,46],[13,46]],b:[-40,-50,80,116]},irrx:{t:[[-13,46],[13,46]],b:[-40,-50,80,116]},hcsr:{t:[[-39,64],[-13,64],[13,64],[39,64]],b:[-90,-62,180,148]},dled:{t:[[-13,46],[13,46]],b:[-40,-44,80,112]},com:{t:[[-45,24],[0,24],[45,24]],b:[-65,-32,130,66]},ac:{t:[[-40,34],[40,34]],b:[-95,-50,190,100]},bat:{t:[[-35,34],[35,34]],b:[-85,-50,170,100]},bat2:{t:[[-70,34],[-26,34],[26,34],[70,34]],b:[-100,-50,200,100]},tsop:{t:[[-26,46],[0,46],[26,46]],b:[-60,-52,90,122]},res:{t:[[-52,0],[52,0]],b:[-70,-20,140,40]},bulb:{t:[[-26,40],[26,40]],b:[-45,-55,90,110]},sw:{t:[[-42,22],[42,22]],b:[-60,-30,120,64]},amp:{t:[[-24,62],[24,62]],b:[-48,-75,96,150]}};/* platine d'essai : 20 colonnes x (5+5) trous + 4 rails ; trou = [x,y,'h',bande] */
 const BP=26,BC=20,BROW=[-143,-117,-91,-65,-39,39,65,91,117,143],BRAIL=[-221,-195,195,221],BX0=-(BC-1)/2*BP;
 GEO.bread=(()=>{const t=[];for(let ci=0;ci<BC;ci++)BROW.forEach((y,ri)=>t.push([BX0+ci*BP,y,'h',(ri<5?0:BC)+ci]));
  BRAIL.forEach((y,r)=>{for(let ci=0;ci<BC;ci++)t.push([BX0+ci*BP,y,'h',2*BC+r])});return{t,b:[-275,-247,550,494]}})();
@@ -26,7 +26,7 @@ GEO.volt=GEO.amp;GEO.voltA=GEO.ampA={t:[[-25,98],[25,98]],b:[-95,-100,190,215]};
 const TD=[];for(let e=-7;e<=-1;e++)[1,2,5].forEach(m=>TD.push(+(m+'e'+e)));
 const VD=[0.005,0.01,0.02,0.05,0.1,0.2,0.5,1,2,5,10,20];let pairId=1;const RV=[0.1,1,3,10,30,100,300,1000],RA=[0.001,0.01,0.1,0.3,1,3,10];
 const UNITS={lux:[['lx',1]],cm:[['cm',1]],V:[['mV',1e-3],['V',1],['kV',1e3]],Om:[['mΩ',1e-3],['Ω',1],['kΩ',1e3],['MΩ',1e6]],uF:[['pF',1e-6],['nF',1e-3],['µF',1],['mF',1e3]],mH:[['µH',1e-3],['mH',1],['H',1e3]],W:[['mW',1e-3],['W',1],['kW',1e3]],Hz:[['Hz',1],['kHz',1e3],['MHz',1e6]],A:[['mA',1e-3],['A',1]],rpm:[['tr/min',1]],pct:[['%',1]],NU:[['',1]],PCT:[['%',0.01]]};
-const FIELDS={bat:[['val','Tension',UNITS.V,{min:0,max:30,sl:[0,30,0.5]}]],
+const FIELDS={bat:[['val','Tension',UNITS.V,{min:0,max:30,sl:[0,30,0.5]}],['il','Limite de courant',UNITS.A,{min:.01,max:10,sl:[.01,10,.01]}]],bat2:[['val','CH1 – tension',UNITS.V,{min:0,max:30,sl:[0,30,0.5]}],['il','CH1 – limite de courant',UNITS.A,{min:.01,max:10,sl:[.01,10,.01]}],['val2','CH2 – tension',UNITS.V,{min:0,max:30,sl:[0,30,0.5]}],['il2','CH2 – limite de courant',UNITS.A,{min:.01,max:10,sl:[.01,10,.01]}]],tsop:[['fc','Fréquence de la porteuse',UNITS.Hz,{min:20000,max:70000,sl:[20000,70000,100]}],['amb','Lumière ambiante parasite',UNITS.pct,{min:0,max:100,sl:[0,100,1]}]],irrx:[['amb','Lumière ambiante parasite',UNITS.pct,{min:0,max:100,sl:[0,100,1]}]],
  ac:[['val','Tension efficace',UNITS.V,{min:0,max:230,sl:[0,230,1]}],['f','Fréquence',UNITS.Hz,{min:1,max:1e6,sl:'log'}]],
  gbf:[['amp','Amplitude crête',UNITS.V,{min:0,max:12,sl:[0,12,0.1]}],['f','Fréquence',UNITS.Hz,{min:10,max:1e6,sl:'log'}],['off','Offset',UNITS.V,{min:-12,max:12}],['duty','Rapport cyclique',UNITS.PCT,{min:.05,max:.95,sl:[.05,.95,.01]}]],
  ldr:[['lux','Éclairement',UNITS.lux,{min:0.1,max:1e4,sl:'log'}]],pot:[['pos','Position du curseur',UNITS.PCT,{min:0,max:1,sl:[0,1,.01]}],['val','Résistance totale',UNITS.Om,{min:100}]],hcsr:[['dist','Distance de l’obstacle',UNITS.cm,{min:2,max:400,sl:[2,400,1]}]],
@@ -42,12 +42,12 @@ const FIELDS={bat:[['val','Tension',UNITS.V,{min:0,max:30,sl:[0,30,0.5]}]],
  m3:[['ml','Charge (0 = à vide · 1 = nominale · 1,2 max)',UNITS.NU,{min:0,max:1.2,sl:[0,1.2,0.01]}],['pn','Puissance utile',UNITS.W,{min:1}],['un','Tension d’enroulement',UNITS.V,{min:1}],['i0r','Courant à vide (% de In)',UNITS.PCT,{min:0.05,max:1}],['cos0','cos φ à vide',UNITS.NU,{min:0.05,max:0.9}],['cosphi','cos φ',UNITS.NU,{min:0.1,max:1}],['eta','Rendement',UNITS.PCT,{min:0.1,max:1}]],
  aop:[['vm','Marge de saturation (V)',UNITS.V,{min:0,max:5}]],cmp:[['vm','Marge de saturation (V)',UNITS.V,{min:0,max:5}]]};
 const selH=(p,o,v)=>`<select data-p="${p}">${o.map(([a,l])=>`<option value="${a}"${String(a)===String(v)?' selected':''}>${l}</option>`).join('')}</select>`;
-const COLS=['#d32f2f','#1b1b1b','#1976d2','#2e7d32','#f9a825','#fb8c00','#8e24aa','#6d4c41','#9e9e9e'];const VERSION='3.0.1';
+const COLS=['#d32f2f','#1b1b1b','#1976d2','#2e7d32','#f9a825','#fb8c00','#8e24aa','#6d4c41','#9e9e9e'];const VERSION='3.1';
 let comps=[],wires=[],sel=null,selW=null,pend=null,mouse={x:0,y:0},drag=null,wd=null,notes=[],selN=null,uid=1,err='',theory=false;
 const cv=document.getElementById('cv'),st=document.getElementById('st'),pn=document.getElementById('pn');
 const T=(c,i)=>{const t=geo(c).t[i];return{x:c.x+t[0],y:c.y+t[1]}};
 const tp=k=>{const[id,i]=k.split(':');const c=comps.find(c=>c.id==id);return c?T(c,+i):null};
-function add(type,x,y){const c={id:uid++,type,x:x??450,y:y??300,val:INFO[type].v,f:type==='gbf'?1000:50,un:({rel:12,ctc:24,mdc:12,mac:230,led:230,cfl:230,m3:230,cch:230})[type]||6,cm:'mono',cpl:'Y',ratio:type==='sc'?100:10,xy:false,ml:1,i0r:({mac:.55,m3:.4})[type]||.5,cos0:({mac:.25,m3:.2})[type]||.2,vm:type==='cmp'?.3:1.5,oc:false,name:'',kind:'d',net:'',lk:'',rc:type==='ctc'?100:120,on:false,run:0,ra:2,la:5,i0:.15,n0:3000,inom:1.5,load:0,pn:({led:8,cfl:11,mac:370,m3:1500})[type]||0,cosphi:({led:.6,cfl:.55,mac:.82,m3:.84})[type]||1,eta:({m3:.8})[type]||.7,r:5,mode:type==='pince'?'AC':'DC',lux:100,dist:100,blk:false,wave:'sin',duty:.5,dk:'d4148',lc:'rouge',amp:5,off:0,td:1e-3,v1:1,v2:1,cp1:'DC',cp2:'DC',on1:true,on2:true,trig:1,pos1:0,pos2:0,cur:{x1:2,x2:6,y1:2,y2:-2},cch:1,rng:type==='amp'?1:10,disp:type==='pince'?'A':'W',rev:false,pos:type==='pot'?.5:0,code:type==='uno'?LaboArduino.EXAMPLES[0].code:'',closed:type==='sw'?false:undefined};comps.push(c);sel=c.id;selW=null;panel();render();return c}
+function add(type,x,y){const c={id:uid++,type,x:x??450,y:y??300,val:INFO[type].v,f:type==='gbf'?1000:50,un:({rel:12,ctc:24,mdc:12,mac:230,led:230,cfl:230,m3:230,cch:230})[type]||6,cm:'mono',cpl:'Y',ratio:type==='sc'?100:10,xy:false,ml:1,i0r:({mac:.55,m3:.4})[type]||.5,cos0:({mac:.25,m3:.2})[type]||.2,vm:type==='cmp'?.3:1.5,oc:false,name:'',kind:'d',net:'',lk:'',rc:type==='ctc'?100:120,on:false,run:0,ra:2,la:5,i0:.15,n0:3000,inom:1.5,load:0,pn:({led:8,cfl:11,mac:370,m3:1500})[type]||0,cosphi:({led:.6,cfl:.55,mac:.82,m3:.84})[type]||1,eta:({m3:.8})[type]||.7,r:5,mode:type==='pince'?'AC':'DC',lux:100,dist:100,blk:false,wave:'sin',duty:.5,dk:'d4148',lc:'rouge',amp:5,off:0,td:1e-3,v1:1,v2:1,cp1:'DC',cp2:'DC',on1:true,on2:true,trig:1,pos1:0,pos2:0,cur:{x1:2,x2:6,y1:2,y2:-2},cch:1,rng:type==='amp'?1:10,disp:type==='pince'?'A':'W',rev:false,il:10,val2:9,il2:10,fc:38000,amb:0,pos:type==='pot'?.5:0,code:type==='uno'?LaboArduino.EXAMPLES[0].code:'',closed:type==='sw'?false:undefined};comps.push(c);sel=c.id;selW=null;panel();render();return c}
 function defCol(a,b){for(const k of[a,b]){const c=comps.find(c=>c.id==k.split(':')[0]),i=k.split(':')[1];if(c&&c.type==='ac')return i==='1'?COLS[0]:COLS[2];if(c&&c.type==='watt')return[COLS[2],COLS[0],COLS[1],COLS[0]][+i];if(c&&c.type==='bb')return[COLS[0],COLS[1],COLS[0],COLS[1]][+i];if(c&&c.type==='a3')return[COLS[2],COLS[4],COLS[3],COLS[0]][+i];if(c&&['bat','amp','volt','pince','gbf','scope','sv','sc'].includes(c.type))return(+i)%2?COLS[0]:COLS[1]}return COLS[2]}
 function wire(a,b){wires.push({a,b,col:defCol(a,b)})}
 const kindOf=k=>{const[id,i]=k.split(':'),c=comps.find(c=>c.id==id);return c?geo(c).t[+i][2]:0};
@@ -83,7 +83,7 @@ function solveOnce(){
  comps.forEach(c=>{if(c.type!=='bread')geo(c).t.forEach((_,i)=>f(c.id+':'+i))});wires.forEach(x=>{f(x.a);f(x.b)});bridges().forEach(([a,b])=>{par[f(a)]=f(b)});
  comps.forEach(c=>{if(c.type==='bb')bbP(c).els.forEach(e=>[e.a,e.b,e.c,e.d].forEach(n=>{if(n)f(bbKey(c,n))}))});
  comps.forEach(c=>{if(c.type==='scope')par[f(c.id+':0')]=f(c.id+':2');if(c.type==='watt')par[f(c.id+':1')]=f(c.id+':3')});  /* masses reliées (oscilloscope, wattmètre) */
- const isS=c=>c.type==='bat'||c.type==='ac'||c.type==='gbf'||c.type==='a3',b0=comps.find(isS),g=f((b0||comps[0]).id+':0');
+ const isS=c=>c.type==='bat'||c.type==='bat2'||c.type==='ac'||c.type==='gbf'||c.type==='a3',b0=comps.find(isS),g=f((b0||comps[0]).id+':0');
  const map={};let m=0;Object.keys(par).forEach(k=>{const r=f(k);if(r!==g&&map[r]===undefined)map[r]=m++});
  const ix=k=>{const r=f(k);return r===g?-1:map[r]};
  /* colonne 0 = continu ; colonnes q>0 = phaseurs efficaces (réf. cosinus) à chaque fréquence/harmonique ; sources de même fréquence supposées en phase */
@@ -91,9 +91,9 @@ function solveOnce(){
  const gh=gbfHarm;
  const src=[];comps.forEach(c=>{if(c.type==='a3'){const Vp=c.val/Math.sqrt(3),fq=col(c.f);[[1,0],[2,-120],[3,120]].forEach(([k,d])=>{const ev={};if(Vp>0)ev[fq]=[Vp*Math.cos(d*Math.PI/180),Vp*Math.sin(d*Math.PI/180)];src.push({c,p:c.id+':'+k,n:c.id+':0',ev})})}
   else if(isS(c)){const ev={};
-   if(c.type==='bat')ev[0]=c.val;else if(c.type==='ac'){if(c.val>0)ev[col(c.f)]=c.val}
+   if(c.type==='bat'||c.type==='bat2')ev[0]=c.val;else if(c.type==='ac'){if(c.val>0)ev[col(c.f)]=c.val}
    else{ev[0]=c.off+(c.wave==='sq'?c.amp*(2*c.duty-1):0);if(c.amp>0)gh(c).forEach(([k,a,b])=>{const q=col(c.f*k);ev[q]=[c.amp*a/Math.SQRT2,c.amp*b/Math.SQRT2]})}
-   src.push({c,p:c.id+':1',n:c.id+':0',ev})}
+   src.push({c,p:c.id+':1',n:c.id+':0',ev,ch:1,lim:c.type==='bat'||c.type==='bat2'?(c.il>0?c.il:10):0});if(c.type==='bat2')src.push({c,p:c.id+':3',n:c.id+':2',ev:{0:c.val2},ch:2,lim:c.il2>0?c.il2:10})}
   else if(c.type==='amp'||(c.type==='sw'&&c.closed))src.push({c,p:c.id+':0',n:c.id+':1',ev:{}});
   else if(c.type==='watt')src.push({c,p:c.id+':2',n:c.id+':0',ev:{}});
   else if(c.type==='sv')src.push({c,p:c.id+':1',n:c.id+':0',ev:{},ctl:[[c.id+':3',1/c.ratio],[c.id+':2',-1/c.ratio]]});
@@ -106,7 +106,7 @@ function solveOnce(){
   if(c.type==='led'||c.type==='cfl'){const R=c.un*c.un/Math.max(c.pn,1e-6),Q=c.pn*Math.tan(Math.acos(Math.min(1,Math.max(.05,c.cosphi)))),C=Q/(2*Math.PI*50*c.un*c.un);return[1/R,w*C]}
   if(c.type==='res')return[1/Math.max(c.val,1e-6),0];if(c.type==='bulb')return[1/Rb(c),0];if(c.type==='volt')return[1e-7,0];
   if(c.type==='cap')return[0,w*c.val*1e-6];if(c.type==='ind'){const L=w*c.val*1e-3,r=Math.max(c.r,1e-3),d=r*r+L*L;return[r/d,-L/d]}return null};
- const n=m+src.length,X=[];
+ const n=m+src.length;let X;const run=()=>{X=[];
  for(let q=0;q<K;q++){const w=ws[q],Ar=Array.from({length:n},()=>new Array(n+1).fill(0)),Ai=Array.from({length:n},()=>new Array(n+1).fill(0));
   for(let i=0;i<m;i++)Ar[i][i]+=1e-9;
   const G=(a,b,gr,gi)=>{const i=ix(a),j=ix(b);if(i>=0){Ar[i][i]+=gr;Ai[i][i]+=gi}if(j>=0){Ar[j][j]+=gr;Ai[j][j]+=gi}if(i>=0&&j>=0){Ar[i][j]-=gr;Ai[i][j]-=gi;Ar[j][i]-=gr;Ai[j][i]-=gi}};
@@ -117,12 +117,20 @@ function solveOnce(){
    if(c.type==='m3'){const y=m3Y(c,w);[[0,1],[1,2],[2,0]].forEach(([i,j])=>G(c.id+':'+i,c.id+':'+j,y[0],y[1]))}if(c.type==='rel'){G(c.id+':0',c.id+':1',1/Math.max(c.rc,1),0);G(c.id+':2',c.id+(c.on?':3':':4'),200,0)}if(c.type==='ctc'){G(c.id+':0',c.id+':1',1/Math.max(c.rc,1),0);if(c.on){G(c.id+':2',c.id+':3',200,0);G(c.id+':4',c.id+':5',200,0)}}});
   wires.forEach(x=>G(x.a,x.b,1/Rw,0));
   if(q===0)comps.forEach(c=>{if(c.type==='mdc'&&c.run){const I=c.run*mdcP(c).Ic,i1=ix(c.id+':1'),i0=ix(c.id+':0');if(i1>=0)Ar[i1][n]-=I;if(i0>=0)Ar[i0][n]+=I}});
-  src.forEach((s,k)=>{const r=m+k,p=ix(s.p),o=ix(s.n);if(p>=0){Ar[p][r]+=1;Ar[r][p]+=1}if(o>=0){Ar[o][r]-=1;Ar[r][o]-=1}const e=s.ev[q]||0;Ar[r][n]=Array.isArray(e)?e[0]:e;Ai[r][n]=Array.isArray(e)?e[1]:0;if(s.ctl)s.ctl.forEach(([kk,cf])=>{const j=ix(kk);if(j>=0)Ar[r][j]-=cf})});
+  src.forEach((s,k)=>{const r=m+k,p=ix(s.p),o=ix(s.n);if(p>=0){Ar[p][r]+=1;Ar[r][p]+=1}if(o>=0){Ar[o][r]-=1;Ar[r][o]-=1}const e=s.ev[q]||0;Ar[r][n]=Array.isArray(e)?e[0]:e;Ai[r][n]=Array.isArray(e)?e[1]:0;if(s.ctl)s.ctl.forEach(([kk,cf])=>{const j=ix(kk);if(j>=0)Ar[r][j]-=cf});if(s.cc){for(let j=0;j<=n;j++){Ar[r][j]=0;Ai[r][j]=0}Ar[r][r]=1;Ar[r][n]=q===0?-s.lim:0}});
   for(let c=0;c<n;c++){let p=c,best=-1;for(let r=c;r<n;r++){const v=Ar[r][c]**2+Ai[r][c]**2;if(v>best){best=v;p=r}}
    if(best<1e-24){err='Court-circuit détecté : vérifie ton câblage (ampèremètre en dérivation ?).';return}
    [Ar[c],Ar[p]]=[Ar[p],Ar[c]];[Ai[c],Ai[p]]=[Ai[p],Ai[c]];const pr=Ar[c][c],pi=Ai[c][c],den=pr*pr+pi*pi;
    for(let r=0;r<n;r++)if(r!==c){const kr=(Ar[r][c]*pr+Ai[r][c]*pi)/den,ki=(Ai[r][c]*pr-Ar[r][c]*pi)/den;if(kr||ki)for(let j=c;j<=n;j++){const a=Ar[c][j],b=Ai[c][j];Ar[r][j]-=kr*a-ki*b;Ai[r][j]-=kr*b+ki*a}}}
   const xr=[],xi=[];for(let i=0;i<n;i++){const pr=Ar[i][i],pi=Ai[i][i],den=pr*pr+pi*pi;xr.push((Ar[i][n]*pr+Ai[i][n]*pi)/den);xi.push((Ai[i][n]*pr-Ar[i][n]*pi)/den)}X[q]={r:xr,i:xi}}
+ return true};
+ if(!run())return;
+ for(let pass=0;pass<8;pass++){let chg=false;
+  src.forEach((s,k)=>{if(!(s.lim>0))return;const ir=X[0].r[m+k];
+   if(!s.cc){if(-ir>s.lim*(1+1e-9)+1e-12){s.cc=true;chg=true}}
+   else{const gv=z=>{const i=ix(z);return i<0?0:X[0].r[i]};if(gv(s.p)-gv(s.n)>=s.ev[0]-1e-9){s.cc=false;chg=true}}});
+  if(!chg)break;if(!run())return}
+ src.forEach(s=>{if(s.lim>0){if(s.ch===2)s.c.cc2=!!s.cc;else s.c.cc=!!s.cc}});
  for(let k=0;k<src.length;k++){let t=0;X.forEach(x=>{t+=x.r[m+k]**2+x.i[m+k]**2});if(Math.sqrt(t)>100){err='Court-circuit détecté : courant excessif (> 100 A).';return}}
  const Vc=(k,q)=>{const i=ix(k);return i<0?[0,0]:[X[q].r[i],X[q].i[i]]};
  const WI=wires.map(x=>X.map((_,q)=>{const a=Vc(x.a,q),b=Vc(x.b,q);return[(a[0]-b[0])/Rw,(a[1]-b[1])/Rw]}));   /* courant a→b dans chaque câble */
@@ -145,6 +153,7 @@ function solveOnce(){
    X.forEach((_,q)=>pr.forEach(([i,j])=>{const a=Vc(c.id+':'+i,q),b=Vc(c.id+':'+j,q),u=[a[0]-b[0],a[1]-b[1]],y=c.type==='cch'?[cchY(c),0]:m3Y(c,ws[q]),cu=[u[0]*y[0]-u[1]*y[1],u[0]*y[1]+u[1]*y[0]];P+=u[0]*cu[0]+u[1]*cu[1];Q+=u[1]*cu[0]-u[0]*cu[1]}));c.P=P;c.Q=Q;
    if(c.type==='m3'){let bb=-1,f=0;ac.forEach((x,k)=>{const m=Math.hypot(x[0],x[1]);if(m>bb){bb=m;f=ws[k+1]/(2*Math.PI)}});const Uw=c.cpl==='D'?c.Ur:c.Ur/Math.sqrt(3);c.rps=Uw>=.6*c.un&&f>0?f/2*(1-.04*c.ml):0;c.rpm=c.rps*60}}
   if(c.type==='scope'){c.ws=ws;c.sig=[0,2].map(o=>X.map((_,q)=>{const a=Vc(c.id+':'+(o+1),q),b=Vc(c.id+':'+o,q);return[a[0]-b[0],a[1]-b[1]]}))}});
+ comps.forEach(c=>{if(c.type==='bat2'){const k2=src.findIndex(s=>s.c===c&&s.ch===2),a=Vc(c.id+':3',0),b=Vc(c.id+':2',0);c.U2=a[0]-b[0];c.I2=-X[0].r[m+k2];c.P=(c.P||0)+c.U2*c.I2}});
  comps.forEach(c=>{if(c.type==='tach'||c.type==='cpm'){let best=null,bd=110;comps.forEach(m=>{if(m.type==='mdc'||m.type==='mac'||m.type==='m3'){const d=Math.hypot(m.x-c.x,m.y-c.y);if(d<bd){bd=d;best=m}}});c.tgt=best?best.id:null;c.tv=best?(c.type==='tach'?(best.rpm||0):torque(best)):undefined}});
 }
 /* relais / contacteurs : l'état dépend de la tension efficace de la bobine (hystérésis 80 % / 30 %) -> itération */
@@ -209,27 +218,27 @@ function finishCapture(){const kind=capt.kind,picked=capt.picked,names=BBN[kind]
  const bb=add('bb',cx,cy);bb.kind=kind;bb.name='BN'+comps.filter(x=>x.type==='bb').length;bb.net=bbEnc(L.join('\n'));sel=bb.id;panel();render();
  st.textContent='Boîte noire '+bb.name+' créée : '+S.length+' composant(s) convertis. Reconnecte-la au montage ; « 🔒 Édition » permet de vérifier la netlist.'}
 /* ---- Simulation temporelle (circuits intégrés : NE555, AOP, comparateur) ---- */
-const ACTIVE=new Set(['ne555','aop','cmp','dio','dled','irrx','hcsr','uno','pot','pb']);
+const ACTIVE=new Set(['ne555','aop','cmp','dio','dled','irrx','hcsr','uno','pot','pb','tsop']);
 /* diodes : modèle linéaire par morceaux  (bloquée / passante V0 + rd·I / Zener -Vz + rz·I) */
 const DK={d4148:['1N4148',.55,5],d4007:['1N4007',.65,.25],z33:['Zener 3,3 V',.6,2,3.3,10],z51:['Zener 5,1 V',.6,2,5.1,8],z91:['Zener 9,1 V',.6,2,9.1,10]},
  LC={ir:['Infrarouge (940 nm)',1.25,'#7b5a7b'],rouge:['Rouge',1.85,'#ff2a2a'],orange:['Orange',1.95,'#ff8a1a'],jaune:['Jaune',2.05,'#ffe100'],vert:['Vert',2.15,'#2bd34a'],bleu:['Bleu',3.0,'#2f6bff'],blanc:['Blanc',3.1,'#f4f8ff']};
 function dmod(c){if(c.type==='dled'){const l=LC[c.lc]||LC.rouge;return{v0:l[1]-.1,rd:10,vz:0,rz:10}}const d=DK[c.dk]||DK.d4148;return{v0:d[1],rd:d[2],vz:d[3]||0,rz:d[4]||10}}
 const dcur=(m,v)=>v>m.v0?(v-m.v0)/m.rd:(m.vz&&v<-m.vz)?(v+m.vz)/m.rz:0;let tranMode=false,tranNote='',tranCache=null;
-const TSKIP=new Set(['iph','x','y','v1','v2','cp1','cp2','on1','on2','trig','pos1','pos2','cur','cch','xy','u','tgt','tv','cl','sig','tr','ws','U','I','P','Q','Ur','Ir','Ua','Ia','rps','rpm','mode','disp','rev','rng','ana','bbp']);
+const TSKIP=new Set(['cc','cc2','U2','I2','det','tsA','iph','x','y','v1','v2','cp1','cp2','on1','on2','trig','pos1','pos2','cur','cch','xy','u','tgt','tv','cl','sig','tr','ws','U','I','P','Q','Ur','Ir','Ua','Ia','rps','rpm','mode','disp','rev','rng','ana','bbp']);
 function gaussR(A,b,S){for(let c=0;c<S;c++){let p=c,m=Math.abs(A[c][c]);for(let r=c+1;r<S;r++){const v=Math.abs(A[r][c]);if(v>m){m=v;p=r}}if(m<1e-30)return null;if(p!==c){const t=A[c];A[c]=A[p];A[p]=t;const u=b[c];b[c]=b[p];b[p]=u}
   const d=A[c][c];for(let r=c+1;r<S;r++){const k=A[r][c]/d;if(k){for(let j=c;j<S;j++)A[r][j]-=k*A[c][j];b[r]-=k*b[c]}}}
  const x=new Float64Array(S);for(let i=S-1;i>=0;i--){let s=b[i];for(let j=i+1;j<S;j++)s-=A[i][j]*x[j];x[i]=s/A[i][i]}return x}
 function tranModel(){const par={},f=k=>{if(par[k]===undefined)par[k]=k;return par[k]===k?k:(par[k]=f(par[k]))},EL=[],VS=[],unsup=new Set();
  comps.forEach(c=>{if(c.type!=='bread')geo(c).t.forEach((_,i)=>f(c.id+':'+i))});wires.forEach(w=>{try{if(tp(w.a)&&tp(w.b))par[f(w.a)]=f(w.b)}catch(e){}});bridges().forEach(([a,b])=>{par[f(a)]=f(b)});
  comps.forEach(c=>{if(c.type==='scope')par[f(c.id+':0')]=f(c.id+':2')});
- const addV=(p,n,fn)=>{const e={t:'V',p,n,f:fn,k:VS.length};VS.push(e);EL.push(e)};
+ const addV=(p,n,fn,lim,cid,ch)=>{const e={t:'V',p,n,f:fn,k:VS.length,lim,cid,ch};VS.push(e);EL.push(e)};
  comps.forEach(c=>{const k=i=>c.id+':'+i,R=(a,b,r)=>EL.push({t:'R',a,b,r});
   switch(c.type){
    case'res':R(k(0),k(1),c.val);break;case'bulb':R(k(0),k(1),c.un*c.un/c.val);break;
    case'led':case'cfl':{R(k(0),k(1),c.un*c.un/c.pn);const Q=c.pn*Math.tan(Math.acos(Math.min(1,Math.max(.05,c.cosphi))));if(Q>0)EL.push({t:'C',a:k(0),b:k(1),c:Q/(2*Math.PI*50*c.un*c.un)});break}
    case'cap':EL.push({t:'C',a:k(0),b:k(1),c:c.val*1e-6});break;case'ind':EL.push({t:'L',a:k(0),b:k(1),l:c.val*1e-3,r:c.r});break;
    case'sw':if(c.closed)R(k(0),k(1),1e-3);break;case'com':R(k(1),k(c.pos?2:0),1e-3);break;case'amp':R(k(0),k(1),1e-3);break;case'volt':R(k(0),k(1),1e7);break;
-   case'bat':addV(k(1),k(0),()=>c.val);break;case'ac':addV(k(1),k(0),t=>Math.SQRT2*c.val*Math.cos(2*Math.PI*c.f*t));break;
+   case'bat':addV(k(1),k(0),()=>c.val,c.il>0?c.il:10,c.id,1);break;case'bat2':addV(k(1),k(0),()=>c.val,c.il>0?c.il:10,c.id,1);addV(k(3),k(2),()=>c.val2,c.il2>0?c.il2:10,c.id,2);break;case'ac':addV(k(1),k(0),t=>Math.SQRT2*c.val*Math.cos(2*Math.PI*c.f*t));break;
    case'gbf':addV(k(1),k(0),t=>gbfWave(c,t));break;
    case'a3':[0,-120,120].forEach((d,i)=>addV(k(i+1),k(0),t=>Math.SQRT2*c.val/Math.sqrt(3)*Math.cos(2*Math.PI*c.f*t+d*Math.PI/180)));break;
    case'cch':if(c.val>0){if(c.cm==='tri'){const r=3*c.un*c.un/c.val;R(k(2),k(3),r);R(k(3),k(4),r);R(k(4),k(2),r)}else R(k(0),k(1),c.un*c.un/c.val)}break;
@@ -241,34 +250,35 @@ function tranModel(){const par={},f=k=>{if(par[k]===undefined)par[k]=k;return pa
    case'cmp':EL.push({t:'CP',p:k(1),n:k(2),o:k(6),vp:k(7),vn:k(3),vm:c.vm,oc:c.oc});break;
    case'dio':case'dled':{const m=dmod(c);EL.push({t:'D',a:k(0),b:k(1),v0:m.v0,rd:m.rd,vz:m.vz,rz:m.rz,emit:c.type==='dled'&&c.lc==='ir',px:c.x,py:c.y});break}
    case'ldr':R(k(0),k(1),ldrR(c));break;
-   case'irrx':EL.push({t:'PT',c:k(0),e:k(1),cid:c.id,px:c.x,py:c.y,blk:c.blk,src:[]});break;
+   case'irrx':EL.push({t:'PT',c:k(0),e:k(1),cid:c.id,px:c.x,py:c.y,blk:c.blk,amb:c.amb||0,src:[]});break;case'tsop':EL.push({t:'TS',o:k(0),g:k(1),vcc:k(2),cid:c.id,px:c.x,py:c.y,blk:c.blk,fc:Math.max(1000,c.fc||38000),amb:c.amb||0,src:[]});break;
    case'hcsr':EL.push({t:'US',vcc:k(0),trg:k(1),o:k(2),g:k(3),dist:c.dist,cid:c.id});break;
    case'pot':{const x=Math.min(.999,Math.max(.001,c.pos));R(k(0),k(1),c.val*x);R(k(1),k(2),c.val*(1-x));break}
    case'pb':if(c.closed)R(k(0),k(1),1e-3);break;
    case'uno':{par[f(k(23))]=f(k(22));addV(k(20),k(22),()=>5);addV(k(21),k(22),()=>3.3);EL.push({t:'MCU',cid:c.id,pin:Array.from({length:20},(_,i)=>k(i)),vcc:k(20),g:k(22),eng:engOf(c)});break}
    case'tach':case'cpm':case'bread':break;default:unsup.add(INFO[c.type].n)}});
- EL.filter(e=>e.t==='PT').forEach(p=>{p.src=EL.filter(q=>q.t==='D'&&q.emit).map(q=>({el:q,k:.05/(1+Math.pow(Math.hypot(q.px-p.px,q.py-p.py)/250,2))*(p.blk?.02:1)}))});
- const gs=comps.find(c=>['bat','ac','gbf','a3'].includes(c.type))||comps.find(c=>c.type==='uno'),g=f((gs||comps[0]).id+':0'),map={};let n=0;Object.keys(par).forEach(k=>{const r=f(k);if(r!==g&&map[r]===undefined)map[r]=n++});
+ EL.filter(e=>e.t==='PT'||e.t==='TS').forEach(p=>{p.src=EL.filter(q=>q.t==='D'&&q.emit).map(q=>({el:q,k:.05/(1+Math.pow(Math.hypot(q.px-p.px,q.py-p.py)/250,2))*(p.blk?.02:1)}))});
+ const gs=comps.find(c=>['bat','bat2','ac','gbf','a3'].includes(c.type))||comps.find(c=>c.type==='uno'),g=f((gs||comps[0]).id+':0'),map={};let n=0;Object.keys(par).forEach(k=>{const r=f(k);if(r!==g&&map[r]===undefined)map[r]=n++});
  return{EL,VS,n,ix:k=>{const r=f(k);return r===g?-1:map[r]},unsup:[...unsup]}}
 function tranCore(M){let dt=1e-6,ts=0,rc=true;const n=M.n,S=n+M.VS.length,E=M.EL,ix=M.ix,x=new Float64Array(S),A=Array.from({length:S},()=>new Float64Array(S)),b=new Float64Array(S);
  const V=k=>{const i=ix(k);return i<0?0:x[i]},Gs=(a,c,g)=>{const i=ix(a),j=ix(c);if(i>=0)A[i][i]+=g;if(j>=0)A[j][j]+=g;if(i>=0&&j>=0){A[i][j]-=g;A[j][i]-=g}},Ib=(a,v)=>{const i=ix(a);if(i>=0)b[i]+=v};
- E.forEach(e=>{e.vc=0;e.ip=0;e.st=e.t==='CP'?-1:0;e.q=0;e.ie=0;e.ph=0;e.sm=0;e.cnt=0;e.busy=false;e.prev=false;e.tR=Infinity;e.tF=0;e.uv=0;e.tp=0});
+ E.forEach(e=>{e.vc=0;e.ip=0;e.st=e.t==='CP'?-1:0;e.q=0;e.ie=0;e.ph=0;e.sm=0;e.cnt=0;e.busy=false;e.prev=false;e.tR=Infinity;e.tF=0;e.uv=0;e.tp=0;e.cc=0;e.za1=0;e.zb1=0;e.za2=0;e.zb2=0;e.det=0;e.pp=0;e.wk=0;e.amp=0;e.sI=0;e.sU=0;e.sn=0});
  const step=(t,dtv)=>{dt=dtv;ts=t-dtv;let xn=null;
   for(let it=0;it<40;it++){for(let i=0;i<S;i++){A[i].fill(0);b[i]=0}for(let i=0;i<n;i++)A[i][i]+=1e-12;
    for(const e of E){switch(e.t){
     case'R':Gs(e.a,e.b,1/e.r);break;
     case'C':{const gc=e.c/dt;Gs(e.a,e.b,gc);Ib(e.a,gc*e.vc);Ib(e.b,-gc*e.vc);break}
     case'L':{const gl=1/(e.r+e.l/dt),ih=e.l/dt*gl*e.ip;Gs(e.a,e.b,gl);Ib(e.a,-ih);Ib(e.b,ih);break}
-    case'V':{const r=n+e.k,p=ix(e.p),q=ix(e.n);if(p>=0){A[p][r]+=1;A[r][p]+=1}if(q>=0){A[q][r]-=1;A[r][q]-=1}b[r]=e.f(t);break}
+    case'V':{const r=n+e.k,p=ix(e.p),q=ix(e.n);if(p>=0){A[p][r]+=1;A[r][p]+=1}if(q>=0){A[q][r]-=1;A[r][q]-=1}b[r]=e.f(t);if(e.cc){A[r].fill(0);A[r][r]=1;b[r]=-e.lim}break}
     case'E':{const r=n+e.k,p=ix(e.p),q=ix(e.n),a=ix(e.cp),c=ix(e.cm);if(p>=0){A[p][r]+=1;A[r][p]+=1}if(q>=0){A[q][r]-=1;A[r][q]-=1}if(a>=0)A[r][a]-=e.g;if(c>=0)A[r][c]+=e.g;break}
     case'AO':case'CP':{const o=ix(e.o),p=ix(e.p),q=ix(e.n);let vh=V(e.vp)-e.vm,vl=V(e.vn)+(e.t==='CP'?.1:e.vm);if(vh<=vl)vh=vl=(V(e.vp)+V(e.vn))/2;const go=1/75;
      if(e.t==='AO'){if(o>=0){A[o][o]+=go;if(e.st===0){if(p>=0)A[o][p]-=go*1e5;if(q>=0)A[o][q]+=go*1e5}else b[o]+=go*(e.st>0?vh:vl)}Gs(e.vp,e.vn,1/3000)}
      else{if(e.oc){if(e.st<0)Gs(e.o,e.vn,go)}else if(o>=0){A[o][o]+=go;b[o]+=go*(e.st>0?vh:vl)}Gs(e.vp,e.vn,1/3000)}break}
     case'D':{if(e.st===1){const g=1/e.rd;Gs(e.a,e.b,g);Ib(e.a,g*e.v0);Ib(e.b,-g*e.v0)}else if(e.st===2){const g=1/e.rz;Gs(e.a,e.b,g);Ib(e.a,-g*e.vz);Ib(e.b,g*e.vz)}else Gs(e.a,e.b,1e-9);break}
-    case'PT':{let I=0;for(const q of e.src)I+=q.k*q.el.ie;e.ph=I;if(e.st===1&&I>0)Gs(e.c,e.e,I/.2);else{Gs(e.c,e.e,1e-9);Ib(e.c,-I);Ib(e.e,I)}break}
+    case'PT':{let I=e.amb*2e-5*(1+.3*Math.cos(628.3185*t));for(const q of e.src)I+=q.k*q.el.ie;e.ph=I;if(e.st===1&&I>0)Gs(e.c,e.e,I/.2);else{Gs(e.c,e.e,1e-9);Ib(e.c,-I);Ib(e.e,I)}break}
+    case'TS':{const on=V(e.vcc)-V(e.g)>2.4;Gs(e.vcc,e.g,1/12000);if(on){Gs(e.vcc,e.o,1/30000);if(e.det)Gs(e.o,e.g,1/80)}break}
     case'MCU':{const en=e.eng;for(let p=0;p<20;p++){const d=en?en.drv(p,ts):0,k=e.pin[p];if(d===1)Gs(k,e.vcc,1/25);else if(d===2)Gs(k,e.g,1/25);else if(d===3)Gs(k,e.vcc,1/35000);else Gs(k,e.g,1e-9)}break}
     case'US':{Gs(e.vcc,e.g,.003);Gs(e.trg,e.g,1e-5);if(e.busy)Gs(e.o,e.vcc,.01);else Gs(e.o,e.g,.01);break}
-    case'T5':{Gs(e.vcc,e.ct,5000);Gs(e.ct,e.d1,5000);Gs(e.d1,e.g,5000);Gs(e.vcc,e.g,2700);
+    case'T5':{Gs(e.vcc,e.ct,1/5000);Gs(e.ct,e.d1,1/5000);Gs(e.d1,e.g,1/5000);Gs(e.vcc,e.g,1/2700);
      if(e.q){Gs(e.o,e.vcc,1/30);Ib(e.o,-1.7/30);Ib(e.vcc,1.7/30)}else{Gs(e.o,e.g,1/15);Gs(e.dis,e.g,1/15)}break}
    }}
    xn=gaussR(A,b.slice(),S);if(!xn)return false;for(let i=0;i<S;i++)x[i]=xn[i];
@@ -276,20 +286,31 @@ function tranCore(M){let dt=1e-6,ts=0,rc=true;const n=M.n,S=n+M.VS.length,E=M.EL
     else if(e.t==='CP'){const d=V(e.p)-V(e.n),ns=d>1e-3?1:d<-1e-3?-1:e.st;if(ns!==e.st){e.st=ns;chg=true}}
     else if(e.t==='D'){const v=V(e.a)-V(e.b),ns=v>e.v0?1:(e.vz&&v<-e.vz)?2:0;if(ns!==e.st){e.st=ns;chg=true}}
     else if(e.t==='PT'){const ns=(V(e.c)-V(e.e)<.2&&e.ph>0)?1:0;if(ns!==e.st){e.st=ns;chg=true}}}
+   if(!chg)for(const e of E)if(e.t==='V'&&e.lim>0){const ir=x[n+e.k],vo=V(e.p)-V(e.n);let ns=e.cc;if(!e.cc&&-ir>e.lim*(1+1e-9)+1e-12)ns=1;else if(e.cc&&vo>=e.f(t)-1e-9)ns=0;if(ns!==e.cc){e.cc=ns;chg=true}}
    if(!chg)break}
   for(const e of E){if(e.t==='D'&&e.emit)e.ie=Math.max(0,dcur(e,V(e.a)-V(e.b)));
    if(e.t==='PT'&&rc){e.sm+=e.ph;e.cnt++}
+   if(e.t==='V'&&rc&&e.cid){e.sI-=x[n+e.k];e.sU+=V(e.p)-V(e.n);e.sn++}
    if(e.t==='US'){const pw=V(e.vcc)-V(e.g)>4,vt=V(e.trg)-V(e.g),tg=pw&&vt>2;if(e.prev&&!tg&&pw&&!(t<e.tF)){const f=Math.abs(e.uv-vt)<1e-12?1:Math.min(1,Math.max(0,(e.uv-2)/(e.uv-vt)));e.tR=e.tp+f*(t-e.tp)+2e-4;e.tF=e.tR+2*e.dist/34300}
     const bz=t>=e.tR-1e-12&&t<e.tF-1e-12;if(bz!==e.busy){e.busy=bz;if(M.hook)M.hook(e,t)}e.prev=tg;e.uv=vt;e.tp=t}
    if(e.t==='C')e.vc=V(e.a)-V(e.b);else if(e.t==='L'){const gl=1/(e.r+e.l/dt),ih=e.l/dt*gl*e.ip;e.ip=gl*(V(e.a)-V(e.b))+ih}
    else if(e.t==='T5'){const rl=V(e.rst)-V(e.g)<.7,tl=V(e.trg)<V(e.d1),th=V(e.thr)>V(e.ct);e.q=rl?0:tl?1:th?0:e.q}}
+  for(const e of E){if(e.t!=='TS')continue;const on=V(e.vcc)-V(e.g)>2.4;
+   let ph=e.amb*2e-5*(1+.3*Math.cos(628.3185*t));for(const q of e.src)ph+=q.k*q.el.ie;
+   if(!on){e.za1=e.zb1=e.za2=e.zb2=0;e.det=0;e.amp=0;e.pp=ph;continue}
+   const tau=6/e.fc;
+   if(dt>.25/e.fc){const d=Math.exp(-dt/tau);e.za1*=d;e.zb1*=d;e.za2*=d;e.zb2*=d}
+   else{const w=6.283185307*e.fc*t,al=1-Math.exp(-dt/tau);e.za1+=(2*ph*Math.cos(w)-e.za1)*al;e.zb1+=(2*ph*Math.sin(w)-e.zb1)*al;e.za2+=(e.za1-e.za2)*al;e.zb2+=(e.zb1-e.zb2)*al}
+   if(Math.abs(ph-e.pp)>1e-7)e.wk=t+30/e.fc;e.pp=ph;
+   const A=Math.hypot(e.za2,e.zb2),th=25e-6*(1+2*e.amb/100);if(!e.det&&A>th)e.det=1;else if(e.det&&A<.5*th)e.det=0;e.amp=A}
   return true};
  return{x,n,V,E,step,ix,rec:v=>{rc=v}}}
 function tranRun(M,dt,Nw,Nr){const core=tranCore(M),n=M.n,rec=Array.from({length:n},()=>new Float64Array(Nr));
  for(let st=0;st<Nw+Nr;st++){core.rec(st>=Nw);if(!core.step((st+1)*dt,dt))return null;if(st>=Nw)for(let i=0;i<n;i++)rec[i][st-Nw]=core.x[i]}
  return rec}
 const mean_=a=>{let s=0;for(let i=0;i<a.length;i++)s+=a[i];return s/a.length},rmsac_=a=>{const m=mean_(a);let s=0;for(let i=0;i<a.length;i++)s+=(a[i]-m)**2;return Math.sqrt(s/a.length)};
-function tranCompute(M,td){const dt=td/40,Nw=3000,Nr=3000,rec=tranRun(M,dt,Nw,Nr),out={unsup:M.unsup,st:{},tr:{},err:''};if(!rec){out.err='Circuit non résoluble (court-circuit ou nœud indéterminé)';return out}
+function tranCompute(M,td){let dt=td/40,Nr=3000;const fm=Math.max(0,...M.EL.filter(e=>e.t==='TS').map(e=>e.fc));if(fm>0){dt=Math.min(dt,1/(24*fm));Nr=Math.min(20000,Math.ceil(75*td/dt))}
+ const Nw=3000,rec=tranRun(M,dt,Nw,Nr),out={unsup:M.unsup,st:{},tr:{},err:''};if(!rec){out.err='Circuit non résoluble (court-circuit ou nœud indéterminé)';return out}
  const Z=new Float64Array(Nr),ser=k=>{const i=M.ix(k);return i<0?Z:rec[i]},sub=(a,b)=>{const o=new Float64Array(Nr);for(let i=0;i<Nr;i++)o[i]=a[i]-b[i];return o},mul=(a,b)=>{const o=new Float64Array(Nr);for(let i=0;i<Nr;i++)o[i]=a[i]*b[i];return o};
  comps.forEach(c=>{const k=i=>c.id+':'+i;
   if(['res','bulb','led','cfl','cap','amp','volt','sw','dio','dled','ldr'].includes(c.type)){const v=sub(ser(k(0)),ser(k(1)));let i=null;
@@ -298,6 +319,7 @@ function tranCompute(M,td){const dt=td/40,Nw=3000,Nr=3000,rec=tranRun(M,dt,Nw,Nr
    else if(c.type==='amp'||(c.type==='sw'&&c.closed))i=v.map(x=>x/1e-3);else if(c.type==='volt')i=v.map(x=>x/1e7);else if(c.type==='cap'){i=new Float64Array(Nr);for(let q=1;q<Nr;q++)i[q]=c.val*1e-6*(v[q]-v[q-1])/dt;i[0]=i[1]}
    const s={U:mean_(v),Ua:rmsac_(v)};s.Ur=Math.hypot(s.U,s.Ua);if(i){s.I=mean_(i);s.Ia=rmsac_(i);s.Ir=Math.hypot(s.I,s.Ia);s.P=mean_(mul(v,i))}out.st[c.id]=s}
   if(c.type==='irrx'){const p=M.EL.find(e=>e.t==='PT'&&e.cid===c.id);out.st[c.id]={iph:p&&p.cnt?p.sm/p.cnt:0}}
+  if(c.type==='bat'||c.type==='bat2'||c.type==='tsop'){const o=out.st[c.id]||(out.st[c.id]={});M.EL.forEach(e=>{if(e.cid!==c.id)return;if(e.t==='V'){const nn=e.sn||1;if(e.ch===2){o.cc2=!!e.cc;o.U2=e.sU/nn;o.I2=e.sI/nn}else{o.cc=!!e.cc;o.U=e.sU/nn;o.I=e.sI/nn}}else if(e.t==='TS'){o.det=!!e.det;o.tsA=e.amp}})}
   if(c.type==='scope'){const y1=sub(ser(k(1)),ser(k(0))),y2=sub(ser(k(3)),ser(k(2)));out.tr[c.id]={dt,y:[y1,y2],mean:[mean_(y1),mean_(y2)]}}});
  return out}
 /* ---- Arduino Uno : exécution du programme en temps réel (temps virtuel couplé au solveur temporel) ---- */
@@ -306,8 +328,9 @@ const engOf=c=>{const e=UNO[c.id];return e&&e.owner===c?e:null};
 function engNew(c){let e=engOf(c);if(!e){e=new LaboArduino.Engine();e.owner=c;UNO[c.id]=e}return e}
 const LSTAT=['res','bulb','led','cfl','cap','amp','volt','sw','pb','dio','dled','ldr'];
 function liveBuild(){const L=live,old=L.M?{M:L.M,core:L.core}:null,M=tranModel(),core=tranCore(M);
- if(old&&old.M.EL.length===M.EL.length&&old.M.EL.every((e,i)=>e.t===M.EL[i].t)){M.EL.forEach((e,i)=>{const o=old.M.EL[i];for(const k of['vc','ip','st','q','ie','ph','sm','cnt','busy','prev','tR','tF','uv','tp'])if(o[k]!==undefined)e[k]=o[k]});if(old.core.x.length===core.x.length)core.x.set(old.core.x)}
+ if(old&&old.M.EL.length===M.EL.length&&old.M.EL.every((e,i)=>e.t===M.EL[i].t)){M.EL.forEach((e,i)=>{const o=old.M.EL[i];for(const k of['vc','ip','st','q','ie','ph','sm','cnt','busy','prev','tR','tF','uv','tp','cc','za1','zb1','za2','zb2','det','pp','wk','amp','em'])if(o[k]!==undefined)e[k]=o[k]});if(old.core.x.length===core.x.length)core.x.set(old.core.x)}
  L.M=M;L.core=core;L.xo=new Float64Array(core.x.length);let cap=5e-4;comps.forEach(c=>{if((c.type==='ac'||c.type==='gbf'||c.type==='a3')&&c.f>0)cap=Math.min(cap,1/(40*c.f))});if(M.EL.some(e=>e.t==='T5'))cap=Math.min(cap,2e-5);L.dtCap=Math.max(2e-6,cap);L.dtNow=Math.min(L.dtNow,L.dtCap);
+ L.vs=M.EL.filter(e=>e.t==='V'&&e.cid);L.tss=M.EL.filter(e=>e.t==='TS');
  L.engs=M.EL.filter(e=>e.t==='MCU'&&e.eng).map(e=>({e,eng:e.eng,ix:e.pin.map(M.ix),ig:M.ix(e.g)}));L.us=M.EL.filter(e=>e.t==='US');
  M.hook=(u,t)=>{const o=M.ix(u.o);L.dtNow=2e-6;if(o<0)return;L.engs.forEach(q=>{for(let p=0;p<20;p++)if(q.ix[p]===o)q.eng.edge(p,t*1e6,u.busy?1:0)})};
  L.items=[];comps.forEach(c=>{if(LSTAT.includes(c.type))L.items.push({c,a:M.ix(c.id+':0'),b:M.ix(c.id+':1'),m:(c.type==='dio'||c.type==='dled')?dmod(c):null});else if(c.type==='irrx'){const e=M.EL.find(q=>q.t==='PT'&&q.cid===c.id);if(e)L.items.push({c,pt:e})}});
@@ -325,13 +348,15 @@ function liveAdvance(target,budget){const L=live,X=L.core.x,xv=i=>i<0?0:X[i],t0=
   if(!L.core.step(tn,dt)){L.err='Circuit non résoluble (court-circuit ou nœud indéterminé)';L.on=false;return}
   let dm=0;for(let i=0;i<X.length;i++){const d=Math.abs(X[i]-L.xo[i]);if(d>dm)dm=d}
   for(const q of L.engs){for(let p=0;p<20;p++)pvA[p]=xv(q.ix[p])-xv(q.ig);q.eng.feed(L.vt,tn,pvA)}
-  const al=1-Math.exp(-dt/.015);
+  const al=1-Math.exp(-dt/.015);for(const e of L.vs){const i=-X[L.M.n+e.k];e.em=e.em===undefined?i:e.em+(i-e.em)*al}
   for(const it of L.items){const c=it.c;if(it.pt){const em=L.em[c.id]||(L.em[c.id]={ph:it.pt.ph});em.ph+=(it.pt.ph-em.ph)*al;continue}
    const v=xv(it.a)-xv(it.b),i=iof(it,v,dt),em=L.em[c.id];if(!em){L.em[c.id]={m1:v,m2:v*v,i1:i,i2:i*i,p:v*i};continue}
    em.m1+=(v-em.m1)*al;em.m2+=(v*v-em.m2)*al;em.i1+=(i-em.i1)*al;em.i2+=(i*i-em.i2)*al;em.p+=(v*i-em.p)*al}
   for(const s of L.scs){const sb=s.sb,j=sb.i;sb.t[j]=tn;sb.a[j]=xv(s.i[0])-xv(s.i[1]);sb.b[j]=xv(s.i[2])-xv(s.i[3]);sb.i=(j+1)&(LN-1);if(sb.n<LN)sb.n++}
-  L.vt=tn;L.dtNow=dm>.02?Math.max(2e-6,L.dtNow*.5):Math.min(L.dtCap,L.dtNow*1.6)}}
+  L.vt=tn;L.dtNow=dm>.02?Math.max(2e-6,L.dtNow*.5):Math.min(L.dtCap,L.dtNow*1.6);for(const e of L.tss)if(e.wk>tn)L.dtNow=Math.min(L.dtNow,2e-6)}}
 function liveStats(){const L=live;
+ for(const e of L.vs){const c=comps.find(q=>q.id===e.cid);if(!c||e.em===undefined)continue;const u=L.core.V(e.p)-L.core.V(e.n);if(e.ch===2){c.U2=u;c.I2=e.em;c.cc2=!!e.cc}else{c.U=u;c.I=e.em;c.cc=!!e.cc}}
+ for(const e of L.tss){const c=comps.find(q=>q.id===e.cid);if(c){c.det=!!e.det;c.tsA=e.amp}}
  for(const it of L.items){const c=it.c,em=L.em[c.id];if(!em)continue;if(it.pt){c.iph=em.ph;continue}
   c.U=em.m1;c.Ua=Math.sqrt(Math.max(0,em.m2-em.m1*em.m1));c.Ur=Math.sqrt(Math.max(0,em.m2));c.I=em.i1;c.Ia=Math.sqrt(Math.max(0,em.i2-em.i1*em.i1));c.Ir=Math.sqrt(Math.max(0,em.i2));c.P=em.p}
  const N=3000;
@@ -413,6 +438,7 @@ function bindP(root,c,cb){root.querySelectorAll('[data-p]').forEach(el=>el.oninp
  root.querySelectorAll('[data-b]').forEach(el=>el.onchange=()=>{c[el.dataset.b]=el.checked;cb()})}
 /* ---- Dessin des appareils ---- */
 const bnc=(x,y)=>`<circle cx="${x}" cy="${y}" r="16" fill="#c9ccd1" stroke="#5f646b" stroke-width="2"/><circle cx="${x}" cy="${y}" r="10" fill="#8f959d"/><circle cx="${x}" cy="${y}" r="4.5" fill="#d4af37" stroke="#7a5f00"/><rect x="${x-19}" y="${y-2.5}" width="6" height="5" fill="#5f646b"/><rect x="${x+13}" y="${y-2.5}" width="6" height="5" fill="#5f646b"/>`;
+const psu=(c,ch)=>{const o=ch===2?{v:c.val2,u:c.U2,i:c.I2,cc:c.cc2,l:c.il2}:{v:c.val,u:c.U,i:c.I,cc:c.cc,l:c.il},ok=!err&&typeof o.u==='number';return{u:ok?o.u:o.v,i:ok&&typeof o.i==='number'?o.i:null,cc:!!o.cc&&ok,l:o.l>0?o.l:10}};
 const jack=(x,y,col)=>`<circle cx="${x}" cy="${y}" r="9" fill="${col}" stroke="#4a4a4a" stroke-width="1.5"/><circle cx="${x}" cy="${y}" r="3.5" fill="#0c0c0c"/>`;
 const BAND=['#111','#8b4513','#d32f2f','#ff9800','#fdd835','#2e7d32','#1976d2','#7b1fa2','#9e9e9e','#fff'];
 function bands(v){let e=Math.floor(Math.log10(v)),m=Math.round(v/Math.pow(10,e-1));if(m>=100){m=10;e++}const x=e-1,col=k=>k===-1?'#d4af37':k===-2?'#c0c0c0':BAND[k]||'#777';return[BAND[Math.floor(m/10)],BAND[m%10],col(x)]}
@@ -421,9 +447,14 @@ const reading=c=>err?'----':c.mode==='AC'?(c.type==='amp'?fmt(c.Ia,'A'):fmt(c.Ua
 const pinH=(x,y)=>`<circle cx="${x}" cy="${y}" r="5" fill="#cfd3d8" stroke="#555" stroke-width="1.5"/>`;
 const DIPL={ne555:['GND','TRG','OUT','RST','CTL','THR','DIS','VCC'],aop:['NUL','−','+','V−','NUL','OUT','V+','NC'],cmp:['GND','+','−','V−','BAL','STB','OUT','V+']};
 function body(c){let s='';const pl=plugSet.has(c.id),jk=(x,y,col)=>pl?pinH(x,y):jack(x,y,col);
- if(c.type==='bat'){const ang=-135+c.val/30*270;
-  s=`<rect x="-85" y="-50" width="170" height="100" rx="8" fill="#cfd6df" stroke="#6b7684" stroke-width="2"/><rect x="-75" y="-42" width="82" height="34" rx="4" fill="#0b1a12" stroke="#444"/>${txt(-34,-17,c.val.toFixed(1)+' V',20,'#46e07a','middle','ui-monospace,Consolas,monospace')}
+ if(c.type==='bat'){const ang=-135+c.val/30*270,P=psu(c,1),mo='ui-monospace,Consolas,monospace';
+  s=`<rect x="-85" y="-50" width="170" height="100" rx="8" fill="#cfd6df" stroke="#6b7684" stroke-width="2"/><rect x="-75" y="-42" width="82" height="34" rx="4" fill="#0b1a12" stroke="#444"/>${txt(-34,-27,P.u.toFixed(2)+' V',15,'#46e07a','middle',mo)}${txt(-34,-13,(P.i===null?'':P.i.toFixed(2)+' A')+(P.cc?' CC':''),11,P.cc?'#ff5252':'#46e07a','middle',mo)}${txt(-34,3,'I max '+fmt(P.l,'A'),8,P.cc?'#c62828':'#334','middle')}
   <circle cx="45" cy="-24" r="17" fill="#3a4350" stroke="#1c222b" stroke-width="2"/><line x1="0" y1="-3" x2="0" y2="-14" stroke="#fff" stroke-width="3" stroke-linecap="round" transform="translate(45 -24) rotate(${ang})"/>${txt(45,12,'TENSION',8,'#334','middle')}${txt(-35,18,'− COM',10,'#222')}${txt(35,18,'+ 0-30V',10,'#b71c1c')}${jack(-35,34,'#1b1b1b')}${jack(35,34,'#d32f2f')}`}
+ else if(c.type==='bat2'){const P=[psu(c,1),psu(c,2)],mo='ui-monospace,Consolas,monospace',kn=(x,a)=>`<circle cx="${x}" cy="4" r="10" fill="#3a4350" stroke="#1c222b" stroke-width="2"/><line x1="0" y1="-2" x2="0" y2="-9" stroke="#fff" stroke-width="2.5" stroke-linecap="round" transform="translate(${x} 4) rotate(${a})"/>`,
+   half=(x,p,v,i)=>`<rect x="${x-44}" y="-44" width="88" height="34" rx="4" fill="#0b1a12" stroke="#444"/>${txt(x,-29,p.u.toFixed(2)+' V',15,'#46e07a','middle',mo)}${txt(x,-15,(p.i===null?'':p.i.toFixed(2)+' A')+(p.cc?'  CC':''),11,p.cc?'#ff5252':'#46e07a','middle',mo)}${kn(x-22,-135+v/30*270)}${kn(x+22,-135+Math.min(1,p.l/10)*270)}${txt(x-22,21,'U',7,'#334','middle')}${txt(x+22,21,'I max',7,'#334','middle')}`;
+  s=`<rect x="-100" y="-50" width="200" height="100" rx="8" fill="#cfd6df" stroke="#6b7684" stroke-width="2"/>${half(-48,P[0],c.val)}${half(48,P[1],c.val2)}${txt(-48,-47,'CH1',7,'#334','middle')}${txt(48,-47,'CH2',7,'#334','middle')}${jack(-70,34,'#1b1b1b')}${jack(-26,34,'#d32f2f')}${jack(26,34,'#1b1b1b')}${jack(70,34,'#d32f2f')}`}
+ else if(c.type==='tsop'){const d=c.det&&!err;
+  s=`<path d="M-26 46V18M0 46V18M26 46V18" stroke="#b9bdc3" stroke-width="3"/><rect x="-36" y="-24" width="72" height="44" rx="4" fill="#17171c" stroke="#555" stroke-width="2"/><circle cx="0" cy="-5" r="12" fill="#2a1030" stroke="#6b3a7a" stroke-width="2"/><circle cx="0" cy="-5" r="5" fill="#0d0612"/>${txt(0,14,'TSOP',8,'#9aa','middle')}<g stroke="#ab47bc" stroke-width="2.2" stroke-linecap="round" opacity="${d?1:.25}"><path d="M-58 -16L-42 -8M-58 -4L-42 4"/></g>${txt(0,-36,+(c.fc/1000).toPrecision(4)+' kHz',9,'var(--ink)','middle')}${err||c.tsA===undefined?'':d?txt(0,-48,'porteuse détectée · OUT bas',8,'#d32f2f','middle'):txt(0,-48,c.blk?'faisceau coupé':'rien détecté · OUT haut',8,'#667','middle')}${txt(-26,68,'OUT',9,'var(--ink)','middle')}${txt(0,68,'GND',9,'var(--ink)','middle')}${txt(26,68,'VS',9,'var(--ink)','middle')}${jk(-26,46,'#bdbdbd')}${jk(0,46,'#1b1b1b')}${jk(26,46,'#d32f2f')}`}
  else if(c.type==='ac'){const a1=-135+c.val/230*270,a2=-135+Math.log10(c.f)/3*270,kn=(x,a)=>`<circle cx="${x}" cy="-20" r="14" fill="#3a4350" stroke="#1c222b" stroke-width="2"/><line x1="0" y1="-3" x2="0" y2="-12" stroke="#fff" stroke-width="3" stroke-linecap="round" transform="translate(${x} -20) rotate(${a})"/>`;
   s=`<rect x="-95" y="-50" width="190" height="100" rx="8" fill="#b9c6d6" stroke="#4d5e73" stroke-width="2"/><rect x="-95" y="-50" width="190" height="8" rx="4" fill="#1565c0"/><rect x="-85" y="-38" width="92" height="40" rx="4" fill="#0b1a12" stroke="#444"/>${txt(-39,-20,+c.val.toFixed(1)+' V ~',17,'#46e07a','middle','ui-monospace,Consolas,monospace')}${txt(-39,-5,+c.f.toPrecision(4)+' Hz',13,'#ffb74d','middle','ui-monospace,Consolas,monospace')}${kn(38,a1)}${kn(74,a2)}${txt(38,8,'TENSION',7,'#334')}${txt(74,8,'FRÉQ.',7,'#334')}${txt(-40,18,'N',10,'#0d47a1')}${txt(40,18,'Φ 0-230V~',10,'#b71c1c')}${jack(-40,34,'#1565c0')}${jack(40,34,'#d32f2f')}`}
  else if(c.type==='gbf'){const a1=-135+c.amp/12*270,a2=-135+(Math.log10(c.f)-1)/5*270,x0=i=>-90+i*38,W=['sin','sq','tri'],
@@ -596,7 +627,9 @@ function panel(){
  if(c.type==='ne555'||c.type==='aop'||c.type==='cmp')h+=`<span class="mut">Boîtier DIP-8 vu de dessus (repère = encoche à gauche, broche 1 en bas à gauche). Alimenter ${c.type==='ne555'?'VCC (8) / GND (1)':'V+ (7) / V− (4)'} ; simulation temporelle. Pose-le sur une platine d’essai : les broches s’enfichent.</span>`;
 
  if(c.type==='ldr')h+=`<span class="mut">Résistance ≈ ${fmt(ldrR(c),'Ω')} : 16 kΩ à 10 lx, environ 1 MΩ dans le noir. Utilise-la en pont diviseur avec une résistance fixe.</span>`;
- if(c.type==='irrx')h+=`<label><input type="checkbox" data-b="blk" ${c.blk?'checked':''}> Obstacle sur le faisceau</label><span class="mut">Phototransistor : le courant de collecteur dépend de la lumière reçue des LED infrarouges posées sur le plan, selon leur courant et leur distance (borne C = collecteur, E = émetteur). Ça marche aussi avec un signal modulé.</span>`;
+ if(c.type==='irrx')h+=`<label><input type="checkbox" data-b="blk" ${c.blk?'checked':''}> Obstacle sur le faisceau</label><span class="mut">Phototransistor : le courant de collecteur dépend de la lumière reçue des LED infrarouges posées sur le plan, selon leur courant et leur distance (borne C = collecteur, E = émetteur). Ça marche aussi avec un signal modulé, mais la lumière ambiante (soleil, lampe) s’ajoute au signal utile : essaie le curseur « lumière ambiante parasite ».</span>`;
+ if(c.type==='bat'||c.type==='bat2')h+=`<span class="mut">${c.type==='bat2'?'Deux voies indépendantes et flottantes (CH1 : bornes 1 noire / rouge, CH2 : 2 noire / rouge). Relie la borne + d’une voie à la borne − de l’autre pour obtenir 2 × 30 V en série, ou la borne − de CH1 avec la borne + de CH2 pour une alim symétrique ± (point milieu). ':''}<b>Limite de courant</b> : tant que le circuit demande moins que I max, la voie reste en régulation de <b>tension</b> (CV) ; au-delà, elle passe en régulation de <b>courant</b> (CC, voyant rouge) : le courant est plafonné et la tension s’effondre. Cherche la valeur de I max qui protège une LED sans résistance !</span>`;
+ if(c.type==='tsop')h+=`<div class="chips">${[30,33,36,38,40,56].map(k=>`<button data-fc="${k*1000}" class="${Math.abs(c.fc-k*1000)<50?'p':''}">${k} kHz</button>`).join('')}</div><label><input type="checkbox" data-b="blk" ${c.blk?'checked':''}> Obstacle sur le faisceau</label><span class="mut">Module TSOP : alimenté en VS (2,5–5,5 V) / GND. Sa sortie est à l’état <b>haut</b> au repos et passe à l’état <b>bas</b> tant qu’il reçoit une lumière infrarouge <b>modulée à sa fréquence</b> (porteuse) ; la lumière continue (soleil, ampoule) et les autres fréquences sont filtrées. Alimente une LED IR avec un GBF carré 0–5 V (ou tone() de l’Arduino) à la même fréquence que le TSOP. Une salve doit durer ≳ 15 périodes.</span>`;
  if(c.type==='hcsr')h+=`<span class="mut">Alimenter VCC (5 V) / GND. La mesure démarre à la <b>fin</b> d’une impulsion sur TRIG (&gt; 2 V, ≥ 10 µs). ECHO passe à l’état haut pendant 2·d / 340 m/s (≈ 5,8 ms pour 1 m). Pour le déclencher : GBF carré 0–5 V à 20 Hz environ (amplitude 2,5 V, offset 2,5 V).</span>`;
  if(c.type==='uno')h+=`<button id="ucode" class="p">💻 Code et moniteur série…</button><button id="urun">${live&&live.on?'⏸ Pause':'▶ Démarrer'}</button><button id="ures">↺ Reset</button><span class="mut">Alimentée par l’USB (5 V et 3,3 V disponibles). Broches D0–D13 et A0–A5 : sortie 5 V (≈ 25 Ω, 40 mA max), entrée haute impédance ; analogRead sur A0–A5 (0–5 V → 0–1023) ; PWM sur les broches ~ (3, 5, 6, 9, 10, 11). La LED « L » suit la broche 13.</span>`;
  if(c.type==='pot')h+=`<span class="mut">Bornes 1 – 2 (curseur) – 3 : relie 1 à GND et 3 à +5 V, le curseur donne alors de 0 à 5 V (0 % → borne 1, 100 % → borne 3).</span>`;
@@ -618,6 +651,7 @@ function panel(){
  const wvS=pn.querySelector('[data-p="wave"]');if(wvS)wvS.addEventListener('change',()=>{panel();render()});const cmS=pn.querySelector('[data-p="cm"]');if(cmS)cmS.addEventListener('change',()=>{c.un=c.cm==='tri'?400:230;panel();render()});
  const md=document.getElementById('md');if(md)md.onclick=()=>{c.mode=c.mode==='AC'?'DC':'AC';panel();render()};
  const rv=document.getElementById('rv');if(rv)rv.onclick=()=>{c.rev=!c.rev;render()};
+ pn.querySelectorAll('[data-fc]').forEach(b=>b.onclick=()=>{c.fc=+b.dataset.fc;panel();render()});
  const uc=document.getElementById('ucode');if(uc){uc.onclick=()=>openDock(c.id);document.getElementById('urun').onclick=()=>{liveToggle();panel()};document.getElementById('ures').onclick=()=>{liveResetAll();panel()}}
  const zm=document.getElementById('zm');if(zm)zm.onclick=()=>openOv(c);const bbe=document.getElementById('bbe');if(bbe)bbe.onclick=()=>openBB(c);
  const tg=document.getElementById('tg');if(tg)tg.onclick=()=>{if(c.type==='com')c.pos=c.pos?0:1;else c.closed=!c.closed;panel();render()};
@@ -672,10 +706,10 @@ window.addEventListener('pointerup',e=>{ptrs.delete(e.pointerId);if(ptrs.size<2)
  else if(c.type==='pince'||c.type==='sc'){const k=clampOf(c);if(k){c.x=k.pt.x;c.y=k.pt.y;render()}}}
  drag=null});
 window.addEventListener('keydown',e=>{if((e.key==='Delete'||e.key==='Backspace')&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName))delSel();if(e.key==='Escape'){pend=null;capt=null;render()}});
-const MENU=[['Alimentations',[['bat','Alimentation continue 0–30 V'],['ac','Alimentation alternative 0–230 V'],['gbf','GBF (générateur de fonctions)'],['a3','Alimentation triphasée 400 V']]],
+const MENU=[['Alimentations',[['bat','Alimentation continue 0–30 V (limite en courant)'],['bat2','Alimentation continue double 2×(0–30 V)'],['ac','Alimentation alternative 0–230 V'],['gbf','GBF (générateur de fonctions)'],['a3','Alimentation triphasée 400 V']]],
  ['Charges',[['res','Résistance'],['bulb','Ampoule'],['led','Lampe à LED'],['cfl','Lampe fluocompacte'],['cap','Condensateur'],['ind','Bobine'],['mdc','Moteur à courant continu'],['mac','Moteur monophasé (cos φ 0,82)'],['m3','Moteur asynchrone triphasé 1,5 kW'],['cch','Caisse de charge 0–4 kW']]],
  ['Composants',[['dio','Diode (1N4148, 1N4007, Zener)'],['dled','LED (rouge, jaune, vert, bleu…)'],['bread','Platine d’essai (breadboard)']]],
- ['Capteurs',[['ldr','Photorésistance (LDR)'],['dled','Émetteur infrarouge (LED IR)','ir'],['irrx','Récepteur infrarouge (phototransistor)'],['hcsr','Capteur ultrason HC-SR04']]],
+ ['Capteurs',[['ldr','Photorésistance (LDR)'],['dled','Émetteur infrarouge (LED IR)','ir'],['irrx','Récepteur infrarouge (phototransistor)'],['tsop','Récepteur infrarouge TSOP (fréquence réglable)'],['hcsr','Capteur ultrason HC-SR04']]],
  ['Arduino',[['uno','Arduino Uno (programmable)'],['pot','Potentiomètre'],['pb','Bouton poussoir']]],
  ['Commandes',[['sw','Interrupteur'],['com','Commutateur 2 voies'],['rel','Relais (bobine + contact)'],['ctc','Contacteur (2 contacts NO)']]],
  ['Appareils de mesure',[['amp','Multimètre – ampèremètre'],['volt','Multimètre – voltmètre'],['amp','Ampèremètre à aiguille',1],['volt','Voltmètre à aiguille',1],['watt','Wattmètre ISW8000'],['pince','Pince ampèremétrique'],['sv','Sonde de tension ÷10 / ÷100'],['sc','Sonde de courant ÷10 / ÷100 / ÷300'],['tach','Compte-tours'],['cpm','Couple-mètre'],['scope','Oscilloscope 2 voies']]],
@@ -798,7 +832,7 @@ Boutons W (P), VAr (Q), VA (S), PF, V, A : clique dessus ou choisis l’affichag
 <h4>Capteurs</h4><ul><li><b>Photorésistance (LDR)</b> : curseur d’éclairement de 0,1 à 10 000 lx ; 16 kΩ à 10 lx, environ 1 MΩ dans le noir. À brancher en pont diviseur.</li>
 <li><b>Émetteur / récepteur infrarouge</b> : l’émetteur est une LED infrarouge (menu « Capteurs ») ; le récepteur est un phototransistor (C = collecteur, E = émetteur). Le courant du récepteur dépend du courant dans les LED infrarouges du plan et de la distance qui les sépare ; la case « Obstacle sur le faisceau » coupe presque tout. Un signal modulé (GBF, NE555) est reproduit.</li>
 <li><b>Capteur ultrason HC-SR04</b> : alimenter VCC (5 V) / GND ; une impulsion sur TRIG (fin de l’impulsion) lance la mesure ; ECHO reste à l’état haut 2·d / 340 m/s. La distance de l’obstacle se règle sur l’appareil (2 à 400 cm). Ces capteurs utilisent la simulation temporelle.</li></ul>
-<h4>Arduino Uno (programmable)</h4><ul><li><b>Carte Arduino Uno</b> : menu « Arduino ». Broches D0–D13 et A0–A5 câblables, 5 V, 3,3 V et GND (la carte est alimentée par l’USB : pas d’alimentation à brancher). La LED « L » suit la broche 13.</li>
+<h4>Alimentations à limite de courant</h4><ul><li>Chaque voie (alim 0–30 V, alim double) a une <b>limite de courant</b> réglable dans le panneau de droite. En dessous, la voie régule la tension (CV) ; au-delà elle régule le courant (CC, voyant rouge « CC ») et la tension s’effondre : un court-circuit ne détruit rien.</li><li>Alim double : CH1 = bornes 1 (−) et 2 (+), CH2 = bornes 3 (−) et 4 (+). Les voies sont flottantes : relie + d’une voie au − de l’autre pour 2 × 30 V en série, ou − de CH1 à + de CH2 pour une alim symétrique ±.</li></ul><h4>Récepteur IR TSOP</h4><ul><li>Sortie <b>haute</b> au repos, <b>basse</b> quand il reçoit de l’infrarouge <b>modulé à sa fréquence</b> (réglable, une par groupe). La lumière continue, le 100 Hz des lampes et les autres fréquences sont ignorés. Émetteur : LED IR + résistance pilotée par un GBF carré 0–5 V ou par <code>tone(3, 38000)</code>. Espace les fréquences de ≥ 5 kHz.</li></ul><h4>Arduino Uno (programmable)</h4><ul><li><b>Carte Arduino Uno</b> : menu « Arduino ». Broches D0–D13 et A0–A5 câblables, 5 V, 3,3 V et GND (la carte est alimentée par l’USB : pas d’alimentation à brancher). La LED « L » suit la broche 13.</li>
 <li><b>Programmer</b> : sélectionne la carte puis « 💻 Code et moniteur série… ». Un volet s’ouvre à droite : écris ton programme (langage Arduino : <code>setup()</code>, <code>loop()</code>, <code>pinMode</code>, <code>digitalWrite</code>, <code>digitalRead</code>, <code>analogRead</code>, <code>analogWrite</code>, <code>delay</code>, <code>millis</code>, <code>pulseIn</code>, <code>Serial.print</code>…), puis « ▶ Téléverser et démarrer ». Les erreurs sont signalées avec le numéro de ligne.</li>
 <li><b>Exécution en temps réel</b> : le programme tourne en même temps que le circuit (LED qui clignotent, tensions mesurées, oscilloscope, moniteur série). « ⏸ Pause », « ↺ Reset » et une vitesse (×0,1 à ×10) sont disponibles. Les <i>int</i> font 16 bits comme sur la vraie carte (débordements à 32767), <i>long</i> 32 bits, la division de deux entiers est entière.</li>
 <li><b>Entrées analogiques</b> : analogRead mesure la tension de la broche (0–5 V → 0–1023, 112 µs). <b>Sorties PWM</b> : analogWrite sur 3, 5, 6, 9, 10, 11 (≈ 490 Hz, 980 Hz sur 5 et 6) — observe-les à l’oscilloscope (base de temps ≈ 1 ms/div).</li>
@@ -943,6 +977,18 @@ document.getElementById('ex20').onclick=()=>exUno(2,u=>{const h=add('hcsr',260,2
 document.getElementById('ex21').onclick=()=>exUno(3,u=>{const p=add('pot',260,200),o=add('scope',260,520);p.pos=.5;o.td=1e-3;o.v1=2;o.v2=2;o.pos1=1;wire(p.id+':0',u.id+':22');wire(p.id+':2',u.id+':20');wire(p.id+':1',u.id+':15');wire(o.id+':1',u.id+':9');wire(o.id+':0',u.id+':22');ledR(u,9,940,140)},'Variateur : le potentiomètre (A1) règle le rapport cyclique PWM de D9 (≈ 490 Hz) — visible à l’oscilloscope.');
 document.getElementById('ex22').onclick=()=>exUno(4,u=>{const b=add('pb',260,220);wire(b.id+':0',u.id+':2');wire(b.id+':1',u.id+':22');ledR(u,8,940,140)},'Bouton entre D2 et GND (INPUT_PULLUP) : maintiens le clic sur le bouton, le compteur s’affiche dans le moniteur série.');
 document.getElementById('ex23').onclick=()=>exUno(5,u=>{ledR(u,10,940,100,'rouge');ledR(u,9,1090,100,'orange');ledR(u,8,1240,100,'vert')},'Feu tricolore : D10 rouge, D9 orange, D8 vert. Une fonction feu() du programme enchaîne les phases.');
+document.getElementById('ex24').onclick=()=>exUno(6,u=>{const[r,d]=ledR(u,3,300,120,'ir'),t=add('tsop',700,540);ledR(u,8,940,140);wire(t.id+':2',u.id+':20');wire(t.id+':1',u.id+':22');wire(t.id+':0',u.id+':2');t.fc=38000},'Télécommande IR : D3 émet une porteuse 38 kHz (tone) dans la LED IR, le TSOP (sortie sur D2) la détecte ; la LED D8 suit la réception. Change la fréquence du TSOP (panneau de droite) ou mets un obstacle : plus de détection. Le moniteur série affiche le résultat.');
+document.getElementById('ex25').onclick=()=>{comps=[];wires=[];notes=[];selN=null;uid=1;liveDrop();const b=add('bat',120,520),g=add('gbf',120,160),r=add('res',380,100),d=add('dled',560,160),t=add('tsop',800,160),o=add('scope',860,470),a=add('volt',560,520);
+ b.val=5;g.wave='sq';g.f=38000;g.amp=2.5;g.off=2.5;g.duty=.5;r.val=220;d.lc='ir';t.fc=38000;o.td=2e-4;o.v1=5;o.v2=5;o.pos1=1.5;o.pos2=-1.5;
+ wire(g.id+':1',r.id+':0');wire(r.id+':1',d.id+':0');wire(d.id+':1',g.id+':0');wire(g.id+':0',b.id+':0');wire(t.id+':2',b.id+':1');wire(t.id+':1',b.id+':0');wire(t.id+':0',o.id+':1');wire(o.id+':0',b.id+':0');wire(t.id+':0',a.id+':0');wire(a.id+':1',b.id+':0');
+ notes.push({k:'t',x:120,y:40,t:'TSOP : le GBF (carré 0–5 V, 38 kHz) module la LED IR ; la sortie du TSOP (voie 1) passe à l’état bas quand la porteuse est détectée. Essaie : fréquence du GBF ≠ celle du TSOP, signal continu (amplitude 0), obstacle, lumière ambiante.',s:16,col:'#1976d2'});
+ sel=t.id;panel();render();fitView()};
+document.getElementById('ex26').onclick=()=>{comps=[];wires=[];notes=[];selN=null;uid=1;liveDrop();const b=add('bat2',140,280),d=add('dled',560,160),r=add('res',560,420),a=add('amp',380,160),v=add('volt',760,160);
+ b.val=12;b.il=.02;b.val2=5;b.il2=1;d.lc='rouge';r.val=100;
+ wire(b.id+':1',a.id+':1');wire(a.id+':0',d.id+':0');wire(d.id+':1',b.id+':0');wire(v.id+':1',d.id+':0');wire(v.id+':0',d.id+':1');
+ wire(b.id+':3',r.id+':0');wire(r.id+':1',b.id+':2');
+ notes.push({k:'t',x:140,y:40,t:'Alim à limitation de courant : CH1 (12 V) alimente une LED SANS résistance, mais sa limite est réglée à 20 mA : la voie passe en régulation de courant (CC) et la LED est protégée. Monte la limite : le courant explose. CH2 alimente une résistance en tension constante (CV).',s:16,col:'#1976d2'});
+ sel=b.id;panel();render();fitView()};
 $('ahx').onclick=closeDock;$('ago').onclick=dockUpload;$('apa').onclick=()=>{if(live&&live.on)liveStop();else liveStart()};$('are').onclick=()=>liveResetAll();
 $('asp').onchange=()=>{if(live)live.speed=+$('asp').value||1};
 $('acl').onclick=()=>{const c=comps.find(x=>x.id===dockId),e=c&&engOf(c);if(e){e.ser='';e.serN=0}dockS='\u0000';dockUpd()};

@@ -44,3 +44,4 @@ main{position:relative}#zc{position:absolute;top:8px;right:10px;display:flex;gap
 #aerr{color:var(--bad);font-size:13px;font-weight:600;min-height:1.2em}
 #aser{height:28%;min-height:90px;margin:0;overflow:auto;background:#10151d;color:#9be99b;font:12px/1.35 ui-monospace,Consolas,Menlo,monospace;padding:6px 8px;border-radius:6px;white-space:pre-wrap;word-break:break-all}
 @media(max-width:820px){#adock.open{position:fixed;inset:0;z-index:26;width:auto}}
+.chips{display:flex;flex-wrap:wrap;gap:4px;margin:4px 0}.chips button{padding:3px 8px}

@@ -372,6 +372,32 @@ void loop() {
   feu(0, 0, 1, 3000);   // vert
   feu(0, 1, 0, 1000);   // orange
 }
+`},
+{n:'Télécommande IR – émetteur D3, récepteur TSOP (D2)',code:`// Une LED IR (D3, via 220 Ω) émet une porteuse ; un TSOP (sortie sur D2) la détecte.
+// Le TSOP ne réagit qu'à une lumière MODULÉE à sa fréquence : règle la même sur le module.
+#define PORTEUSE 38000   // Hz
+
+void setup() {
+  pinMode(2, INPUT);
+  pinMode(3, OUTPUT);
+  pinMode(8, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  tone(3, PORTEUSE);                 // salve de porteuse (≥ 15 périodes nécessaires)
+  delay(20);
+  bool avec = (digitalRead(2) == LOW);   // TSOP : sortie BASSE = porteuse détectée
+  noTone(3);
+  delay(20);
+  bool sans = (digitalRead(2) == LOW);
+  digitalWrite(8, avec);             // la LED D8 suit la réception
+  Serial.print("avec porteuse : ");
+  Serial.print(avec ? "détecté" : "rien");
+  Serial.print("   sans : ");
+  Serial.println(sans ? "détecté" : "rien");
+  delay(400);
+}
 `}];
 G.LaboArduino={compile,Engine,EXAMPLES,PWMP};
 if(typeof module!=='undefined'&&module.exports)module.exports=G.LaboArduino;

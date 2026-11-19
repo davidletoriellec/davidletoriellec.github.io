@@ -17,7 +17,8 @@ const place = (c, w, t) => { const p = L.bz(L.tp(w.a), L.tp(w.b), w, t); c.x = p
 L.reset(); { const b = L.add('bat'), r = L.add('res'), a = L.add('amp'); b.val = 10; r.val = 100;
   L.wire(b.id + ':1', r.id + ':0'); L.wire(r.id + ':1', a.id + ':1'); L.wire(a.id + ':0', b.id + ':0'); L.render(); near('I = U/R (A)', -a.I, 0.1, 0.01); }
 // 2. Court-circuit
-L.reset(); { const b = L.add('bat'); L.wire(b.id + ':1', b.id + ':0'); L.render(); yes('court-circuit signalé', L.err !== ''); }
+L.reset(); { const g = L.add('ac'); L.wire(g.id + ':1', g.id + ':0'); L.render(); yes('court-circuit signalé', L.err !== ''); }
+L.reset(); { const b = L.add('bat'), a = L.add('amp'); b.val = 10; b.il = 2; L.wire(b.id + ':1', a.id + ':1'); L.wire(a.id + ':0', b.id + ':0'); L.render(); yes('court-circuit d’une alim : pas d’erreur (limitée)', L.err === ''); near('court-circuit : courant = limite (A)', -a.I, 2, 0.01); yes('court-circuit : voyant CC', b.cc === true); }
 // 3. Filtre RC avec GBF + oscilloscope
 L.reset(); { const g = L.add('gbf'), r = L.add('res'), c = L.add('cap'), o = L.add('scope'); r.val = 1000; c.val = 0.1; g.amp = 5;
   L.wire(g.id + ':1', r.id + ':0'); L.wire(r.id + ':1', c.id + ':0'); L.wire(c.id + ':1', g.id + ':0'); L.wire(o.id + ':1', r.id + ':0'); L.wire(o.id + ':0', g.id + ':0'); L.wire(o.id + ':3', c.id + ':0'); L.render();
@@ -256,7 +257,45 @@ L.reset(); { const b = L.add('bat'), g = L.add('gbf'), h = L.add('hcsr'), o = L.
   near('ultrason 100 cm : durée de l’écho (ms)', width(), 2 * 100 / 34300 * 1000, 0.03); h.dist = 200; L.render(); near('ultrason 200 cm : durée de l’écho (ms)', width(), 2 * 200 / 34300 * 1000, 0.03); let hi = 0;
   b.val = 0; L.render(); hi = 0; for (const v of o.tr.y[1]) if (v > 2.5) hi++; yes('ultrason non alimenté : pas d’écho', hi === 0); }
 // 12. Dessin de tous les appareils
-L.reset(); ['bat', 'ac', 'gbf', 'res', 'bulb', 'cap', 'ind', 'sw', 'com', 'rel', 'ctc', 'mdc', 'mac', 'led', 'cfl', 'a3', 'm3', 'cch', 'sv', 'sc', 'tach', 'cpm', 'amp', 'volt', 'watt', 'pince', 'scope', 'bb', 'ne555', 'aop', 'cmp', 'dio', 'dled', 'bread', 'ldr', 'irrx', 'hcsr'].forEach(t => L.add(t));
+L.reset(); ['bat', 'ac', 'gbf', 'res', 'bulb', 'cap', 'ind', 'sw', 'com', 'rel', 'ctc', 'mdc', 'mac', 'led', 'cfl', 'a3', 'm3', 'cch', 'sv', 'sc', 'tach', 'cpm', 'amp', 'volt', 'watt', 'pince', 'scope', 'bb', 'ne555', 'aop', 'cmp', 'dio', 'dled', 'bread', 'ldr', 'irrx', 'hcsr', 'bat2', 'tsop'].forEach(t => L.add(t));
+// 12c. Alimentations : limite de courant (CV / CC) et double alim
+L.reset(); { const b = L.add('bat'), r = L.add('res'), a = L.add('amp'); r.val = 100; b.il = 0.05;
+  L.wire(b.id + ':1', r.id + ':0'); L.wire(r.id + ':1', a.id + ':1'); L.wire(a.id + ':0', b.id + ':0');
+  b.val = 12; L.render(); near('CC : courant plafonné (A)', -a.I, 0.05, 0.01); yes('CC : voyant allumé', b.cc === true); near('CC : tension de sortie (V)', b.U, 5, 0.01); near('CC : tension aux bornes de R (V)', 100 * -a.I, 5, 0.01);
+  b.val = 4; L.render(); near('CV : courant I = U/R (A)', -a.I, 0.04, 0.01); yes('CV : voyant éteint', b.cc === false); near('CV : tension de sortie (V)', b.U, 4, 0.01);
+  b.val = 12; L.render(); near('CC de nouveau après remontée de la tension', -a.I, 0.05, 0.01); }
+L.reset(); { const b = L.add('bat2'), r1 = L.add('res'), r2 = L.add('res'), a1 = L.add('amp'), a2 = L.add('amp'); b.val = 5; b.val2 = 12; r1.val = 100; r2.val = 1000; b.il2 = 0.005;
+  L.wire(b.id + ':1', r1.id + ':0'); L.wire(r1.id + ':1', a1.id + ':1'); L.wire(a1.id + ':0', b.id + ':0');
+  L.wire(b.id + ':3', r2.id + ':0'); L.wire(r2.id + ':1', a2.id + ':1'); L.wire(a2.id + ':0', b.id + ':2'); L.render();
+  near('double alim CH1 : I (A)', -a1.I, 0.05, 0.01); yes('double alim CH1 : CV', !b.cc); near('double alim CH1 : U (V)', b.U, 5, 0.01);
+  near('double alim CH2 : I limité (A)', -a2.I, 0.005, 0.01); yes('double alim CH2 : CC', b.cc2 === true); near('double alim CH2 : U (V)', b.U2, 5, 0.01); }
+L.reset(); { const b = L.add('bat2'), r = L.add('res'), a = L.add('amp'); b.val = 15; b.val2 = 15; r.val = 300;
+  L.wire(b.id + ':1', b.id + ':2'); L.wire(b.id + ':3', r.id + ':0'); L.wire(r.id + ':1', a.id + ':1'); L.wire(a.id + ':0', b.id + ':0'); L.render();
+  near('double alim en série : 30 V → I (A)', -a.I, 0.1, 0.01); }
+L.reset(); { const b = L.add('bat2'), r = L.add('res'), a = L.add('amp'); b.val = 15; b.val2 = 15; r.val = 300;
+  L.wire(b.id + ':0', b.id + ':3'); L.wire(b.id + ':1', r.id + ':0'); L.wire(r.id + ':1', a.id + ':1'); L.wire(a.id + ':0', b.id + ':0'); L.render();
+  near('double alim symétrique : +15 V → I (A)', -a.I, 0.05, 0.01); }
+// CC en simulation temporelle (un bouton fermé impose le mode temporel)
+L.reset(); { const b = L.add('bat'), r = L.add('res'), a = L.add('amp'), p = L.add('pb'); p.closed = true; r.val = 100; b.val = 12; b.il = 0.05;
+  L.wire(b.id + ':1', p.id + ':0'); L.wire(p.id + ':1', r.id + ':0'); L.wire(r.id + ':1', a.id + ':1'); L.wire(a.id + ':0', b.id + ':0'); L.render();
+  yes('CC temporel : mode temporel', L.tranMode); near('CC temporel : courant (A)', -a.I, 0.05, 0.02); yes('CC temporel : voyant', b.cc === true); }
+// TSOP : détection de la porteuse seulement
+const tsopRig = (fGen, wave, fc, opt = {}) => { L.reset();
+  const b = L.add('bat'), g = L.add('gbf', 100, 300), r = L.add('res'), d = L.add('dled', 100, 100), t = L.add('tsop', 200, 100), v = L.add('volt'), o = L.add('scope');
+  b.val = 5; g.wave = wave; g.f = fGen; g.amp = wave === 'dc' ? 0 : 2.5; g.off = 2.5; g.duty = .5; if (wave === 'dc') g.wave = 'sin'; r.val = 220; d.lc = 'ir'; t.fc = fc; t.amb = opt.amb || 0; t.blk = !!opt.blk; o.td = 5e-4;
+  L.wire(g.id + ':1', r.id + ':0'); L.wire(r.id + ':1', d.id + ':0'); L.wire(d.id + ':1', g.id + ':0'); L.wire(g.id + ':0', b.id + ':0');
+  L.wire(t.id + ':2', b.id + ':1'); L.wire(t.id + ':1', b.id + ':0'); L.wire(t.id + ':0', v.id + ':0'); L.wire(v.id + ':1', b.id + ':0'); L.wire(o.id + ':0', b.id + ':0'); L.wire(o.id + ':1', t.id + ':0'); L.render(); return { t, v, o }; };
+{ const R = tsopRig(38000, 'sq', 38000); yes('TSOP : mode temporel', L.tranMode); yes('TSOP : porteuse détectée', R.t.det === true); yes('TSOP : sortie basse', R.v.U < 0.5); }
+{ const R = tsopRig(56000, 'sq', 38000); yes('TSOP : autre fréquence ignorée', R.t.det === false); yes('TSOP : sortie haute', R.v.U > 4.5); }
+{ const R = tsopRig(1000, 'sq', 38000); yes('TSOP : signal lent (1 kHz) ignoré', R.t.det === false); }
+{ const R = tsopRig(38000, 'dc', 38000); yes('TSOP : lumière continue ignorée', R.t.det === false && R.v.U > 4.5); }
+{ const R = tsopRig(38000, 'sq', 38000, { amb: 100 }); yes('TSOP : détecte malgré une forte lumière ambiante', R.t.det === true); }
+{ const R = tsopRig(38000, 'sq', 38000, { blk: true }); yes('TSOP : obstacle sur le faisceau', R.t.det === false); }
+{ const R = tsopRig(40000, 'sq', 40000); yes('TSOP : fréquence réglée à 40 kHz', R.t.det === true); }
+{ const R = tsopRig(30000, 'sq', 38000); yes('TSOP : 30 kHz ignoré par un 38 kHz', R.t.det === false); }
+// Exemples fournis
+store['ex25'].onclick(); { const t = L.comps.find(c => c.type === 'tsop'); yes('exemple TSOP + GBF : porteuse détectée', t.det === true && !L.err); }
+store['ex26'].onclick(); { const b = L.comps.find(c => c.type === 'bat2'), a = L.comps.find(c => c.type === 'amp'); yes('exemple alim limitée : CH1 en CC', b.cc === true && !L.err); near('exemple alim limitée : I (A)', -a.I, 0.02, 0.02); yes('exemple alim limitée : CH2 en CV', b.cc2 === false); near('exemple alim limitée : I CH2 (A)', b.I2, 0.05, 0.02); }
 // 13. Arduino Uno : exécution en temps réel couplée au solveur temporel
 { const run = (T, dt = 0.05) => { const t1 = L.live.vt + T; while (L.live.vt < t1 - 1e-9) L.liveAdvance(L.live.vt + dt, 1e9); L.render(); };
   const find = t => L.comps.filter(c => c.type === t), ser = () => L.engOf(find('uno')[0]).ser, last = () => ser().trim().split('\r\n').pop();
@@ -282,6 +321,12 @@ L.reset(); ['bat', 'ac', 'gbf', 'res', 'bulb', 'cap', 'ind', 'sw', 'com', 'rel',
   store['ex23'].onclick(); { run(0.5); let I = find('dled').map(d => d.I); yes('feu : rouge', I[0] > 0.01 && I[1] < 1e-4 && I[2] < 1e-4); run(3); I = find('dled').map(d => d.I); yes('feu : vert à 3,5 s', I[2] > 0.01 && I[0] < 1e-4); run(3); I = find('dled').map(d => d.I); yes('feu : orange à 6,5 s', I[1] > 0.01 && I[0] < 1e-4 && I[2] < 1e-4); }
   // Pause / reprise / reset
   { const t = L.live.vt; L.liveStop(); yes('pause : temps figé', L.live.vt === t && !L.live.on); L.liveStart(); run(0.2); yes('reprise', L.live.vt > t); L.liveResetAll(); run(0.5); yes('reset : redémarre à zéro', L.live.vt < 0.6 && find('dled')[0].I > 0.01); }
+  // Télécommande IR : tone() 38 kHz + TSOP
+  store['ex24'].onclick(); { const tt = find('tsop')[0], t0 = Date.now(); run(1.2); yes('IR : salve détectée, rien sans porteuse', /avec porteuse : détecté {3}sans : rien/.test(last())); const dtm = Date.now() - t0;
+    yes('IR : LED de réception allumée', find('dled').some(d => d.lc !== 'ir' && d.I > 0.01) || last().indexOf('détecté') > 0);
+    tt.fc = 56000; L.render(); run(1.2); yes('IR : TSOP réglé sur une autre fréquence : rien', /avec porteuse : rien {3}sans : rien/.test(last()));
+    tt.fc = 38000; tt.blk = true; L.render(); run(1.2); yes('IR : obstacle : rien', /avec porteuse : rien/.test(last()));
+    tt.blk = false; L.render(); run(1.2); yes('IR : retour à la détection', /avec porteuse : détecté {3}sans : rien/.test(last())); console.log('     (durée du test IR : ' + dtm + ' ms)'); }
   // Erreur de compilation signalée
   { const u = find('uno')[0]; u.code = 'void setup(){ int x = ; }\nvoid loop(){}'; L.liveDrop(); yes('erreur de compilation : démarrage refusé', L.liveStart() === false); }
   // sauvegarde / chargement du code
