@@ -1,5 +1,21 @@
 # Changelog
 
+## v3.2.3
+- Suppression de la case à cocher « Valeurs théoriques » en haut de l’écran.
+
+## v3.2.2
+- Menu de gauche : les catégories (Alimentations, Charges, Composants…) s’enroulent / se déroulent d’un clic sur leur titre ; l’état est mémorisé dans le navigateur.
+- Au démarrage, l’application s’ouvre sur un plan vide (plus d’exemple par défaut) ; les exemples restent accessibles dans le menu.
+
+## v3.2.1
+- Correction : le curseur de niveau de déclenchement restait grisé après avoir décoché « Niveau auto ». Il est désormais toujours actif, et le déplacer passe automatiquement en niveau manuel (la valeur en volts s’affiche en direct).
+
+## v3.2
+- **Multimètre universel 5½ digits** (menu « Appareils de mesure ») : face avant inspirée d'un multimètre de paillasse, avec les 4 bornes du vrai appareil — **COM** (noire, commune), **V/Ω** (rouge) et deux bornes blanches **3 A** / **16 A** pour le courant — et 5 boutons cliquables : **V DC, V AC, A DC, A AC, Ω**. Tension en dérivation (10 MΩ), courant en série, **ohmmètre** (composant hors tension ; « OL » = circuit ouvert). Affichage à 5 chiffres. Fonctionne en simulation continue, temporelle et temps réel. Les anciens ampèremètres / voltmètres restent disponibles.
+- **Résistance à tolérance ±5 %** : bouton « Tolérance ±5 % » dans le panneau. Actif : la valeur réelle est tirée au hasard (une fois, enregistrée avec le montage) à ±5 % de la valeur marquée — à mesurer à l'ohmmètre. Inactif : valeur exacte.
+- **Oscilloscope : niveau de déclenchement (TRIGGER)** : curseur de −4 à +4 divisions sur la voie de déclenchement, avec repère de niveau à l'écran ; case « Niveau auto » (comportement précédent) cochée par défaut.
+- **Alimentations continues** : bornes inversées pour coller aux appareils réels (**+ rouge à gauche, − noire à droite**), alim simple et double.
+
 ## v3.1.1
 - **Rotation des composants** : bouton « ⟳ Pivoter 90° » dans le panneau ou touche **R** (composant sélectionné). Les bornes et les fils suivent ; la rotation est enregistrée avec le montage. Non disponible pour la platine, la pince et le capteur de courant à pince.
 

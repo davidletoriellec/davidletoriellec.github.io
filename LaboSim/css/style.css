@@ -45,3 +45,4 @@ main{position:relative}#zc{position:absolute;top:8px;right:10px;display:flex;gap
 #aser{height:28%;min-height:90px;margin:0;overflow:auto;background:#10151d;color:#9be99b;font:12px/1.35 ui-monospace,Consolas,Menlo,monospace;padding:6px 8px;border-radius:6px;white-space:pre-wrap;word-break:break-all}
 @media(max-width:820px){#adock.open{position:fixed;inset:0;z-index:26;width:auto}}
 .chips{display:flex;flex-wrap:wrap;gap:4px;margin:4px 0}.chips button{padding:3px 8px}
+#menu h3[data-gh]{cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px}#menu h3[data-gh]::before{content:'▾';font-size:11px;transition:transform .15s}#menu h3[data-gh].fold::before{transform:rotate(-90deg)}#menu .grp[hidden]{display:none}

@@ -6,7 +6,7 @@ const el = () => ({ style: {}, dataset: {}, classList: { toggle() {}, remove() {
 const store = {};
 global.document = { getElementById: id => store[id] || (store[id] = el()), querySelectorAll: () => [] };
 global.window = { addEventListener() {} };
-const L = new Function(code + `;return{T,add,wire,connect,render,mkWave,bz,tp,wsamples,buildPdf,pdfWrap,serializeMontage,loadMontage,buildMenu,setFilter(v){tagFilter=v},get TAGS(){return TAGS},get tranMode(){return tranMode},startCapture,capPick,get capt(){return capt},trFreq,bbEnc,bbDec,bbHash,bbParse,BBT,pv,get view(){return view},fitView,zoomAt,contentBounds,menuHtml(){return menuEl.innerHTML},reset(){comps=[];wires=[];notes=[];uid=1;sel=selW=selN=pend=null},get err(){return err},get wires(){return wires},get comps(){return comps},get solve(){return solve},geo,BX0,BP,BROW,BC,nearHole,snapPlug,plugSet(){return plugSet},DK,LC,gbfHarm,gbfWave,bridges,mergeTags,tagSlug,ldrR,liveStart,liveStop,liveAdvance,liveDrop,liveSync,liveResetAll,get live(){return live},engOf,UNO,tranModel,dockUpload,exUno}`)();
+const L = new Function(code + `;return{T,reading,traces,add,wire,connect,render,mkWave,bz,tp,wsamples,buildPdf,pdfWrap,serializeMontage,loadMontage,buildMenu,setFilter(v){tagFilter=v},get TAGS(){return TAGS},get tranMode(){return tranMode},startCapture,capPick,get capt(){return capt},trFreq,bbEnc,bbDec,bbHash,bbParse,BBT,pv,get view(){return view},fitView,zoomAt,contentBounds,menuHtml(){return menuEl.innerHTML},reset(){comps=[];wires=[];notes=[];uid=1;sel=selW=selN=pend=null},get err(){return err},get wires(){return wires},get comps(){return comps},get solve(){return solve},geo,BX0,BP,BROW,BC,nearHole,snapPlug,plugSet(){return plugSet},DK,LC,gbfHarm,gbfWave,bridges,mergeTags,tagSlug,ldrR,liveStart,liveStop,liveAdvance,liveDrop,liveSync,liveResetAll,get live(){return live},engOf,UNO,tranModel,dockUpload,exUno}`)();
 
 let fail = 0;
 const near = (name, got, want, tol) => { const ok = Math.abs(got - want) <= tol * Math.max(1, Math.abs(want)); if (!ok) fail++; console.log((ok ? 'ok   ' : 'FAIL ') + name + ' → ' + got.toPrecision(5) + ' (attendu ' + want + ')'); };
@@ -257,7 +257,7 @@ L.reset(); { const b = L.add('bat'), g = L.add('gbf'), h = L.add('hcsr'), o = L.
   near('ultrason 100 cm : durée de l’écho (ms)', width(), 2 * 100 / 34300 * 1000, 0.03); h.dist = 200; L.render(); near('ultrason 200 cm : durée de l’écho (ms)', width(), 2 * 200 / 34300 * 1000, 0.03); let hi = 0;
   b.val = 0; L.render(); hi = 0; for (const v of o.tr.y[1]) if (v > 2.5) hi++; yes('ultrason non alimenté : pas d’écho', hi === 0); }
 // 12. Dessin de tous les appareils
-L.reset(); ['bat', 'ac', 'gbf', 'res', 'bulb', 'cap', 'ind', 'sw', 'com', 'rel', 'ctc', 'mdc', 'mac', 'led', 'cfl', 'a3', 'm3', 'cch', 'sv', 'sc', 'tach', 'cpm', 'amp', 'volt', 'watt', 'pince', 'scope', 'bb', 'ne555', 'aop', 'cmp', 'dio', 'dled', 'bread', 'ldr', 'irrx', 'hcsr', 'bat2', 'tsop'].forEach(t => L.add(t));
+L.reset(); ['bat', 'ac', 'gbf', 'res', 'bulb', 'cap', 'ind', 'sw', 'com', 'rel', 'ctc', 'mdc', 'mac', 'led', 'cfl', 'a3', 'm3', 'cch', 'sv', 'sc', 'tach', 'cpm', 'amp', 'volt', 'watt', 'pince', 'scope', 'bb', 'ne555', 'aop', 'cmp', 'dio', 'dled', 'bread', 'ldr', 'irrx', 'hcsr', 'bat2', 'tsop', 'dmm'].forEach(t => L.add(t));
 // 12c. Alimentations : limite de courant (CV / CC) et double alim
 L.reset(); { const b = L.add('bat'), r = L.add('res'), a = L.add('amp'); r.val = 100; b.il = 0.05;
   L.wire(b.id + ':1', r.id + ':0'); L.wire(r.id + ':1', a.id + ':1'); L.wire(a.id + ':0', b.id + ':0');
@@ -298,6 +298,30 @@ store['ex25'].onclick(); { const t = L.comps.find(c => c.type === 'tsop'); yes('
 store['ex26'].onclick(); { const b = L.comps.find(c => c.type === 'bat2'), a = L.comps.find(c => c.type === 'amp'); yes('exemple alim limitée : CH1 en CC', b.cc === true && !L.err); near('exemple alim limitée : I (A)', -a.I, 0.02, 0.02); yes('exemple alim limitée : CH2 en CV', b.cc2 === false); near('exemple alim limitée : I CH2 (A)', b.I2, 0.05, 0.02); }
 // Rotation des composants
 L.reset(); { const r = L.add('res', 100, 100); const p0 = L.T(r, 0); r.rot = 90; const p1 = L.T(r, 0); near('rotation 90° : x', p1.x - 100, -(p0.y - 100), 0.001); near('rotation 90° : y', p1.y - 100, p0.x - 100, 0.001); r.rot = 180; near('rotation 180°', L.T(r, 0).x - 100, -(p0.x - 100), 0.001); }
+// Multimètre universel (dmm) : V, A, Ω ; bornes COM(0) V/Ω(1) 3A(2) 16A(3)
+const rigDmm = (fn, mode, jack = 2) => { L.reset(); const b = L.add('bat'), r = L.add('res'), d = L.add('dmm'); b.val = 10; r.val = 100; d.fn = fn; d.mode = mode || 'DC';
+  if (fn === 'V') { L.wire(b.id + ':1', r.id + ':0'); L.wire(r.id + ':1', b.id + ':0'); L.wire(d.id + ':1', r.id + ':0'); L.wire(d.id + ':0', r.id + ':1'); }
+  else if (fn === 'I') { L.wire(b.id + ':1', d.id + ':' + jack); L.wire(d.id + ':0', r.id + ':0'); L.wire(r.id + ':1', b.id + ':0'); }
+  else { L.wire(d.id + ':1', r.id + ':0'); L.wire(d.id + ':0', r.id + ':1'); b.val = 0; L.comps.splice(L.comps.indexOf(b), 1); }
+  L.render(); return { d, r, b }; };
+{ const { d } = rigDmm('V'); yes('DMM tension DC', /^10\.0\d+ V$/.test(L.reading(d)) || /^9\.99/.test(L.reading(d))); }
+{ const { d } = rigDmm('I'); near('DMM courant DC (jack 3 A) (A)', -d.I, 0.1, 0.01); yes('DMM courant : affichage', /^0\.0999|^0\.1000/.test(L.reading(d)) || /m?A$/.test(L.reading(d))); }
+{ const { d } = rigDmm('I', 'DC', 3); near('DMM courant DC (jack 16 A) (A)', -d.I, 0.1, 0.01); }
+{ const { d, r } = rigDmm('R'); near('DMM ohmmètre (Ω)', -1 / d.I, 100, 0.001); yes('DMM ohmmètre : affichage', /^100\.\d+ Ω$/.test(L.reading(d))); r.tol = true; r.eps = 0.03; L.render(); near('DMM ohmmètre avec tolérance 5 % (Ω)', -1 / d.I, 103, 0.001); r.tol = false; L.render(); near('DMM ohmmètre sans tolérance (Ω)', -1 / d.I, 100, 0.001); }
+{ L.reset(); const r = L.add('res'), d = L.add('dmm'); d.fn = 'R'; L.wire(d.id + ':1', r.id + ':0'); L.render(); yes('DMM ohmmètre : circuit ouvert = OL', L.reading(d) === 'OL'); }
+{ L.reset(); const s = L.add('ac'), r = L.add('res'), d = L.add('dmm'); s.val = 24; r.val = 100; d.fn = 'V'; d.mode = 'AC'; L.wire(s.id + ':1', r.id + ':0'); L.wire(r.id + ':1', s.id + ':0'); L.wire(d.id + ':1', r.id + ':0'); L.wire(d.id + ':0', r.id + ':1'); L.render(); near('DMM tension AC (V)', d.Ua, 24, 0.001); }
+{ L.reset(); const b = L.add('bat'), r = L.add('res'), d = L.add('dmm'), p = L.add('pb'); p.closed = true; b.val = 10; r.val = 100; d.fn = 'V';
+  L.wire(b.id + ':1', p.id + ':0'); L.wire(p.id + ':1', r.id + ':0'); L.wire(r.id + ':1', b.id + ':0'); L.wire(d.id + ':1', r.id + ':0'); L.wire(d.id + ':0', r.id + ':1'); L.render(); yes('DMM en mode temporel', L.tranMode); near('DMM tension en mode temporel (V)', -d.U, 10, 0.01); }
+{ L.reset(); const b = L.add('bat'), r = L.add('res'), d = L.add('dmm'), p = L.add('pb'); p.closed = true; b.val = 10; r.val = 100; d.fn = 'I';
+  L.wire(b.id + ':1', d.id + ':2'); L.wire(d.id + ':0', p.id + ':0'); L.wire(p.id + ':1', r.id + ':0'); L.wire(r.id + ':1', b.id + ':0'); L.render(); near('DMM courant en mode temporel (A)', -d.I, 0.1, 0.01); }
+// Résistance à tolérance 5 %
+L.reset(); { const b = L.add('bat'), r = L.add('res'), a = L.add('amp'); b.val = 10; r.val = 100; L.wire(b.id + ':1', r.id + ':0'); L.wire(r.id + ':1', a.id + ':1'); L.wire(a.id + ':0', b.id + ':0'); L.render();
+  near('R sans tolérance : I (A)', -a.I, 0.1, 0.001); r.tol = true; r.eps = 0.05; L.render(); near('R +5 % : I (A)', -a.I, 10 / 105, 0.001); r.eps = -0.05; L.render(); near('R −5 % : I (A)', -a.I, 10 / 95, 0.001);
+  r.tol = true; r.eps = undefined; L.render(); yes('R tolérance : écart tiré dans ±5 %', Math.abs(r.eps) <= 0.05 + 1e-9 && r.eps !== undefined); }
+// Oscilloscope : niveau de déclenchement
+L.reset(); { const g = L.add('gbf'), o = L.add('scope'); g.amp = 2; g.f = 1000; o.td = 5e-4; L.wire(g.id + ':1', o.id + ':1'); L.wire(g.id + ':0', o.id + ':0'); L.wire(o.id + ':0', o.id + ':2'); L.render();
+  yes('Trigger auto : pas de marqueur', L.traces(o, 30).indexOf('stroke-dasharray="4 5"') < 0); o.tla = false; o.tl = 1; o.v1 = 1; yes('Trigger manuel : marqueur de niveau', L.traces(o, 30).indexOf('stroke-dasharray="4 5"') >= 0);
+  o.tl = 3.9; yes('Trigger hors signal : pas de plantage', typeof L.traces(o, 30) === 'string'); }
 // 13. Arduino Uno : exécution en temps réel couplée au solveur temporel
 { const run = (T, dt = 0.05) => { const t1 = L.live.vt + T; while (L.live.vt < t1 - 1e-9) L.liveAdvance(L.live.vt + dt, 1e9); L.render(); };
   const find = t => L.comps.filter(c => c.type === t), ser = () => L.engOf(find('uno')[0]).ser, last = () => ser().trim().split('\r\n').pop();
