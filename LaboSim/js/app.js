@@ -43,7 +43,7 @@ const FIELDS={bjt:[['beta','Gain en courant β',UNITS.NU,{min:10,max:500,sl:[10,
  m3:[['ml','Charge (0 = à vide · 1 = nominale · 1,2 max)',UNITS.NU,{min:0,max:1.2,sl:[0,1.2,0.01]}],['pn','Puissance utile',UNITS.W,{min:1}],['un','Tension d’enroulement',UNITS.V,{min:1}],['i0r','Courant à vide (% de In)',UNITS.PCT,{min:0.05,max:1}],['cos0','cos φ à vide',UNITS.NU,{min:0.05,max:0.9}],['cosphi','cos φ',UNITS.NU,{min:0.1,max:1}],['eta','Rendement',UNITS.PCT,{min:0.1,max:1}]],
  aop:[['vm','Marge de saturation (V)',UNITS.V,{min:0,max:5}]],cmp:[['vm','Marge de saturation (V)',UNITS.V,{min:0,max:5}]]};
 const selH=(p,o,v)=>`<select data-p="${p}">${o.map(([a,l])=>`<option value="${a}"${String(a)===String(v)?' selected':''}>${l}</option>`).join('')}</select>`;
-const COLS=['#d32f2f','#1b1b1b','#1976d2','#2e7d32','#f9a825','#fb8c00','#8e24aa','#6d4c41','#9e9e9e'];const VERSION='3.3.7';
+const COLS=['#d32f2f','#1b1b1b','#1976d2','#2e7d32','#f9a825','#fb8c00','#8e24aa','#6d4c41','#9e9e9e'];const VERSION='3.3.8';
 let comps=[],wires=[],sel=null,selW=null,pend=null,mouse={x:0,y:0},drag=null,wd=null,notes=[],selN=null,uid=1,err='',theory=false;
 const cv=document.getElementById('cv'),st=document.getElementById('st'),pn=document.getElementById('pn');
 const NOROT=new Set(['bread','pince','sc']);
@@ -71,7 +71,7 @@ function acMotorY(c,w,tri){const Un=c.un,In=tri?c.pn/c.eta/(3*Un*c.cosphi):c.pn/
 const torque=m=>{if(m.type==='mdc')return m.run?mdcP(m).TL:0;if(!(m.rps>0))return 0;const mac=m.type==='mac',rN=m.rps*(mac?.95:.96)/(1-(mac?.05:.04)*m.ml),Uw=mac||m.cpl==='D'?m.Ur:m.Ur/Math.sqrt(3);return m.ml*m.pn/(2*Math.PI*rN)*Math.min(1.5,(Uw/m.un)**2)};
 function macZ(c){const S=c.pn/c.eta/c.cosphi,Z=c.un*c.un/S,ph=Math.acos(Math.min(1,Math.max(.05,c.cosphi)));return{R:Z*Math.cos(ph),X:Z*Math.sin(ph)}}
 let AC_=null,soundOn=true,VOL=.36;try{const v=localStorage.getItem('labosim_vol');if(v!==null)VOL=Math.pow(Math.min(1,Math.max(0,+v/100)),2)}catch(e){}
-function dest(A){if(!A._m){const g=A.createGain();g.connect(A.destination);A._m=g}A._m.gain.value=VOL;return A._m}
+function dest(A){if(!A._m){const g=A.createGain();g.connect(A.destination);A._m=g}A._m.gain.value=soundOn?VOL:0;return A._m}
 function clac(heavy){if(!soundOn)return;try{const A=AC_=AC_||new(window.AudioContext||window.webkitAudioContext)();if(A.state==='suspended')A.resume();
  const hit=(delay,g)=>{const n=Math.floor(A.sampleRate*.09),buf=A.createBuffer(1,n,A.sampleRate),d=buf.getChannelData(0),tau=A.sampleRate*(heavy?.016:.008);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.exp(-i/tau)+(i<A.sampleRate*.003?.8*Math.sin(i/6):0);
   const s=A.createBufferSource();s.buffer=buf;const f=A.createBiquadFilter();f.type='bandpass';f.frequency.value=heavy?700:1800;f.Q.value=.9;const gn=A.createGain();gn.gain.value=g;s.connect(f);f.connect(gn);gn.connect(dest(A));s.start(A.currentTime+delay)};
@@ -985,8 +985,8 @@ Boutons W (P), VAr (Q), VA (S), PF, V, A : clique dessus ou choisis l’affichag
 <h4>Sauvegarde d’un montage</h4><ul><li>« 💾 Enregistrer » télécharge un fichier <code>montage_labosim.json</code> (appareils, câbles, repérages) ; « 📂 Ouvrir » le recharge.</li></ul>
 <h4>Export PDF</h4><ul><li>« Export PDF » (en haut) : schéma de montage + champs NOM, PRÉNOM, GROUPE, RESSOURCE et notes libres. Le même bouton existe dans l’écran agrandi de l’oscilloscope : le PDF contient alors la copie d’écran, les mesures des curseurs et le texte libre.</li></ul>`;
 $('novb').innerHTML=NOTICE;$('nb').onclick=()=>{$('nov').style.display='block'};$('novc').onclick=()=>{$('nov').style.display='none'};
-$('snd').onclick=()=>{soundOn=!soundOn;$('snd').textContent=soundOn?'🔊':'🔇'};
-{const v=$('vol');if(v){let p=60;try{const q=localStorage.getItem('labosim_vol');if(q!==null)p=+q}catch(e){}v.value=p;v.oninput=()=>{VOL=Math.pow(v.value/100,2);try{localStorage.setItem('labosim_vol',v.value)}catch(e){}if(AC_&&AC_._m)AC_._m.gain.value=VOL;if(v.value>0&&!soundOn){soundOn=true;$('snd').textContent='🔊'}}}}
+$('snd').onclick=()=>{soundOn=!soundOn;$('snd').textContent=soundOn?'🔊':'🔇';if(AC_&&AC_._m)AC_._m.gain.value=soundOn?VOL:0;render()};
+{const v=$('vol');if(v){let p=60;try{const q=localStorage.getItem('labosim_vol');if(q!==null)p=+q}catch(e){}v.value=p;v.oninput=()=>{VOL=Math.pow(v.value/100,2);try{localStorage.setItem('labosim_vol',v.value)}catch(e){}if(v.value>0&&!soundOn){soundOn=true;$('snd').textContent='🔊'}if(AC_&&AC_._m)AC_._m.gain.value=soundOn?VOL:0}}}
 /* ---- Étiquettes du matériel (TP, projet…) : couleurs et filtre du menu ---- */
 const TCOL=['#e53935','#fb8c00','#43a047','#1e88e5','#8e24aa','#00897b','#6d4c41','#546e7a'];
 let TAGS={tags:['TP ELEN','TP ENER','TP1','TP2','Projet'],map:{},colors:{'TP ELEN':TCOL[0],'TP ENER':TCOL[1],'TP1':TCOL[2],'TP2':TCOL[3],'Projet':TCOL[4]}},tagFilter='*',tagsLocal=false;
@@ -1167,7 +1167,7 @@ document.getElementById('ex30').onclick=()=>{comps=[];wires=[];notes=[];selN=nul
  sel=o.id;panel();render();fitView()};
 /* Exemples : notes coupées en ~4 lignes (sinon le zoom s'adapte à une ligne très longue) */
 function wrapT(t,lines=4){if(!t||t.includes('\n'))return t;const w=Math.max(55,Math.ceil(t.length/lines)+8),out=[];let cur='';t.split(' ').forEach(x=>{if(cur&&(cur+' '+x).length>w){out.push(cur);cur=x}else cur=cur?cur+' '+x:x});if(cur)out.push(cur);return out.join('\n')}
-function wrapNotes(){let ch=false;notes.forEach(n=>{if(n.k==='t'&&n.t&&!n.t.includes('\n')&&n.t.length>70){n.t=wrapT(n.t);n.y-=(n.t.split('\n').length-1)*((n.s||16)+4);ch=true}});if(ch){render();fitView()}}
+function wrapNotes(){let ch=false;const top=comps.length?Math.min(...comps.map(c=>c.y+geo(c).b[1])):300;notes.forEach(n=>{if(n.k==='t'&&n.t&&!n.t.includes('\n')&&n.t.length>70){n.t=wrapT(n.t);const L=n.t.split('\n').length,sz=(n.s||16)+4;n.y=Math.min(n.y,top-40-(L-1)*sz);ch=true}});if(ch){render();fitView()}}
 if(typeof document!=='undefined')document.querySelectorAll('#exs button[id^="ex"]').forEach(b=>{const f=b.onclick;if(f)b.onclick=ev=>{f.call(b,ev);wrapNotes()}});
 initTags();buildMenu();
 setInterval(()=>{const mm=motorTick()||comps.some(c=>c.zm);if((mm||comps.some(c=>c.type==='scope'&&c.free)||needleMoving())&&!(live&&live.on)){render();if(typeof ovId!=='undefined'&&ovId!=null)renderOv()}},60);

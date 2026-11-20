@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.3.8
+- **Bouton 🔊 / 🔇** : le muet coupe maintenant immédiatement tous les sons en cours (moteurs, haut-parleur), sans attendre une action.
+- Exemples : le texte explicatif est placé au-dessus du montage (il ne passe plus sur les composants).
+
 ## v3.3.7
 - Exemples : les textes explicatifs sont maintenant coupés en ~4 lignes (au lieu d'une seule ligne très longue qui faussait le zoom automatique).
 
