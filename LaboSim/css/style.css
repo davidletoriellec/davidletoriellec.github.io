@@ -46,3 +46,5 @@ main{position:relative}#zc{position:absolute;top:8px;right:10px;display:flex;gap
 @media(max-width:820px){#adock.open{position:fixed;inset:0;z-index:26;width:auto}}
 .chips{display:flex;flex-wrap:wrap;gap:4px;margin:4px 0}.chips button{padding:3px 8px}
 #side h3[data-gh]{cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px}#side h3[data-gh]::before{content:'▾';font-size:11px;transition:transform .15s}#side h3[data-gh].fold::before{transform:rotate(-90deg)}#menu .grp[hidden],#exs[hidden]{display:none}
+
+#nbar{position:sticky;top:-14px;background:var(--panel);padding:6px 0 8px;z-index:2;border-bottom:1px solid var(--line)}#nbar input{width:100%;box-sizing:border-box;padding:8px 10px;font-size:15px}#ntoc{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}#ntoc button{font-size:12px;padding:3px 8px}#ntoc[hidden]{display:none}#nov section[hidden],#nov li[hidden]{display:none}

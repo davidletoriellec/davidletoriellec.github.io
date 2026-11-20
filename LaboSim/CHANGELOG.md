@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.4.0
+- **Boîte à décades** (menu Charges) : 6 cadrans de 0 à 9, utilisable en **résistance** (1 Ω à 999 999 Ω), **condensateur** (1 nF à 999,999 µF) ou **bobine** (1 µH à 999,999 mH). On change un chiffre en cliquant sur ▲ (haut) ou ▼ (bas) du cadran, ou en tapant la valeur dans le panneau.
+- **Saisie avec préfixes** dans tous les champs de valeur : `1k` = 1 kΩ / 1 kV, `4k7`, `1u` = 1 µ, `10m` = 10 milli, `2M` = 2 méga, `p`, `n`, `G`… (m = milli, M = méga). L'unité s'ajuste automatiquement.
+- **Multimètre universel** : boutons de courant renommés **DCI** et **ACI** (au lieu de DCA / ACA).
+- **Notice** : sommaire cliquable et **champ de recherche** (filtre les rubriques et les lignes qui contiennent le mot).
+
 ## v3.3.8
 - **Bouton 🔊 / 🔇** : le muet coupe maintenant immédiatement tous les sons en cours (moteurs, haut-parleur), sans attendre une action.
 - Exemples : le texte explicatif est placé au-dessus du montage (il ne passe plus sur les composants).
