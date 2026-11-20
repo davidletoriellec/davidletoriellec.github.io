@@ -1,5 +1,8 @@
 # Changelog
 
+## v3.2.4
+- Oscilloscope : quand le niveau de déclenchement est réglé hors de la courbe (aucun passage possible), la trace **défile** comme sur un vrai oscilloscope au lieu de rester figée ; elle se stabilise dès que le niveau recoupe le signal.
+
 ## v3.2.3
 - Suppression de la case à cocher « Valeurs théoriques » en haut de l’écran.
 

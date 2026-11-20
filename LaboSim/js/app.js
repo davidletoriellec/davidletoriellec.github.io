@@ -42,7 +42,7 @@ const FIELDS={bat:[['val','Tension',UNITS.V,{min:0,max:30,sl:[0,30,0.5]}],['il',
  m3:[['ml','Charge (0 = à vide · 1 = nominale · 1,2 max)',UNITS.NU,{min:0,max:1.2,sl:[0,1.2,0.01]}],['pn','Puissance utile',UNITS.W,{min:1}],['un','Tension d’enroulement',UNITS.V,{min:1}],['i0r','Courant à vide (% de In)',UNITS.PCT,{min:0.05,max:1}],['cos0','cos φ à vide',UNITS.NU,{min:0.05,max:0.9}],['cosphi','cos φ',UNITS.NU,{min:0.1,max:1}],['eta','Rendement',UNITS.PCT,{min:0.1,max:1}]],
  aop:[['vm','Marge de saturation (V)',UNITS.V,{min:0,max:5}]],cmp:[['vm','Marge de saturation (V)',UNITS.V,{min:0,max:5}]]};
 const selH=(p,o,v)=>`<select data-p="${p}">${o.map(([a,l])=>`<option value="${a}"${String(a)===String(v)?' selected':''}>${l}</option>`).join('')}</select>`;
-const COLS=['#d32f2f','#1b1b1b','#1976d2','#2e7d32','#f9a825','#fb8c00','#8e24aa','#6d4c41','#9e9e9e'];const VERSION='3.2.3';
+const COLS=['#d32f2f','#1b1b1b','#1976d2','#2e7d32','#f9a825','#fb8c00','#8e24aa','#6d4c41','#9e9e9e'];const VERSION='3.2.4';
 let comps=[],wires=[],sel=null,selW=null,pend=null,mouse={x:0,y:0},drag=null,wd=null,notes=[],selN=null,uid=1,err='',theory=false;
 const cv=document.getElementById('cv'),st=document.getElementById('st'),pn=document.getElementById('pn');
 const NOROT=new Set(['bread','pince','sc']);
@@ -419,11 +419,11 @@ function mkWave(c,ch,acOnly){if(c.tr)return trWave(c,ch,acOnly);const ph=c.sig[c
  const dc=(acOnly||cp==='AC')?0:ph[0][0],T=[];for(let q=1;q<ph.length;q++)if(Math.hypot(ph[q][0],ph[q][1])>1e-9)T.push([c.ws[q],ph[q][0]*Math.SQRT2,ph[q][1]*Math.SQRT2]);
  return t=>{let y=dc;for(const[w,a,b]of T)y+=a*Math.cos(w*t)-b*Math.sin(w*t);return y}}
 function domFreq(ph,ws){let b=1e-6,f=0;for(let q=1;q<ph.length;q++){const a=Math.hypot(ph[q][0],ph[q][1]);if(a>b){b=a;f=ws[q]/(2*Math.PI)}}return f}
-function traces(c,S){if(err||(!c.sig&&!c.tr))return'';let s='';const tr=c.trig===2?1:0,fT=chFreq(c,tr),H=8*S,Wd=10*S;let t0=c.tr&&c.tr.t0||0;
+function traces(c,S){if(err||(!c.sig&&!c.tr))return'';let s='';const tr=c.trig===2?1:0,fT=chFreq(c,tr),H=8*S,Wd=10*S;let t0=c.tr&&c.tr.t0||0;c.free=false;
  if(c.xy){const W1=mkWave(c,0),W2=mkWave(c,1),f1=chFreq(c,0),f2=chFreq(c,1),fm=Math.min(f1||1e12,f2||1e12),Ts=fm<1e12?20/fm:1,N=3000;let d='';
   for(let k=0;k<=N;k++){const t=k/N*Ts,x=Wd/2+(W1(t)/c.v1+c.pos1)*S,y=H/2-(W2(t)/c.v2+c.pos2)*S;d+=(k?'L':'M')+Math.max(0,Math.min(Wd,x)).toFixed(1)+' '+Math.max(0,Math.min(H,y)).toFixed(1)}
   return`<path d="${d}" stroke="#7cfc00" stroke-width="${S>30?2:1.5}" fill="none" stroke-linejoin="round"/>`}
- if(fT){const LV=c.tla?0:(c.tl||0)*(tr?c.v2:c.v1),ref=mkWave(c,tr,!!c.tla),dt=1/(fT*600);let pv=ref(0)-LV;for(let t=dt;t<1.3/fT;t+=dt){const y=ref(t)-LV;if(pv<0&&y>=0){t0=t-dt*y/(y-pv);break}pv=y}}
+ let fnd=false;if(fT){const LV=c.tla?0:(c.tl||0)*(tr?c.v2:c.v1),ref=mkWave(c,tr,!!c.tla),dt=1/(fT*600);let pv=ref(0)-LV;for(let t=dt;t<1.3/fT;t+=dt){const y=ref(t)-LV;if(pv<0&&y>=0){t0=t-dt*y/(y-pv);fnd=true;break}pv=y}if(!fnd&&!c.tla){c.free=true;t0+=((performance.now()/1000)*c.td*5)%(1/fT)}}
  [0,1].forEach(ch=>{if(!(ch?c.on2:c.on1))return;const colr=ch?'#00e5ff':'#ffeb3b',vd=ch?c.v2:c.v1,pos=ch?c.pos2:c.pos1,W=mkWave(c,ch),fd=chFreq(c,ch),span=c.td*10;
   const Y=v=>Math.max(0,Math.min(H,H/2-(v/vd+pos)*S)).toFixed(1);let d='';
   if(fd&&span*fd>20){for(let px=0;px<=Wd;px++){const tx=t0+px/Wd*span;let mn=1e9,mx=-1e9;for(let j=0;j<24;j++){const y=W(tx+j/(24*fd));if(y<mn)mn=y;if(y>mx)mx=y}d+=`M${px} ${Y(mn)}V${Y(mx)}`}
@@ -1013,3 +1013,4 @@ $('acode').onkeydown=ev=>{if(ev.key==='Tab'){ev.preventDefault();const t=ev.targ
 $('aex').innerHTML='<option value="">— exemples de programmes —</option>'+LaboArduino.EXAMPLES.map((x,i)=>`<option value="${i}">${esc_(x.n)}</option>`).join('');
 $('aex').onchange=()=>{const v=$('aex').value;if(v==='')return;const t=$('acode');if(t.value.trim()&&!LaboArduino.EXAMPLES.some(x=>x.code===t.value)&&typeof confirm==='function'&&!confirm('Remplacer le code actuel par cet exemple ?')){$('aex').value='';return}t.value=LaboArduino.EXAMPLES[+v].code;t.oninput();$('aex').value=''};
 initTags();buildMenu();
+setInterval(()=>{if(comps.some(c=>c.type==='scope'&&c.free)&&!(live&&live.on)){render();if(typeof ovId!=='undefined'&&ovId!=null)renderOv()}},60);

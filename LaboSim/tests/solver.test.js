@@ -321,7 +321,9 @@ L.reset(); { const b = L.add('bat'), r = L.add('res'), a = L.add('amp'); b.val =
 // Oscilloscope : niveau de déclenchement
 L.reset(); { const g = L.add('gbf'), o = L.add('scope'); g.amp = 2; g.f = 1000; o.td = 5e-4; L.wire(g.id + ':1', o.id + ':1'); L.wire(g.id + ':0', o.id + ':0'); L.wire(o.id + ':0', o.id + ':2'); L.render();
   yes('Trigger auto : pas de marqueur', L.traces(o, 30).indexOf('stroke-dasharray="4 5"') < 0); o.tla = false; o.tl = 1; o.v1 = 1; yes('Trigger manuel : marqueur de niveau', L.traces(o, 30).indexOf('stroke-dasharray="4 5"') >= 0);
-  o.tl = 3.9; yes('Trigger hors signal : pas de plantage', typeof L.traces(o, 30) === 'string'); }
+  o.tl = 3.9; const f1 = L.traces(o, 30); yes('Trigger hors signal : pas de plantage', typeof f1 === 'string'); yes('Trigger hors signal : défilement', o.free === true);
+  const t0 = Date.now(); while (Date.now() - t0 < 40); yes('Trigger hors signal : la courbe défile', L.traces(o, 30) !== f1);
+  o.tl = 1; const g1 = L.traces(o, 30); const t1 = Date.now(); while (Date.now() - t1 < 40); yes('Trigger dans le signal : courbe stable', L.traces(o, 30) === g1 && o.free === false); }
 // 13. Arduino Uno : exécution en temps réel couplée au solveur temporel
 { const run = (T, dt = 0.05) => { const t1 = L.live.vt + T; while (L.live.vt < t1 - 1e-9) L.liveAdvance(L.live.vt + dt, 1e9); L.render(); };
   const find = t => L.comps.filter(c => c.type === t), ser = () => L.engOf(find('uno')[0]).ser, last = () => ser().trim().split('\r\n').pop();
