@@ -6,9 +6,10 @@ const el = () => ({ style: {}, dataset: {}, classList: { toggle() {}, remove() {
 const store = {};
 global.document = { getElementById: id => store[id] || (store[id] = el()), querySelectorAll: () => [] };
 global.window = { addEventListener() {} };
-const L = new Function(code + `;return{T,reading,traces,add,wire,connect,render,mkWave,bz,tp,wsamples,buildPdf,pdfWrap,serializeMontage,loadMontage,buildMenu,setFilter(v){tagFilter=v},get TAGS(){return TAGS},get tranMode(){return tranMode},startCapture,capPick,get capt(){return capt},trFreq,bbEnc,bbDec,bbHash,bbParse,BBT,pv,get view(){return view},fitView,zoomAt,contentBounds,menuHtml(){return menuEl.innerHTML},reset(){comps=[];wires=[];notes=[];uid=1;sel=selW=selN=pend=null},get err(){return err},get wires(){return wires},get comps(){return comps},get solve(){return solve},geo,BX0,BP,BROW,BC,nearHole,snapPlug,plugSet(){return plugSet},DK,LC,gbfHarm,gbfWave,bridges,mergeTags,tagSlug,ldrR,liveStart,liveStop,liveAdvance,liveDrop,liveSync,liveResetAll,get live(){return live},engOf,UNO,tranModel,dockUpload,exUno}`)();
+const L = new Function(code + `;return{undo,redo,copySel,pasteSel,setSel(v){sel=v},meterHits,setSmooth(v){smoothOn=v},needle,fuseBlown,T,reading,traces,add,wire,connect,render,mkWave,bz,tp,wsamples,buildPdf,pdfWrap,serializeMontage,loadMontage,buildMenu,setFilter(v){tagFilter=v},get TAGS(){return TAGS},get tranMode(){return tranMode},startCapture,capPick,get capt(){return capt},trFreq,bbEnc,bbDec,bbHash,bbParse,BBT,pv,get view(){return view},fitView,zoomAt,contentBounds,menuHtml(){return menuEl.innerHTML},reset(){comps=[];wires=[];notes=[];uid=1;sel=selW=selN=pend=null},get err(){return err},get wires(){return wires},get comps(){return comps},get solve(){return solve},geo,BX0,BP,BROW,BC,nearHole,snapPlug,plugSet(){return plugSet},DK,LC,gbfHarm,gbfWave,bridges,mergeTags,tagSlug,ldrR,liveStart,liveStop,liveAdvance,liveDrop,liveSync,liveResetAll,get live(){return live},engOf,UNO,tranModel,dockUpload,exUno}`)();
 
 let fail = 0;
+L.setSmooth(false);
 const near = (name, got, want, tol) => { const ok = Math.abs(got - want) <= tol * Math.max(1, Math.abs(want)); if (!ok) fail++; console.log((ok ? 'ok   ' : 'FAIL ') + name + ' → ' + got.toPrecision(5) + ' (attendu ' + want + ')'); };
 const yes = (name, c) => { if (!c) fail++; console.log((c ? 'ok   ' : 'FAIL ') + name); };
 const place = (c, w, t) => { const p = L.bz(L.tp(w.a), L.tp(w.b), w, t); c.x = p.x; c.y = p.y };
@@ -360,6 +361,78 @@ L.reset(); { const g = L.add('gbf'), o = L.add('scope'); g.amp = 2; g.f = 1000; 
   // sauvegarde / chargement du code
   { const u = find('uno')[0]; u.code = LaboArduino.EXAMPLES[1].code; const js = L.serializeMontage(); yes('le code est sauvegardé', js.indexOf('analogRead') > 0); L.loadMontage(js); yes('le code est rechargé', find('uno')[0].code === LaboArduino.EXAMPLES[1].code); }
 }
+// 12 ter. Fusibles du multimètre numérique
+{ const { d, r } = rigDmm('I', 'DC', 2); r.val = 1; L.render(); yes('fusible 3 A : grille à 10 A', d.fb3 === true && !d.fb16); yes('fusible grillé : affichage FUSE', L.reading(d) === 'FUSE');
+  r.val = 100; L.render(); yes('fusible grillé : circuit ouvert (courant nul)', L.reading(d) === 'FUSE' && Math.abs(d.I || 0) < 1e-6);
+  d.fb3 = false; L.render(); near('fusible changé : mesure rétablie (A)', -d.I, 0.1, 0.01); }
+{ const { d, r } = rigDmm('I', 'DC', 2); r.val = 3.2; L.render(); near('3 A : 3,1 A passe', -d.I, 10 / 3.2, 0.01); yes('3 A : pas grillé sous 3,3 A', !d.fb3); r.val = 2.5; L.render(); yes('3 A : grillé à 4 A', d.fb3 === true); }
+{ const { d, r } = rigDmm('I', 'DC', 3); r.val = 1; L.render(); yes('16 A : 10 A passe', !d.fb16 && !d.fb3); near('16 A : mesure ≈ 10 A', -d.I, 10, 0.03); }
+{ L.reset(); const a = L.add('ac'), r = L.add('res'), d = L.add('dmm'); a.val = 12; r.val = 0.5; d.fn = 'I'; d.mode = 'AC'; L.wire(a.id + ':1', d.id + ':3'); L.wire(d.id + ':0', r.id + ':0'); L.wire(r.id + ':1', a.id + ':0'); L.render(); yes('16 A : grille à 24 A', d.fb16 === true && !d.fb3); r.val = 100; d.fb16 = false; L.render(); yes('16 A : réarmé', L.reading(d) !== 'FUSE'); }
+// 12 quater-bis. Affichage numérique lissé (sinon désactivé pour les tests)
+{ L.setSmooth(true); const { d, b } = rigDmm('V'); d.zs = undefined; L.reading(d); b.val = 20; L.render(); const x = parseFloat(L.reading(d)); yes('affichage numérique : un échelon n’est pas instantané', x > 10.01 && x < 19.99); L.setSmooth(false); }
+// 12 quater. Aiguille amortie
+{ const c = {}; L.needle(c, 0); const v1 = L.needle(c, 1); yes('aiguille : ne saute pas instantanément', v1 < 0.2); }
+// 12 quinquies. Semi-conducteurs, audio
+const rig3 = (type, fn) => { L.reset(); const b = L.add('bat'); b.val = 5; const q = L.add(type); if (fn) fn(q, b); L.render(); return { b, q }; };
+{ // NPN actif : Ic = β·Ib
+  L.reset(); const b = L.add('bat'), rc = L.add('res'), rb = L.add('res'), q = L.add('bjt'); b.val = 5; rc.val = 470; rb.val = 1e6;
+  L.wire(b.id + ':1', rc.id + ':0'); L.wire(rc.id + ':1', q.id + ':1'); L.wire(b.id + ':1', rb.id + ':0'); L.wire(rb.id + ':1', q.id + ':0'); L.wire(q.id + ':2', b.id + ':0'); L.render();
+  near('NPN actif : Ic (mA)', q.mi1 * 1000, 0.435, 0.05); yes('NPN actif : état actif', q.mst === 1);
+  rb.val = 10000; L.render(); near('NPN saturé : Ic (mA)', q.mi1 * 1000, 10.3, 0.05); yes('NPN saturé : état saturé', q.mst === 2);
+  rb.val = 1e9; L.render(); yes('NPN bloqué (courant de base nul)', q.mi1 < 1e-6); }
+{ // PNP actif
+  L.reset(); const b = L.add('bat'), rc = L.add('res'), rb = L.add('res'), q = L.add('bjt'); b.val = 5; q.kd = 'pnp'; rc.val = 470; rb.val = 1e6;
+  L.wire(b.id + ':1', q.id + ':2'); L.wire(q.id + ':0', rb.id + ':0'); L.wire(rb.id + ':1', b.id + ':0'); L.wire(q.id + ':1', rc.id + ':0'); L.wire(rc.id + ':1', b.id + ':0'); L.render();
+  near('PNP actif : Ic (mA)', q.mi1 * 1000, 0.435, 0.05); }
+{ // MOSFET N : interrupteur, puis blocage
+  L.reset(); const b = L.add('bat'), rd = L.add('res'), q = L.add('fet'); b.val = 5; rd.val = 100;
+  L.wire(b.id + ':1', rd.id + ':0'); L.wire(rd.id + ':1', q.id + ':1'); L.wire(q.id + ':2', b.id + ':0'); L.wire(q.id + ':0', b.id + ':1'); L.render();
+  near('MOSFET N passant : Id (mA)', q.mi1 * 1000, 48, 0.06);
+  L.wires.pop(); L.wire(q.id + ':0', b.id + ':0'); L.render(); yes('MOSFET N bloqué (Vgs = 0)', q.mi1 < 1e-6); }
+{ // MOSFET P
+  L.reset(); const b = L.add('bat'), rd = L.add('res'), q = L.add('fet'); b.val = 5; rd.val = 100; q.fk = 'pmos'; q.vt = 2; q.kp = .04;
+  L.wire(b.id + ':1', q.id + ':2'); L.wire(q.id + ':1', rd.id + ':0'); L.wire(rd.id + ':1', b.id + ':0'); L.wire(q.id + ':0', b.id + ':0'); L.render();
+  yes('MOSFET P passant', q.mi1 > 0.03);
+  L.wires.pop(); L.wire(q.id + ':0', b.id + ':1'); L.render(); yes('MOSFET P bloqué', q.mi1 < 1e-6); }
+{ // HEMT à déplétion : conduit à Vgs = 0, bloqué à Vgs = −1,5 V
+  L.reset(); const b = L.add('bat'), rd = L.add('res'), q = L.add('fet'); b.val = 5; rd.val = 47; q.fk = 'hemt'; q.vt = -.8; q.kp = .1;
+  L.wire(b.id + ':1', rd.id + ':0'); L.wire(rd.id + ':1', q.id + ':1'); L.wire(q.id + ':2', b.id + ':0'); L.wire(q.id + ':0', b.id + ':0'); L.render();
+  near('HEMT Vgs = 0 : Id (mA)', q.mi1 * 1000, 65, 0.1);
+  const g = L.add('bat'); g.val = 1.5; L.wires.pop(); L.wire(q.id + ':0', g.id + ':0'); L.wire(g.id + ':1', b.id + ':0'); L.render(); yes('HEMT Vgs = −1,5 V : bloqué', q.mi1 < 1e-5); }
+{ // Triac : amorçage par la gâchette, blocage au zéro de courant
+  L.reset(); const a = L.add('ac'), r = L.add('res'), t = L.add('triac'), g = L.add('bat'), rg = L.add('res'); a.val = 12; r.val = 100; g.val = 10; rg.val = 270;
+  L.wire(a.id + ':1', r.id + ':0'); L.wire(r.id + ':1', t.id + ':1'); L.wire(t.id + ':0', a.id + ':0'); L.wire(g.id + ':1', rg.id + ':0'); L.wire(rg.id + ':1', t.id + ':2'); L.wire(g.id + ':0', a.id + ':0'); L.render();
+  yes('triac amorcé : courant efficace dans la charge', r.Ir > 0.1 && r.Ir < 0.125); L.add('scope').td = 4e-3; L.render(); yes('triac : conduit dans les deux sens (moyenne ≈ 0)', Math.abs(r.I) < 0.05 * r.Ir);
+  L.wires.splice(L.wires.length - 3, 2); L.render(); yes('triac sans gâchette : bloqué', r.Ir < 1e-3); }
+{ // Optotriac
+  L.reset(); const a = L.add('ac'), r = L.add('res'), o = L.add('otri'), g = L.add('bat'), rl = L.add('res'); a.val = 12; r.val = 100; g.val = 5; rl.val = 220;
+  L.wire(a.id + ':1', r.id + ':0'); L.wire(r.id + ':1', o.id + ':3'); L.wire(o.id + ':2', a.id + ':0'); L.wire(g.id + ':1', rl.id + ':0'); L.wire(rl.id + ':1', o.id + ':0'); L.wire(o.id + ':1', g.id + ':0'); L.render();
+  yes('optotriac : LED allumée → sortie passante', r.Ir > 0.08); g.val = 0; L.render(); yes('optotriac : LED éteinte → sortie bloquée', r.Ir < 1e-3); }
+{ // Haut-parleur : fréquence et puissance déduites du courant
+  L.reset(); const g = L.add('gbf'), h = L.add('spk'); g.amp = 5; g.f = 1000; L.wire(g.id + ':1', h.id + ':0'); L.wire(g.id + ':0', h.id + ':1'); L.render();
+  near('haut-parleur : fréquence (Hz)', h.afq, 1000, 0.03); near('haut-parleur : courant efficace (mA)', h.arm * 1000, 5 / Math.SQRT2 / Math.hypot(8, 2 * Math.PI * 1000 * 5e-4) * 1000, 0.05); near('haut-parleur : sinus → facteur de crête', h.acr, 1.414, 0.1);
+  g.wave = 'sq'; L.render(); yes('haut-parleur : carré → facteur de crête ≈ 1', h.acr < 1.27); }
+{ // Microphone dynamique
+  L.reset(); const m = L.add('mic'), r = L.add('res'); r.val = 10000; m.mf = 1000; m.ma = .5; L.wire(m.id + ':0', r.id + ':0'); L.wire(m.id + ':1', r.id + ':1'); L.render();
+  near('micro dynamique : tension efficace (mV)', r.Ua * 1000, 20 * .5 / Math.SQRT2 * 10000 / 10600, 0.05); }
+{ // Microphone électret polarisé
+  L.reset(); const b = L.add('bat'), rp = L.add('res'), m = L.add('mic'); b.val = 5; rp.val = 2200; m.mk = 'ele'; m.mf = 1000; m.ma = .5;
+  L.wire(b.id + ':1', rp.id + ':0'); L.wire(rp.id + ':1', m.id + ':0'); L.wire(m.id + ':1', b.id + ':0'); L.render();
+  near('micro électret : composante alternative (mV)', rp.Ua * 1000, .5e-3 * .2 * .5 * 2200 / Math.SQRT2 * 1000, 0.08); near('micro électret : courant de polarisation (mA)', Math.abs(rp.I) * 1000, .5, 0.05); }
+store['ex27'].onclick(); { const q = L.comps.find(c => c.type === 'bjt'), pb = L.comps.find(c => c.type === 'pb'); yes('ex27 : bouton relâché, transistor bloqué', !L.err && q.mi1 < 1e-6); pb.closed = true; L.render(); yes('ex27 : bouton appuyé, transistor saturé', q.mst === 2 && q.mi1 > 0.005); }
+store['ex28'].onclick(); { const sw = L.comps.find(c => c.type === 'sw'), bl = L.comps.find(c => c.type === 'bulb'); yes('ex28 : gâchette ouverte, ampoule éteinte', !L.err && (bl.Ir || 0) < 1e-3); sw.closed = true; L.render(); yes('ex28 : gâchette fermée, ampoule allumée', bl.Ir > 0.3); }
+store['ex29'].onclick(); { const h = L.comps.find(c => c.type === 'spk'); yes('ex29 : haut-parleur à 440 Hz', !L.err && Math.abs(h.afq - 440) < 20); }
+// 12 sexies. Démarrage moteur monophasé : appel de courant
+{ L.reset(); const a = L.add('ac'), m = L.add('mac'); a.val = 230; L.wire(a.id + ':1', m.id + ':0'); L.wire(m.id + ':0', m.id + ':0'); L.wire(a.id + ':0', m.id + ':1'); L.render(); const I1 = m.Ir; m.kst = 0; L.render(); const I0 = m.Ir; m.kst = 0.5; L.render(); const Ih = m.Ir;
+  yes('moteur : appel de courant au démarrage (≥ 4 × nominal)', I0 > 4 * I1); yes('moteur : le courant décroît avec la vitesse', I0 > Ih && Ih > I1); }
+// 12 septies. Annuler / rétablir, copier / coller, clics sur les appareils
+{ const wait = ms => { const t0 = Date.now(); while (Date.now() - t0 < ms); };
+  L.reset(); L.render(); wait(800); const r = L.add('res'); r.val = 330; L.render(); wait(800); const c2 = L.add('cap'); L.render(); yes('annuler : 2 composants', L.comps.length === 2);
+  L.undo(); yes('Ctrl+Z : retire le dernier ajout', L.comps.length === 1 && L.comps[0].type === 'res'); L.redo(); yes('Ctrl+Y : rétablit', L.comps.length === 2);
+  L.undo(); L.undo(); yes('Ctrl+Z ×2 : plan vide', L.comps.length === 0);
+  L.redo(); L.setSel(L.comps[0].id); yes('copier', L.copySel()); L.pasteSel(); yes('coller : nouveau composant identique, nouvel id', L.comps.length === 2 && L.comps[1].type === 'res' && L.comps[1].val === 330 && L.comps[1].id !== L.comps[0].id && L.comps[1].x === L.comps[0].x + 40);
+  const a = L.add('amp'); a.ana = 1; yes('zones cliquables AC/DC + calibres sur l’aiguille', (L.meterHits(a).match(/data-mq/g) || []).length === 1 + 7); const v = L.add('volt'); yes('zones AC/DC sur le numérique', /data-mq="AC"/.test(L.meterHits(v)) && /data-mq="DC"/.test(L.meterHits(v))); }
+store['ex30'].onclick(); { const sw = L.comps.find(c => c.type === 'sw'), bl = L.comps.find(c => c.type === 'bulb'); yes('ex30 : commande ouverte, lampe 230 V éteinte', !L.err && (bl.Ir || 0) < 1e-3); sw.closed = true; L.render(); yes('ex30 : commande 5 V fermée, lampe 230 V allumée', !L.err && bl.Ir > 0.2 && bl.Ir < 0.3); }
 // 12 bis. Sans Uno : le mode temps réel s'arrête
 L.reset(); L.liveDrop(); L.add('bat'); L.render(); yes('pas de Uno : pas de temps réel', !L.live);
 L.add('volt').ana = 1; L.add('amp').ana = 1; L.render(); yes('rendu complet', true);

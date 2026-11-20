@@ -1,4 +1,4 @@
-# ⚡ LaboSim – laboratoire d'électricité virtuel (v3.2)
+# ⚡ LaboSim – laboratoire d'électricité virtuel (v3.3)
 
 Simulateur de travaux pratiques d'électricité qui tourne dans un navigateur, sans installation ni serveur.
 Les appareils sont dessinés comme en vrai et l'élève les **câble lui-même** avec des cordons banane ou BNC.
@@ -89,3 +89,6 @@ NE555 et amplificateurs opérationnels (nécessitent une simulation temporelle n
 ## Licence
 
 MIT – voir `LICENSE`.
+
+## Nouveautés v3.3
+Fusibles du multimètre numérique (3 A / 16 A, bouton « Changer le fusible »), aiguille amortie sur les appareils analogiques, et nouveaux composants : transistors bipolaires et de puissance, MOSFET, HEMT, triac, optotriac, haut-parleur, microphone. Voir `CHANGELOG.md`.

@@ -1,5 +1,40 @@
 # Changelog
 
+## v3.3.7
+- Exemples : les textes explicatifs sont maintenant coupés en ~4 lignes (au lieu d'une seule ligne très longue qui faussait le zoom automatique).
+
+## v3.3.6
+- **Moteurs : son coupé par défaut** ; case « Son du moteur (vrombissement) » dans le panneau de chaque moteur pour l'activer (les relais et le haut-parleur gardent leur son).
+- Nouvel exemple **« Interface 5 V / 230 V (optotriac + triac) »** : commande logique 5 V (ou 3,3 V) → LED de l'optotriac MOC3021 → gâchette du triac → lampe 60 W sous 230 V, avec isolation galvanique.
+
+## v3.3.5
+- **Curseur de volume** à côté du bouton 🔊 (réglage mémorisé) : agit sur les relais, le haut-parleur et les moteurs.
+- Vrombissement des moteurs beaucoup plus doux (onde adoucie, filtre grave, niveau divisé par ~5).
+
+## v3.3.4
+- Démarrage des moteurs alternatifs : appel de courant ramené à **≈ 0,2 s**.
+- **Multimètres numériques** : latence réduite à ≈ 80 ms (affichage quasi instantané, en continu).
+
+## v3.3.3
+- **Annuler / rétablir** : Ctrl+Z / Ctrl+Y (ou Ctrl+Maj+Z), jusqu'à 100 étapes (ajout, suppression, déplacement, câblage, réglages, exemples chargés).
+- **Copier / coller** de composant : Ctrl+C / Ctrl+V (collages décalés), et Ctrl+D pour dupliquer. Les réglages sont conservés, les câbles non.
+- **Appareils de mesure** : sur les voltmètres / ampèremètres à aiguille, clic sur « AC ~ / DC = » pour changer de mode et clic sur un **calibre** (les chiffres autour du bouton) pour le choisir ; sur les multimètres numériques, clic sur AC/DC (cadran ou écran). Le menu du bas reste disponible.
+- **Vrombissement léger** des moteurs (MCC, monophasé, triphasé), qui monte avec la vitesse ; coupé par le bouton 🔊.
+- **Menus** : bouton ⊟ / ⊞ pour tout replier ou tout déplier, et la section **Exemples** peut maintenant se replier.
+
+## v3.3.2
+- Démarrage des moteurs alternatifs ramené à **≈ 0,3 s** (appel de courant bref).
+- **Multimètres numériques** (ampèremètre, voltmètre, multimètre universel) : affichage à intégration lente (≈ 0,5 s), comme un vrai appareil — le pic de démarrage de 0,3 s n'est presque pas visible ; il reste bien visible sur les appareils **à aiguille**.
+
+## v3.3.1
+- **Démarrage des moteurs alternatifs** (monophasé et triphasé) : quand on les met sous tension, le courant d'appel (≈ 6 × In) décroît progressivement pendant ~1,5 s à mesure que le moteur accélère (la vitesse affichée monte aussi). Un ampèremètre à aiguille ou un multimètre montre donc le pic de démarrage. À la coupure, le moteur ralentit et le prochain démarrage refait un appel de courant.
+
+## v3.3.0
+- **Multimètre universel : fusibles.** Borne **3 A** : le fusible grille au-dessus de 3,3 A ; borne **16 A** : au-dessus de 17 A (on peut monter jusqu'à 20 A). Un fusible grillé coupe le circuit (« FUSE » à l'écran, croix rouge sur la borne). Bouton **« Changer le fusible »** dans le panneau pour réarmer l'appareil.
+- **Voltmètres / ampèremètres à aiguille** : équipage mobile amorti (≈ 0,4 s, léger dépassement) : l'aiguille ne suit plus les variations rapides (démarrage moteur, PWM…) et indique la moyenne (valeur efficace en AC), comme un vrai appareil.
+- **Nouveaux composants** (simulation temporelle) : transistor bipolaire NPN / PNP et de puissance (TIP41 / TIP42), MOSFET canal N / P et de puissance, HEMT à déplétion, HEMT GaN, **triac de puissance**, **optotriac** (MOC3021, option passage par zéro), **haut-parleur** (son WebAudio reconstruit depuis le courant de bobine), **microphone** (dynamique ou électret ; son réglable ou micro réel de l'appareil).
+- Exemples : transistor en commutation, triac, haut-parleur + GBF.
+
 ## v3.2.4
 - Oscilloscope : quand le niveau de déclenchement est réglé hors de la courbe (aucun passage possible), la trace **défile** comme sur un vrai oscilloscope au lieu de rester figée ; elle se stabilise dès que le niveau recoupe le signal.
 
