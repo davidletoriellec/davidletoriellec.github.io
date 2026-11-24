@@ -1,0 +1,1 @@
+Dépose ici un fichier .json par boîte noire (export « Un fichier par boîte » de la bibliothèque), puis ajoute son chemin (ex. "bb/ma-boite.json") dans labosim-bb-index.json.

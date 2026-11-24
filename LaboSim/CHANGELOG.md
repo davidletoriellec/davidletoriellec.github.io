@@ -1,4 +1,62 @@
+## v3.10.0
+- **Menu de gauche réorganisé** : 18 catégories classées par ordre alphabétique (Alimentations, Appareils de mesure, Audio, Boîtes noires, Capteurs, Charges, Charges domestiques, Charges industrielles, Circuits intégrés, Commandes, Composants, Composants électroniques, Micro-contrôleur, Moteurs, Relais et Contacteurs, Repérage, Semi-conducteurs, Transformateurs). Les étiquettes (filtre) sont inchangées.
+- **Oscilloscope** : voie mathématique (CH1 + CH2, CH1 − CH2, CH2 − CH1, CH1 × CH2) avec échelle auto ou réglable ; mémorisation d'une courbe de référence (CH1 ou CH2, pointillés blancs) et enregistrement des courbes en fichier CSV.
+- **Transformateurs réalistes** (nouvelle rubrique) : monophasé et triphasé (Yy0/6, Yd1/11, Dy11/1, Dd0/6) ; réglage de U1n, U2 à vide, Sn (VA), pertes fer, puissance réactive de magnétisation Q0, pertes cuivre Pj et tension de court-circuit (flux de fuite). Modèle d'enroulements couplés (R, L de fuite, Lm, Rfe), actif en régime sinusoïdal **et** en simulation temporelle (transformateur + redresseur). Panneau : U, I, P, pertes, Q, rendement, charge, chute de tension. Bouton « Valeurs typiques ».
+- **Alimentation à découpage** (menu Alimentations) : entrée 24–400 V (alternatif ou continu), sortie 3,3–15 V, puissance maximale 30–300 W (limitation), rendement réglable ; courant d'entrée = P sortie / rendement.
+- **Résistance des câbles** : option par câble (cuivre / aluminium, section 0,75 à 35 mm², longueur en m ; R = ρ·L/S à 20 °C), active en régime sinusoïdal/continu et en simulation temporelle. Affichage de R, du courant, de la chute de tension et des pertes ; étiquette sur le câble ; **témoin de surcharge** (rouge + ⚠) au-delà du courant admissible indicatif de la section (alu = 80 % du cuivre). **Sélection multiple** de câbles (Maj/Ctrl + clic, ou « Sélectionner tous les câbles ») avec application groupée ; Suppr supprime la sélection. Par défaut les câbles restent idéaux (5 mΩ). Câbles coaxiaux exclus.
+- **Textes du plan** : édition directe par double-clic (ou double-tap) ; barre d'outils G / I / S, indice, exposant, **vecteur** (flèche tracée au-dessus), tailles petit / moyen / grand **par portion de texte** (et taille de base du texte entier), boutons qui s'allument selon la position du curseur ; le vecteur se plaque sur toute la sélection par **une seule flèche**, et se désactive en recliquant sur le bouton. Rendu identique dans le plan, l'export PDF et l'export PNG ; les anciens textes restent inchangés. Le titre d'un rectangle pointillé se modifie aussi par double-clic. Zone de clic des textes élargie à toute leur boîte.
+
 # Changelog
+
+## v3.9.3
+- **Import de boîtes noires** : accepte maintenant l'export de la bibliothèque, le fichier d'**une seule boîte** (format « un fichier par boîte »), un **montage enregistré** contenant des boîtes, et plusieurs fichiers à la fois ; messages d'erreur explicites (le fichier index n'est pas importable).
+- **Export en PDF ou en PNG** : le bouton « Exporter » propose le PDF (page A4 avec nom, date, notes) ou une **image PNG sur fond blanc ou transparent** du schéma (ou de l'écran de l'oscilloscope), haute résolution, sans quadrillage.
+- **Fenêtre d'accueil** au démarrage : nom, version, zone des créateurs (à modifier dans `index.html`, bloc `#spc`), boutons « Faire un montage » et « Ouvrir un exemple », et 3 exemples tirés au hasard. Se ferme aussi avec Échap ou un clic à côté.
+- **Exemples** : retirés du menu de gauche ; bouton « 📚 Exemples » dans la barre du haut qui ouvre une fenêtre avec la liste complète (aussi accessible depuis l'accueil).
+
+## v3.9.2
+- **Contournement automatique** : un câble sans point manuel contourne désormais les écrans, cadrans et boutons des appareils (calcul de trajet par points de passage autour de la zone), en plus du masquage résiduel de v3.9.1. Les câbles à points manuels ne sont pas modifiés. Bouton 🧵 pour désactiver.
+- Test d'export/import des boîtes noires : la valeur réelle d'une résistance à tolérance (ex. 1037 Ω) est conservée.
+
+## v3.9.1
+- Les câbles restent **devant** les appareils mais sont masqués au-dessus des **écrans, cadrans et boutons** (afficheurs, ampèremètres, wattmètre, multimètre, GBF…) ; fiches toujours visibles. Bouton 🧵 près du zoom pour afficher les câbles partout (mémorisé).
+
+## v3.8.2
+- **Boîtes noires : nouveaux éléments** — GBF (`G`), régulateur réglable (`U`), ampli-op (`A`), comparateur (`K`), optotriac (`O`), NE555 (`N`), MOSFET / HEMT / GaN (`M … N|P|H|G`), phase des sources alternatives (`V … AC f phase`). La capture « tout type » reprend aussi l'alimentation double, l'alimentation triphasée, le GBF, les lampes LED / fluocompactes, l'optotriac, le régulateur, l'ampli-op, le comparateur et le NE555.
+- Référence de masse : sans alimentation à l'extérieur, la masse est prise sur la borne « − » de la première source de la boîte.
+
+## v3.8.1
+- **Sources dans les boîtes noires** : nouvelle ligne de netlist `V nom + - valeur [AC fréquence]` (générateur de tension continu ou alternatif), utilisable pour simuler une batterie (modèle de Thévenin : source + résistance) ou une alimentation. Deux modèles ajoutés dans l'éditeur.
+- Menu Boîtes noires : entrées « Dipôle / Quadripôle tout type » pour capturer aussi alimentations, diodes, transistors, triacs, lampes… (les entrées habituelles ne prennent toujours que R, C, L).
+
+## v3.8.0
+- **Boîtes noires étendues** : la capture accepte aussi diodes / LED / Zener, transistors bipolaires, MOSFET N/P, triacs, lampes, LDR, boîtes à décades et interrupteurs fermés ; nouveaux éléments de netlist `D`, `Q`, `M`, `T` (mode temporel automatique). Les valeurs réelles des résistances à tolérance ±5 % sont figées dans la boîte.
+- **Ventilateurs** 230 V monophasé (domestique) et 400 V triphasé (industriel), **aspirateur 2000 W** (moteur universel ≈ 9 A, 17 000 tr/min) : nouveaux modèles de moteur avec hélice / turbine. Exemples 33 et 34.
+
+## v3.7.3
+- Bibliothèque de boîtes noires : **un fichier par boîte** + `labosim-bb-index.json` (même principe que les étiquettes). Les fichiers placés dans `bb/` et listés dans l'index se chargent au démarrage ; `labosim-bb.json` (tout en un) reste accepté.
+
+## v3.7.2
+- **Correctif** : relais et contacteurs fonctionnent maintenant en simulation temporelle (dès qu'un triac, une diode, un transistor… est dans le montage). Avant, la bobine était ignorée dans ce mode : le contacteur ne collait jamais quand il était piloté par un triac / optotriac. La bobine, le collage (80 % de la tension bobine), le retombée (30 %) et les contacts sont désormais pris en compte.
+
+## v3.7.1
+- **Ampèremètre shunté par un fil** (astuce pour éviter la pointe de démarrage d'un moteur) : un fil entre les deux bornes de l'ampèremètre (numérique, multimètre en mode courant ou à aiguille) court-circuite l'appareil : il ne voit plus le courant et son fusible ne saute plus. En retirant le fil une fois le moteur lancé, on lit le courant nominal. Sans fil, la pointe de démarrage fait toujours sauter le fusible.
+
+## v3.7.0
+- **Bibliothèque de boîtes noires** (menu Boîtes noires) : « 📚 Enregistrer dans la bibliothèque » sur une boîte sélectionnée ; le contenu reste chiffré et le code professeur est conservé. La bibliothèque est mémorisée dans le navigateur, avec export / import, et se charge automatiquement depuis `labosim-bb.json` placé à côté de `index.html` (même principe que les étiquettes).
+- **Système de levage** (menu Charges mécaniques) : treuil + masse couplés à un moteur (automatique = le plus proche, ou choix). Masse, rayon du tambour et réducteur fixent le couple résistant, donc la charge du moteur (courant, rotation) ; la masse monte à la vitesse du moteur, se retient à l'arrêt, et le moteur cale si la charge est trop lourde. Exemple 32.
+
+## v3.6.0
+- **Ohmmètre** (menu Appareils de mesure) : calibres 200 Ω, 2 kΩ, 20 kΩ, 200 kΩ, 2 MΩ (« OL » au-delà), choix en cliquant sur l'appareil ou dans le panneau. Mode **BIP** (test de continuité) : bip continu sous 50 Ω.
+- **Régulateur de tension réglable** (menu Alimentation régulée) : tension de sortie Un réglable, tension de déchet (dropout), limitation de courant. Exemple 31 : alimentation régulée (pont + filtre + régulateur).
+- Correctif : le calibre choisi sur l'ampèremètre à aiguille s'affiche sur l'appareil.
+
+## v3.5.0
+- **Wattmètre renommé POWER8000** ; fusible **16 A** (saute au-dessus de 17 A, affichage FUSE, bouton « Changer le fusible »).
+- **Ampèremètres numériques** : fusible **10 A** (saute au-dessus de 11 A).
+- **Ampèremètre à aiguille** : 3 bornes **COM / 3 A / 10 A**. Borne 3 A (fusible 3 A, jusqu'à 3,3 A) : calibres ≤ 3 A, précision élevée ; borne 10 A (fusible 10 A) : calibre 10 A, précision moindre.
+- Champs de valeur : **liste déroulante des préfixes supprimée** (saisie 1k, 4u7, 10m… ; l'unité est affichée à côté).
+- Notice : le sommaire ne masque plus le début de la rubrique.
 
 ## v3.4.0
 - **Boîte à décades** (menu Charges) : 6 cadrans de 0 à 9, utilisable en **résistance** (1 Ω à 999 999 Ω), **condensateur** (1 nF à 999,999 µF) ou **bobine** (1 µH à 999,999 mH). On change un chiffre en cliquant sur ▲ (haut) ou ▼ (bas) du cadran, ou en tapant la valeur dans le panneau.

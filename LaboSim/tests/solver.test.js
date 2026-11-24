@@ -6,7 +6,7 @@ const el = () => ({ style: {}, dataset: {}, classList: { toggle() {}, remove() {
 const store = {};
 global.document = { getElementById: id => store[id] || (store[id] = el()), querySelectorAll: () => [] };
 global.window = { addEventListener() {} };
-const L = new Function(code + `;return{decSet,decVal,undo,redo,copySel,pasteSel,setSel(v){sel=v},meterHits,setSmooth(v){smoothOn=v},needle,fuseBlown,T,reading,traces,add,wire,connect,render,mkWave,bz,tp,wsamples,buildPdf,pdfWrap,serializeMontage,loadMontage,buildMenu,setFilter(v){tagFilter=v},get TAGS(){return TAGS},get tranMode(){return tranMode},startCapture,capPick,get capt(){return capt},trFreq,bbEnc,bbDec,bbHash,bbParse,BBT,pv,get view(){return view},fitView,zoomAt,contentBounds,menuHtml(){return menuEl.innerHTML},reset(){comps=[];wires=[];notes=[];uid=1;sel=selW=selN=pend=null},get err(){return err},get wires(){return wires},get comps(){return comps},get solve(){return solve},geo,BX0,BP,BROW,BC,nearHole,snapPlug,plugSet(){return plugSet},DK,LC,gbfHarm,gbfWave,bridges,mergeTags,tagSlug,ldrR,liveStart,liveStop,liveAdvance,liveDrop,liveSync,liveResetAll,get live(){return live},engOf,UNO,tranModel,dockUpload,exUno}`)();
+const L = new Function(code + `;return{ohmR,setOhm,motPreset,BBLIB(){return BBLIB},bbLibAdd,bbLibPlace,bbLibMerge,bbLibArr,wR,wOver,wAdm,noteSvg,noteRuns,setNotes(v){notes=v},motorTick,HMAX,decSet,decVal,undo,redo,copySel,pasteSel,setSel(v){sel=v},meterHits,setSmooth(v){smoothOn=v},needle,fuseBlown,T,reading,traces,add,wire,connect,render,mkWave,bz,tp,wsamples,buildPdf,pdfWrap,serializeMontage,loadMontage,buildMenu,setFilter(v){tagFilter=v},get TAGS(){return TAGS},get tranMode(){return tranMode},startCapture,capPick,get capt(){return capt},trFreq,bbEnc,bbDec,bbHash,bbParse,BBT,pv,get view(){return view},fitView,zoomAt,contentBounds,menuHtml(){return menuEl.innerHTML},reset(){comps=[];wires=[];notes=[];uid=1;sel=selW=selN=pend=null},get err(){return err},get wires(){return wires},get comps(){return comps},get solve(){return solve},geo,BX0,BP,BROW,BC,nearHole,snapPlug,plugSet(){return plugSet},DK,LC,gbfHarm,gbfWave,bridges,mergeTags,tagSlug,ldrR,liveStart,liveStop,liveAdvance,liveDrop,liveSync,liveResetAll,get live(){return live},engOf,UNO,tranModel,dockUpload,exUno}`)();
 
 let fail = 0;
 L.setSmooth(false);
@@ -442,5 +442,150 @@ near('pv 4k7', L.pv('4k7'), 4700, 1e-9); near('pv 1u (µ)', L.pv('1u') * 1e6, 1,
 { L.reset(); const a = L.add('ac'), d = L.add('dec'); a.val = 10; a.f = 50; d.dkind = 'C'; L.decSet(d, 100e-6); L.wire(a.id + ':1', d.id + ':0'); L.wire(d.id + ':1', a.id + ':0'); L.render(); near('décades C en alternatif : I = U·Cω (mA)', d.Ir * 1000, 10 * 100e-6 * 2 * Math.PI * 50 * 1000, 0.02); }
 // 12 bis. Sans Uno : le mode temps réel s'arrête
 L.reset(); L.liveDrop(); L.add('bat'); L.render(); yes('pas de Uno : pas de temps réel', !L.live);
+// 12 nonies. Fusibles ampèremètres / wattmètre (v3.5)
+{ const rig = (ana, jack, R, V = 10) => { L.reset(); const b = L.add(V > 30 ? 'ac' : 'bat'), r = L.add('res'), a = L.add('amp'); b.val = V; r.val = R; a.ana = ana; a.rng = 10; L.wire(b.id + ':1', a.id + ':' + jack); L.wire(a.id + ':0', r.id + ':0'); L.wire(r.id + ':1', b.id + ':0'); L.render(); return { a, r }; };
+  { const { a } = rig(0, 1, 2); yes('ampèremètre num. : 5 A passe', !a.fb10); }
+  { const { a } = rig(0, 1, 1, 100); yes('ampèremètre num. : grillé à 20 A', a.fb10 === true); L.render(); yes('ampèremètre num. grillé : courant nul', Math.abs(a.I || 0) < 1e-6); }
+  { const { a } = rig(1, 1, 5); yes('aiguille 3 A : 2 A passe', !a.fb3); }
+  { const { a } = rig(1, 1, 2); yes('aiguille 3 A : grillé à 5 A', a.fb3 === true); }
+  { const { a } = rig(1, 2, 2); yes('aiguille 10 A : 5 A passe, fusible 3 A intact', !a.fb10 && !a.fb3); }
+  { const { a } = rig(1, 2, 1, 100); yes('aiguille 10 A : grillé à 20 A', a.fb10 === true); }
+}
+{ L.reset(); const a = L.add('ac'), r = L.add('res'), w = L.add('watt'); a.val = 230; r.val = 5; L.wire(a.id + ':1', w.id + ':2'); L.wire(w.id + ':0', r.id + ':0'); L.wire(r.id + ':1', a.id + ':0'); L.wire(w.id + ':3', a.id + ':1'); L.render(); yes('wattmètre : 16 A grillé à 46 A', w.fb16 === true && L.reading(w) !== undefined); }
+// 12 decies. Ohmmètre et régulateur réglable (v3.5)
+{ L.reset(); const r = L.add('res'), o = L.add('ohm'); r.val = 470; L.wire(o.id + ':1', r.id + ':0'); L.wire(o.id + ':0', r.id + ':1'); L.render(); near('ohmmètre : 470 Ω', L.ohmR(o), 470, 0.01); yes('ohmmètre : affichage', /470/.test(L.reading(o)));
+  r.val = 5000; L.render(); yes('ohmmètre calibre 2 kΩ : OL à 5 kΩ', L.reading(o) === 'OL'); L.setOhm(o, 20000); L.render(); yes('ohmmètre 20 kΩ : lit 5 kΩ', /5/.test(L.reading(o)) && L.reading(o) !== 'OL');
+  r.val = 10; L.setOhm(o, 'bip'); L.render(); yes('BIP : continuité < 50 Ω', o.bip === true && L.ohmR(o) < 50); }
+{ L.reset(); const b = L.add('bat'), g = L.add('reg'), r = L.add('res'), v = L.add('dmm'); b.val = 12; g.ur = 5; r.val = 100; v.fn = 'V';
+  L.wire(b.id + ':1', g.id + ':0'); L.wire(g.id + ':1', r.id + ':0'); L.wire(r.id + ':1', b.id + ':0'); L.wire(g.id + ':2', b.id + ':0');
+  L.wire(v.id + ':1', r.id + ':0'); L.wire(v.id + ':0', r.id + ':1'); L.render(); near('régulateur : 5 V en sortie', -v.U, 5, 0.03);
+  g.ur = 9; L.render(); near('régulateur réglé à 9 V', -v.U, 9, 0.03);
+  b.val = 10; g.ur = 12; L.render(); near('dropout : sortie ≈ Vin − 2 V', -v.U, 8, 0.05); }
+store['ex31'].onclick(); { const v = L.comps.find(c => c.type === 'dmm'); yes('ex31 : pas d\'erreur', !L.err); near('ex31 : sortie régulée 5 V', -v.U, 5, 0.05); }
+// 12 undecies. Levage et bibliothèque de boîtes noires (v3.6)
+{ L.reset(); const a = L.add('ac'), m = L.add('mac'), h = L.add('lev'); a.val = 230; m.x = 300; m.y = 300; h.x = 480; h.y = 300; h.mass = 20; h.gr = 20; h.dr = 8;
+  L.wire(a.id + ':1', m.id + ':0'); L.wire(m.id + ':1', a.id + ':0'); L.render();
+  const T = 20 * 9.81 * 0.08 / 20 / 0.9, Tn = m.pn / (2 * Math.PI * 47.5); near('levage : charge du moteur = couple / nominal', m.ml, T / Tn, 0.02); yes('levage : moteur couplé (automatique)', h.lm === m.id && m.hext === h.id && !h.stall);
+  const h0 = h.lh || 0; m.kst = 1; L.render(); for (let i = 0; i < 5; i++) L.motorTick(); yes('levage : vitesse de montée > 0', h.lv > 0);
+  h.mass = 400; h.gr = 1; h.dr = 20; L.render(); yes('levage : charge trop lourde → le moteur cale', h.stall === true && m.ml === 1.2 && h.lv === 0 || h.stall === true); }
+{ L.reset(); const b = L.add('bb'); b.name = 'MYS1'; b.net = L.bbEnc ? 'x' : 'x'; b.lk = 'abc'; const n0 = L.BBLIB().length; L.bbLibAdd(b); yes('bibliothèque : ajout', L.BBLIB().length === n0 + 1);
+  const c = L.bbLibPlace(L.BBLIB().find(x => x.name === 'MYS1')); yes('bibliothèque : placement conserve code et contenu', c.lk === 'abc' && c.net === 'x' && c.name === 'MYS1');
+  yes('bibliothèque : fusion sans doublon', !L.bbLibMerge([{ name: 'MYS1', kind: 'd', net: 'y' }], false)); }
+// 12 duodecies. Ampèremètre shunté par un fil (v3.7.1)
+{ const rig = (ana, shunt) => { L.reset(); const a = L.add('ac'), r = L.add('res'), am = L.add('amp'); a.val = 100; r.val = 1; am.ana = ana; am.rng = 10;
+    L.wire(a.id + ':1', am.id + ':' + (ana ? 1 : 0)); L.wire(am.id + ':' + (ana ? 0 : 1), r.id + ':0'); L.wire(r.id + ':1', a.id + ':0'); if (shunt) L.wire(am.id + ':0', am.id + ':1'); L.render(); return am; };
+  for (const ana of [0, 1]) { const am = rig(ana, true);  yes('ampèremètre ' + (ana ? 'aiguille' : 'num.') + ' shunté : fusible intact', !L.fuseBlown(am)); yes('ampèremètre shunté : ne voit plus le courant', Math.abs(am.I || 0) < 0.5); const am2 = rig(ana, false); yes('sans fil : fusible grillé', L.fuseBlown(am2)); } }
+{ L.reset(); const a = L.add('ac'), m = L.add('mac'), am = L.add('amp'); a.val = 230; am.ana = 1; am.rng = 3; L.wire(a.id + ':1', am.id + ':1'); L.wire(am.id + ':0', m.id + ':0'); L.wire(m.id + ':1', a.id + ':0'); L.wire(am.id + ':0', am.id + ':1'); m.kst = 0; L.render();
+  yes('moteur + ampèremètre shunté : fusible intact au démarrage', !L.fuseBlown(am)); m.kst = 1; L.render(); L.render(); yes('shunt : l\'ampèremètre ne voit rien', Math.abs(am.Ir || 0) < 1e-6);
+  L.setSel && 0; const w = L.wire; }
+// 12 terdecies. Contacteur piloté par triac + optotriac (mode temporel, v3.7.2)
+{ L.reset(); const a = L.add('ac'), k = L.add('ctc'), t = L.add('triac'), r = L.add('res'), o = L.add('otri'), b = L.add('bat'), sw = L.add('sw'), rd = L.add('res'); a.val = 230; k.un = 230; r.val = 150; b.val = 5; rd.val = 220; sw.closed = true;
+  L.wire(a.id + ':1', k.id + ':0'); L.wire(k.id + ':1', t.id + ':1'); L.wire(a.id + ':0', t.id + ':0'); L.wire(t.id + ':1', r.id + ':0'); L.wire(r.id + ':1', o.id + ':3'); L.wire(o.id + ':2', t.id + ':2');
+  L.wire(b.id + ':1', sw.id + ':0'); L.wire(sw.id + ':1', rd.id + ':0'); L.wire(rd.id + ':1', o.id + ':0'); L.wire(o.id + ':1', b.id + ':0'); L.render();
+  yes('contacteur sur triac : la bobine reçoit ~230 V', k.Ur > 200); yes('contacteur sur triac : colle', k.on === true);
+  sw.closed = false; L.render(); yes('contacteur : retombe quand la commande 5 V est coupée', k.on === false && !(k.Ur > 50)); }
+// 12 quaterdecies. Boîtes noires étendues (diode, transistor…) et valeurs de tolérance figées (v3.8)
+{ L.reset(); const a = L.add('ac'), d = L.add('dio'), r = L.add('res'); a.val = 12; r.val = 100; L.wire(a.id + ':1', d.id + ':0'); L.wire(d.id + ':1', r.id + ':0'); L.wire(r.id + ':1', a.id + ':0'); L.render(); const U0 = r.U, Ur0 = r.Ur;
+  yes('redresseur simple alternance (référence)', U0 > 3 && Ur0 > U0);
+  L.reset(); const d2 = L.add('dio'); L.startCapture('d', true); L.capPick(d2.id + ':0'); L.capPick(d2.id + ':1'); const bb = L.comps.find(c => c.type === 'bb'); yes('capture : boîte créée avec une diode', !!bb && /^D1 /m.test(L.bbDec(bb.net)));
+  const a2 = L.add('ac'), r2 = L.add('res'); a2.val = 12; r2.val = 100; L.wire(a2.id + ':1', bb.id + ':0'); L.wire(bb.id + ':1', r2.id + ':0'); L.wire(r2.id + ':1', a2.id + ':0'); L.render(); near('boîte noire avec diode : même tension moyenne', r2.U, U0, 0.02); yes('boîte noire avec diode : mode temporel', L.tranMode); }
+{ const P = L.bbParse('Q1 A B C NPN 100 P\nM1 A B C N 2 0.05\nT1 A B C\nD1 A B 0.7 1', 'q'); yes('netlist : Q, M, T, D acceptés', !P.er && P.els.length === 4); yes('netlist : élément inconnu refusé', !!L.bbParse('X1 A B', 'd').er); }
+{ L.reset(); const r = L.add('res'), c = L.add('res'); r.tol = true; r.val = 1000; r.eps = 0.037; c.val = 50; L.wire(r.id + ':1', c.id + ':0'); L.startCapture('d'); L.capPick(r.id + ':0'); L.capPick(c.id + ':1'); const bb = L.comps.find(c => c.type === 'bb'); yes('tolérance : valeur réelle figée dans la boîte', /1037/.test(L.bbDec(bb.net))); }
+// 12 quindecies. Ventilateurs et aspirateur (v3.8)
+{ const mk = (type, kind, pre) => { L.reset(); const a = L.add(kind), m = L.add(type); a.val = kind === 'a3' ? 400 : 230; L.motPreset(m, pre); L.wire(a.id + ':1', m.id + ':0'); L.wire(a.id + (kind === 'a3' ? ':2' : ':0'), m.id + ':1'); if (kind === 'a3') L.wire(a.id + ':3', m.id + ':2'); m.kst = 1; L.render(); L.render(); return m; };
+  { const m = mk('mac', 'ac', 'vac');  yes('aspirateur : environ 2000 W absorbés', m.P > 1800 && m.P < 2200); yes('aspirateur : vitesse élevée (> 10 000 tr/min)', m.rpm > 10000); }
+  { const m = mk('mac', 'ac', 'fan1');  yes('ventilateur 230 V : ~1400 tr/min', m.rpm > 1200 && m.rpm < 1600); yes('ventilateur 230 V : quelques dizaines de watts', m.P > 40 && m.P < 200); }
+  { const m = mk('m3', 'a3', 'fan3');  yes('ventilateur 400 V tri : tourne à ~1400 tr/min', m.rpm > 1300 && m.rpm < 1520); } }
+// 12 sexdecies. Sources dans les boîtes noires (v3.8.1)
+{ L.reset(); const b = L.add('bb'), r = L.add('res'); b.kind = 'd'; b.net = L.bbEnc('V1 n1 B 12\nR1 A n1 0.1'); r.val = 10; L.wire(b.id + ':0', r.id + ':0'); L.wire(b.id + ':1', r.id + ':1'); L.render();
+  near('batterie Thévenin dans une boîte : 12 V sur 10 Ω', r.U, 12 * 10 / 10.1, 0.01); yes('batterie en boîte : pas d\'erreur', !L.err);
+  L.reset(); const b2 = L.add('bb'), r3 = L.add('res'), d = L.add('dio'); b2.kind = 'd'; b2.net = L.bbEnc('V1 n1 B 12\nR1 A n1 0.1'); r3.val = 10; L.wire(b2.id + ':0', d.id + ':0'); L.wire(d.id + ':1', r3.id + ':0'); L.wire(b2.id + ':1', r3.id + ':1'); L.render(); yes('batterie en boîte + diode : mode temporel sans erreur', !L.err && L.tranMode); yes('batterie en boîte + diode : tension de sortie cohérente', r3.U > 7 && r3.U < 11.3); }
+{ L.reset(); const b = L.add('bb'), r = L.add('res'); b.kind = 'd'; b.net = L.bbEnc('V1 n1 B 230 AC 50\nR1 A n1 0.5'); r.val = 100; L.wire(b.id + ':0', r.id + ':0'); L.wire(b.id + ':1', r.id + ':1'); L.render(); near('source alternative en boîte : 230 V~ sur 100 Ω', r.Ur, 230 * 100 / 100.5, 0.01); }
+{ L.reset(); const g = L.add('bat'), r = L.add('res'), q = L.add('res'); g.val = 9; r.val = 2; q.val = 8; L.wire(g.id + ':1', r.id + ':0'); L.wire(r.id + ':1', q.id + ':0'); L.wire(q.id + ':1', g.id + ':0');
+  L.startCapture('d', true); L.capPick(q.id + ':0'); L.capPick(g.id + ':0'); const bb = L.comps.find(c => c.type === 'bb'); const txt = L.bbDec(bb.net); yes('capture : une alimentation est reprise dans la boîte (V)', /^V\d /m.test(txt)); }
+// 12 septdecies. Éléments avancés en boîte noire (v3.8.2)
+{ const box = (net, R = 1000) => { L.reset(); const b = L.add('bb'), r = L.add('res'); b.kind = 'd'; b.net = L.bbEnc(net); r.val = R; L.wire(b.id + ':0', r.id + ':0'); L.wire(b.id + ':1', r.id + ':1'); L.render(); return { b, r }; };
+  { const { r } = box('G1 A B 5 1000 sq 0 0.5'); near('GBF en boîte (carré 5 V) : 5 V efficaces', r.Ur, 5, 0.03); }
+  { const { r } = box('V1 IN B 12\nU1 IN A B 5', 100); yes('régulateur en boîte : sortie 5 V', !L.err && Math.abs(r.U - 5) < 0.2); }
+  { const { r } = box('V1 IN B 3\nV2 VP B 12\nA1 IN A A VP B', 1000); yes('ampli-op suiveur en boîte : sortie ≈ 3 V', !L.err && Math.abs(r.U - 3) < 0.15); }
+  { const P = L.bbParse('K1 P N O VP VN 1.5 OC\nO1 A K T2 T1 15m ZC\nN1 G TR OU RS CT TH DI VC\nM1 G D S H -2 0.05\nM2 G D S G 1.5 0.2', 'd'); yes('netlist : K, O, N, M(HEMT, GaN) acceptés', !P.er && P.els.length === 5); }
+  }
+{ for (const [type, pa, pb, re] of [['reg', 0, 2, /^U\d /m], ['gbf', 1, 0, /^G\d /m], ['a3', 1, 0, /^V\d\w .* AC /m], ['aop', 2, 1, /^A\d /m], ['otri', 0, 1, /^O\d /m], ['bat2', 1, 0, /^V\d /m], ['ne555', 2, 0, /^N\d /m], ['cmp', 1, 2, /^K\d /m], ['led', 0, 1, /^R\d /m]]) { L.reset(); const x = L.add(type); L.startCapture('d', true); L.capPick(x.id + ':' + pa); L.capPick(x.id + ':' + pb); const bb = L.comps.find(c => c.type === 'bb'); yes('capture tout type : ' + type, !!bb && re.test(L.bbDec(bb.net)) && !L.bbParse(L.bbDec(bb.net), 'd').er); } }
 L.add('volt').ana = 1; L.add('amp').ana = 1; L.render(); yes('rendu complet', true);
+// 12 octodecies. Boîte noire : la valeur réelle (tolérance) survit à l'export/import (v3.9.2)
+{ L.reset(); const r = L.add('res'), c = L.add('res'); r.tol = true; r.val = 1000; r.eps = 0.037; c.val = 50; L.wire(r.id + ':1', c.id + ':0'); L.startCapture('d'); L.capPick(r.id + ':0'); L.capPick(c.id + ':1');
+  const bb = L.comps.find(c => c.type === 'bb'); bb.name = 'RTOL'; L.bbLibAdd(bb);
+  const ex = JSON.stringify({ boxes: L.BBLIB().map(({ name, kind, net, lk }) => ({ name, kind, net, lk })) });   /* fichier exporté */
+  L.BBLIB().length = 0; L.bbLibMerge(JSON.parse(ex).boxes, true);
+  const e = L.BBLIB().find(x => x.name === 'RTOL'); yes('export/import : boîte retrouvée', !!e); yes('export/import : 1037 Ω conservé', !!e && /1037/.test(L.bbDec(e.net)));
+  L.reset(); L.bbLibPlace(e); const nb = L.comps.find(c => c.type === 'bb'); yes('boîte replacée : 1037 Ω', /1037/.test(L.bbDec(nb.net)));
+  const j = L.serializeMontage(); L.reset(); L.loadMontage(j); yes('montage rechargé : 1037 Ω', /1037/.test(L.bbDec(L.comps.find(c => c.type === 'bb').net))); }
+// 12 novodecies. Import de boîtes noires : tous les formats (v3.9.3)
+{ const box = { name: 'T1', kind: 'd', net: 'x', lk: '' };
+  yes('import : export bibliothèque', L.bbLibArr({ boxes: [box] }).length === 1); yes('import : tableau', L.bbLibArr([box]).length === 1);
+  yes('import : fichier d\'une seule boîte', L.bbLibArr(box).length === 1);
+  yes('import : montage avec boîte noire', L.bbLibArr({ comps: [{ type: 'bb', name: 'M1', net: 'y' }, { type: 'res' }] }).length === 1);
+  yes('import : index refusé', L.bbLibArr({ files: ['bb/a.json'] }).length === 0); }
+// 12 vicies. Textes riches : indice, exposant, vecteur, gras, rétro-compatibilité (v3.10.0)
+{ L.setNotes([{ k: 't', x: 100, y: 100, t: 'Vieux texte', s: 16, col: '#123456' }]); let s = L.noteSvg('t');
+  yes('texte simple : rendu inchangé', /Vieux texte/.test(s) && !/<path/.test(s));
+  L.setNotes([{ k: 't', x: 100, y: 100, t: 'F=ma', s: 16, col: '#123456', r: [[{ t: 'F', vec: 1 }, { t: '=m' }, { t: 'a', b: 1 }, { t: '0', sub: 1 }, { t: '2', sup: 1, i: 1, u: 1 }]] }]); s = L.noteSvg('t');
+  yes('vecteur : flèche tracée', /<path d="M/.test(s)); yes('gras', /font-weight="800"/.test(s)); yes('indice : dy positif + taille réduite', /dy="3\.5"/.test(s) && /font-size="11\.2"/.test(s));
+  yes('exposant : dy négatif', /dy="-/.test(s)); yes('italique + souligné', /font-style="italic"/.test(s) && /text-decoration="underline"/.test(s));
+  yes('lignes multiples', L.noteRuns({ t: 'a\nb' }).length === 2); }
+// 12 vicies semel. Une seule flèche sur un vecteur à plusieurs segments ; tailles par portion (v3.10.0)
+{ L.setNotes([{ k: 't', x: 100, y: 100, t: 'Uab', s: 16, col: '#123456', r: [[{ t: 'U', vec: 1 }, { t: 'ab', vec: 1, sub: 1 }]] }]); let s = L.noteSvg('t');
+  yes('vecteur U + indice : une seule flèche', (s.match(/<path/g) || []).length === 1);
+  L.setNotes([{ k: 't', x: 100, y: 100, t: 'ab', s: 16, col: '#123456', r: [[{ t: 'a', z: 'g' }, { t: 'b', z: 'p' }]] }]); s = L.noteSvg('t');
+  yes('taille par portion : grand 24, petit 12', /font-size="24\.0"/.test(s) && /font-size="12\.0"/.test(s)); }
+// 12 vicies bis. Résistance des câbles : chute de tension, tran, surcharge (v3.10.0)
+{ L.reset(); const b = L.add('bat'), r = L.add('res'), a = L.add('amp'); b.val = 10; r.val = 10;
+  L.wire(b.id + ':1', r.id + ':0'); L.wire(r.id + ':1', a.id + ':1'); L.wire(a.id + ':0', b.id + ':0');
+  L.wires[0].res = { m: 'cu', s: 1.5, l: 100 }; L.render(); const R = 0.0172 * 100 / 1.5;
+  near('R cuivre 100 m 1,5 mm² (Ω)', L.wR(L.wires[0]), R, 0.001); near('courant avec câble résistif (A)', -a.I, 10 / (10 + R + 0.01), 0.005); near('courant du câble (A)', L.wires[0].Iw, 10 / (10 + R + 0.01), 0.005);
+  L.wires[0].res = { m: 'al', s: 2.5, l: 50 }; L.render(); near('R alu 50 m 2,5 mm² (Ω)', L.wR(L.wires[0]), 0.56, 0.001); near('courant alu (A)', -a.I, 10 / (10.56 + 0.01), 0.005);
+  delete L.wires[0].res; L.render(); near('câble idéal inchangé (A)', -a.I, 10 / 10.01, 0.002); yes('câble idéal : pas de courant câble', L.wires[0].Iw === undefined); }
+{ L.reset(); const g = L.add('ac'), r = L.add('res'); g.val = 12; r.val = 1; L.wire(g.id + ':1', r.id + ':0'); L.wire(r.id + ':1', g.id + ':0');
+  L.wires[0].res = { m: 'cu', s: 1, l: 1 }; L.render(); yes('surcharge détectée (11,7 A > 10 A)', L.wOver(L.wires[0]) && L.wires[0].Iw > 11); near('admissible 1 mm² cuivre', L.wAdm(L.wires[0]), 10, 0.001);
+  L.wires[0].res = { m: 'cu', s: 2.5, l: 1 }; L.render(); yes('pas de surcharge en 2,5 mm²', !L.wOver(L.wires[0]));
+  L.wires[0].res = { m: 'al', s: 2.5, l: 1 }; L.render(); near('admissible alu 2,5 mm² (80 %)', L.wAdm(L.wires[0]), 16, 0.001); }
+{ L.reset(); const b = L.add('bat'), d = L.add('dio'), r = L.add('res'); b.val = 12; r.val = 100;
+  L.wire(b.id + ':1', d.id + ':0'); L.wire(d.id + ':1', r.id + ':0'); L.wire(r.id + ':1', b.id + ':0');
+  L.wires[1].res = { m: 'cu', s: 1.5, l: 500 }; L.render(); yes('mode temporel actif', L.tranMode);
+  yes('tran : courant câble ≈ courant résistance', L.wires[1].Iw > 0.05 && Math.abs(L.wires[1].Iw - Math.abs(r.I)) / Math.abs(r.I) < 0.02); }
+
+// 12 tricies. Transformateurs réalistes et alimentation à découpage (v3.10.0)
+{ L.reset(); const g=L.add('ac'),tr=L.add('tr1'),r=L.add('res'); g.val=230; r.val=1e6;
+  L.wire(g.id+':1',tr.id+':0');L.wire(g.id+':0',tr.id+':1');L.wire(tr.id+':2',r.id+':0');L.wire(tr.id+':3',r.id+':1');L.render();
+  const T=tr.tx; yes('tr1 : bilan à vide calculé',!!T&&!L.err);
+  near('tr1 à vide : U2 ≈ rapport (V)',T.U2,24,0.4); near('tr1 à vide : Pfer (W)',T.Pfe,3,0.15); near('tr1 à vide : P absorbée ≈ Pfer',T.P1,3,0.3);
+  near('tr1 à vide : Q ≈ Q0 + fuites',T.Qm,8,0.4); yes('tr1 à vide : courant I0 ≈ 37 mA',Math.abs(T.I1-0.0371)<0.004);
+  r.val=24*24/100; L.render(); const F=tr.tx; near('tr1 charge nominale : S2 (VA) ≈ 90',F.U2*F.I2,90,6); near('tr1 charge : pertes Pj (W)',F.Pj,6,0.8);
+  yes('tr1 charge : rendement 0,85–0,95',F.eta>0.85&&F.eta<0.95); yes('tr1 charge : chute de tension 2–10 %',F.dU>2&&F.dU<10);
+  near('tr1 bilan de puissance P1 = P2 + Pfer + Pj',F.P1,F.P2+F.Pfe+F.Pj,0.05);
+  tr.pj=1;tr.ucc=2;L.render(); yes('tr1 : moins de pertes -> meilleur rendement',tr.tx.eta>F.eta);
+  const gg=L.add('bat'),tq=L.add('tr1'),rr=L.add('res'); gg.val=10; rr.val=100; L.wire(gg.id+':1',tq.id+':0');L.wire(gg.id+':0',tq.id+':1');L.wire(tq.id+':2',rr.id+':0');L.wire(tq.id+':3',rr.id+':1');L.render(); yes('tr1 en continu : pas de tension au secondaire',Math.abs(tq.tx.U2)<0.01); }
+{ L.reset(); const g=L.add('a3'),tr=L.add('tr3'),r=[L.add('res'),L.add('res'),L.add('res')]; g.val=400; tr.cp='Yy0'; tr.u1=400; tr.u2=230; tr.sn=5000;
+  r.forEach(x=>{x.val=1e6}); for(let k=0;k<3;k++){L.wire(g.id+':'+(k+1),tr.id+':'+k);L.wire(tr.id+':'+(4+k),r[k].id+':0');L.wire(r[k].id+':1',tr.id+':7')}
+  L.wire(g.id+':0',tr.id+':3'); L.render(); const T=tr.tx; yes('tr3 Yy0 : calculé',!!T&&!L.err); near('tr3 Yy0 à vide : U2 ligne (V)',T.U2,230,4); near('tr3 Yy0 à vide : Pfer (W)',T.Pfe,60,3);
+  tr.cp='Dy11'; tr.u1=400; tr.u2=400; r.forEach(x=>{x.val=1e6}); L.render(); near('tr3 Dy11 400/400 : U2 ligne',tr.tx.U2,400,8); }
+{ L.reset(); const g=L.add('ac'),s=L.add('smps'),r=L.add('res'); g.val=230; s.val=12; s.pmax=100; r.val=12; L.wire(g.id+':1',s.id+':0');L.wire(g.id+':0',s.id+':1');L.wire(s.id+':2',r.id+':0');L.wire(s.id+':3',r.id+':1');L.render();
+  yes('smps : sortie active',s.smon===true); near('smps : Uo (V)',s.Uo,12,0.05); near('smps : Io (A)',s.Io,1,0.02); near('smps : P entrée = Pout/η + 0,5 (W)',s.P,12/0.88+0.5,0.6); yes('smps : pas de limitation',!s.cc);
+  g.val=24; L.render(); near('smps 24 V~ : toujours 12 V',s.Uo,12,0.05); yes('smps 24 V : courant d’entrée plus fort',s.Ir>0.5);
+  g.val=15; L.render(); yes('smps : coupée sous 24 V',!s.smon&&Math.abs(s.Uo)<0.01);
+  g.val=230; r.val=1; L.render(); yes('smps : limitation de puissance (100 W/12 V)',s.cc===true); near('smps : courant limité (A)',s.Io,100/12,0.2);
+  g.val=500; r.val=12; L.render(); yes('smps : coupée au-dessus de 400 V',!s.smon); }
+{ L.reset(); const g=L.add('ac'),s=L.add('smps'),r=L.add('res'),d=L.add('dio'),tr=L.add('tr1'),rr=L.add('res'); g.val=230;
+  L.wire(g.id+':1',tr.id+':0');L.wire(g.id+':0',tr.id+':1');L.wire(tr.id+':2',d.id+':0');L.wire(d.id+':1',rr.id+':0');L.wire(rr.id+':1',tr.id+':3'); rr.val=10; L.render();
+  yes('tran : transformateur + diode',L.tranMode&&!L.err); yes('tran : tx disponible',!!tr.tx); yes('tran : tension redressée moyenne (mono-alternance, avec chutes)',rr.U>5&&rr.U<11); yes('tran : bilan de puissance',Math.abs(tr.tx.P1-tr.tx.P2-tr.tx.Pfe-tr.tx.Pj)<0.1*tr.tx.P1+0.2); }
+{ L.reset(); const g=L.add('ac'),s=L.add('smps'),r=L.add('res'),d=L.add('dio'); g.val=230; s.val=12; s.pmax=100; r.val=12;
+  L.wire(g.id+':1',s.id+':0');L.wire(g.id+':0',s.id+':1');L.wire(s.id+':2',d.id+':0');L.wire(d.id+':1',r.id+':0');L.wire(r.id+':1',s.id+':3');L.render();
+  yes('tran : smps + diode',L.tranMode&&!L.err); yes('tran : smps sortie ≈ 12 V − diode',r.U>6&&r.U<12&&Math.abs(s.Uo-12)<0.05); yes('tran : smps entrée consommée',s.P>8&&s.P<20); }
+// 12 tricies semel. Oscilloscope : voie math et mémoire de courbe (v3.10.0)
+{ L.reset(); const g=L.add('ac'),r=L.add('res'),o=L.add('scope'); g.val=10; r.val=100;
+  L.wire(g.id+':1',r.id+':0');L.wire(r.id+':1',g.id+':0');L.wire(o.id+':1',r.id+':0');L.wire(o.id+':0',r.id+':1');L.wire(o.id+':3',r.id+':0');L.wire(o.id+':2',r.id+':1');
+  o.v1=5;o.v2=5;o.mth='mul';o.cp1='DC';o.cp2='DC';L.render(); const s1=L.traces(o,30);
+  yes('oscillo : voie math tracée (violet)',/#e040fb/.test(s1)); o.mth='s12';L.render(); yes('oscillo : CH1 − CH2 = 0 tracé',/#e040fb/.test(L.traces(o,30)));
+  o.mth='off';L.render(); yes('oscillo : math éteinte',!/#e040fb/.test(L.traces(o,30)));
+  const mw=L.mkWave(o,0); yes('oscillo : onde CH1 non nulle',Math.abs(mw(0.0025))>5); }
 console.log(fail ? `\n${fail} test(s) en échec` : '\nTous les tests passent'); process.exit(fail ? 1 : 0);

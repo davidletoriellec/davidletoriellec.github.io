@@ -11,7 +11,7 @@ Une notice intégrée (bouton « Notice ») explique le câblage de chaque appar
 | Alimentations | continue 0–30 V **avec limite de courant (CV / CC)** · continue **double** 2×(0–30 V), voies indépendantes ·  alternative 0–230 V~ (tension et fréquence réglables) · triphasée 400 V (N, L1, L2, L3) · GBF 0–12 V, 10 Hz–1 MHz (sinus, carré, triangle, offset) |
 | Charges | résistance (code couleur) · ampoule (puissance et tension nominales) · lampe à LED · lampe fluocompacte · condensateur · bobine (avec résistance interne) · moteur à courant continu · moteur monophasé (cos φ 0,82) · moteur asynchrone triphasé 1,5 kW (cos φ 0,84, étoile/triangle) · curseur de charge des moteurs alternatifs de l'à-vide à 1,2 × In · caisse de charge 0–4 kW (bornes M1/M2 mono ou continu et L1/L2/L3 tri, paliers de 200 W) |
 | Commandes | interrupteur · commutateur 2 voies (3 bornes) · relais (bobine et contact visibles) · contacteur (2 contacts NO) |
-| Appareils de mesure | multimètre numérique (A/V, DC ou AC efficace) · ampèremètre et voltmètre à aiguille (calibres) · wattmètre IeS ISW8000 (W, VAr, VA, PF, V, A) · pince ampèremétrique PROVA 21 (A, W, VAr, VA, PF, V) · sonde de tension (÷10, ÷100) · sonde de courant (÷10, ÷100, ÷300) · compte-tours · couple-mètre · oscilloscope 2 voies (mode XY, curseurs) |
+| Appareils de mesure | multimètre numérique (A/V, DC ou AC efficace) · ampèremètre et voltmètre à aiguille (calibres) · wattmètre POWER8000 (W, VAr, VA, PF, V, A) · pince ampèremétrique PROVA 21 (A, W, VAr, VA, PF, V) · sonde de tension (÷10, ÷100) · sonde de courant (÷10, ÷100, ÷300) · compte-tours · couple-mètre · oscilloscope 2 voies (mode XY, curseurs) |
 | Repérage | rectangles pointillés · textes |
 
 Autres fonctions : unités au choix pour chaque réglage (mΩ…MΩ, pF…mF, µH…H, Hz…MHz, mV…kV, mW…kW), câbles banane/BNC/coaxiaux
@@ -59,7 +59,7 @@ Ouvrir `index.html` dans un navigateur. Pour un serveur local : `npm start`.
 npm test
 ```
 
-Les tests (Node ≥ 16, sans dépendance) vérifient le solveur, le compilateur Arduino (types, débordements, Serial, temps virtuel, erreurs) et l'exécution couplée au circuit (Blink, LDR, HC-SR04, PWM, bouton) : loi d'Ohm, filtre RC, puissances P/Q/S de l'ISW8000 (câblages 3 et 4 fils),
+Les tests (Node ≥ 16, sans dépendance) vérifient le solveur, le compilateur Arduino (types, débordements, Serial, temps virtuel, erreurs) et l'exécution couplée au circuit (Blink, LDR, HC-SR04, PWM, bouton) : loi d'Ohm, filtre RC, puissances P/Q/S de l'POWER8000 (câblages 3 et 4 fils),
 pince, commutateur, relais et contacteur, tracés de câbles, moteurs (CC, mono, tri), caisse de charge, sondes, XY, sauvegarde, génération PDF, dessin de tous les appareils.
 
 ## Publier sur GitHub Pages
