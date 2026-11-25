@@ -6,7 +6,7 @@ const el = () => ({ style: {}, dataset: {}, classList: { toggle() {}, remove() {
 const store = {};
 global.document = { getElementById: id => store[id] || (store[id] = el()), querySelectorAll: () => [] };
 global.window = { addEventListener() {} };
-const L = new Function(code + `;return{ohmR,setOhm,motPreset,BBLIB(){return BBLIB},bbLibAdd,bbLibPlace,bbLibMerge,bbLibArr,wR,wOver,wAdm,noteSvg,noteRuns,setNotes(v){notes=v},motorTick,HMAX,decSet,decVal,undo,redo,copySel,pasteSel,setSel(v){sel=v},meterHits,setSmooth(v){smoothOn=v},needle,fuseBlown,T,reading,traces,add,wire,connect,render,mkWave,bz,tp,wsamples,buildPdf,pdfWrap,serializeMontage,loadMontage,buildMenu,setFilter(v){tagFilter=v},get TAGS(){return TAGS},get tranMode(){return tranMode},startCapture,capPick,get capt(){return capt},trFreq,bbEnc,bbDec,bbHash,bbParse,BBT,pv,get view(){return view},fitView,zoomAt,contentBounds,menuHtml(){return menuEl.innerHTML},reset(){comps=[];wires=[];notes=[];uid=1;sel=selW=selN=pend=null},get err(){return err},get wires(){return wires},get comps(){return comps},get solve(){return solve},geo,BX0,BP,BROW,BC,nearHole,snapPlug,plugSet(){return plugSet},DK,LC,gbfHarm,gbfWave,bridges,mergeTags,tagSlug,ldrR,liveStart,liveStop,liveAdvance,liveDrop,liveSync,liveResetAll,get live(){return live},engOf,UNO,tranModel,dockUpload,exUno}`)();
+const L = new Function(code + `;return{ladToText,ladNew,plcScan,plcMap,plcCompile,enTick,fieldParse,UNITS,thermAdvance,thOf,TH,ohmR,setOhm,motPreset,BBLIB(){return BBLIB},bbLibAdd,bbLibPlace,bbLibMerge,bbLibArr,wR,wOver,wAdm,noteSvg,noteRuns,setNotes(v){notes=v},motorTick,HMAX,decSet,decVal,undo,redo,copySel,pasteSel,setSel(v){sel=v},meterHits,setSmooth(v){smoothOn=v},needle,fuseBlown,T,reading,traces,add,wire,connect,render,mkWave,bz,tp,wsamples,buildPdf,pdfWrap,serializeMontage,loadMontage,buildMenu,setFilter(v){tagFilter=v},get TAGS(){return TAGS},get tranMode(){return tranMode},startCapture,capPick,get capt(){return capt},trFreq,bbEnc,bbDec,bbHash,bbParse,BBT,pv,get view(){return view},fitView,zoomAt,contentBounds,menuHtml(){return menuEl.innerHTML},reset(){comps=[];wires=[];notes=[];uid=1;sel=selW=selN=pend=null},get err(){return err},get wires(){return wires},get comps(){return comps},get solve(){return solve},geo,BX0,BP,BROW,BC,nearHole,snapPlug,plugSet(){return plugSet},DK,LC,gbfHarm,gbfWave,bridges,mergeTags,tagSlug,ldrR,liveStart,liveStop,liveAdvance,liveDrop,liveSync,liveResetAll,get live(){return live},engOf,UNO,tranModel,dockUpload,exUno}`)();
 
 let fail = 0;
 L.setSmooth(false);
@@ -588,4 +588,79 @@ L.add('volt').ana = 1; L.add('amp').ana = 1; L.render(); yes('rendu complet', tr
   yes('oscillo : voie math tracée (violet)',/#e040fb/.test(s1)); o.mth='s12';L.render(); yes('oscillo : CH1 − CH2 = 0 tracé',/#e040fb/.test(L.traces(o,30)));
   o.mth='off';L.render(); yes('oscillo : math éteinte',!/#e040fb/.test(L.traces(o,30)));
   const mw=L.mkWave(o,0); yes('oscillo : onde CH1 non nulle',Math.abs(mw(0.0025))>5); }
+// v3.11.0 : préfixes SI (1m, 1k, 4u7…) dans tous les champs, y compris ceux sans unité à préfixe (s, K/W, °C…)
+{ const fp=L.fieldParse; near('champ en s : 1k = 1000',fp('1k',[['s',1]]),1000,1e-9); near('champ en s : 10m = 0,01',fp('10m',[['s',1]]),0.01,1e-12); near('champ en s : 15 simple',fp('15',[['s',1]]),15,1e-12);
+  near('champ K/W : 100m = 0,1',fp('100m',[['K/W',1]]),0.1,1e-12); near('champ V : 1k = 1000 V',fp('1k',L.UNITS.V),1000,1e-9); near('champ V : 1m = 1 mV',fp('1m',L.UNITS.V),0.001,1e-12);
+  near('champ µF : 4u7',fp('4u7',L.UNITS.uF),4.7,1e-9); near('champ % (PCT) : 50 = 0,5',fp('50',L.UNITS.PCT),0.5,1e-12); yes('texte invalide → NaN',isNaN(fp('abc',[['s',1]]))); }
+// v3.11.0 : compteurs d'énergie mono / tri, commutateur de wattmètre, pince en Wh
+{ L.reset(); const g=L.add('ac'),m=L.add('cem'),r=L.add('res'); g.val=230; r.val=100; L.wire(g.id+':1',m.id+':0');L.wire(m.id+':1',r.id+':0');L.wire(r.id+':1',m.id+':3');L.wire(m.id+':2',g.id+':0');L.render();
+  near('compteur mono : P = U²/R',m.P,529,3); m.eacc=3600; L.enTick(1); L.enTick(1); near('compteur mono : 2 s × 3600 = 2 h → 1058 Wh',m.E,1058,6);
+  const xr=L.comps.length; g.val=0; L.render(); near('compteur mono : 0 V → P = 0',m.P||0,0,0.5); }
+{ L.reset(); const a=L.add('a3'),t=L.add('cet'),r=[1,2,3].map(()=>L.add('res')); r.forEach(x=>x.val=100);
+  [1,2,3].forEach(k=>{L.wire(a.id+':'+k,t.id+':'+2*(k-1));L.wire(t.id+':'+(2*k-1),r[k-1].id+':0');L.wire(r[k-1].id+':1',t.id+':7')});L.wire(a.id+':0',t.id+':6');L.render();
+  near('compteur tri : 3 × U²/R = 1600 W',t.P,1600,10); t.eacc=3600; L.enTick(1); near('compteur tri : 1 s × 3600 = 1 h → 1600 Wh',t.E,1600,10); }
+{ L.reset(); const a=L.add('a3'),c=L.add('cwm'),w=L.add('watt'),r=[100,100,100].map(v=>{const x=L.add('res');x.val=v;return x});
+  [1,2,3].forEach(k=>{L.wire(a.id+':'+k,c.id+':'+2*(k-1))});
+  L.wire(r[0].id+':0',c.id+':1');L.wire(r[0].id+':1',c.id+':3');L.wire(r[1].id+':0',c.id+':3');L.wire(r[1].id+':1',c.id+':5');L.wire(r[2].id+':0',c.id+':5');L.wire(r[2].id+':1',c.id+':1');
+  L.wire(c.id+':6',w.id+':0');L.wire(w.id+':2',c.id+':7');L.wire(c.id+':8',w.id+':3');
+  const P=()=>[0,1].map(p=>{c.cwp=p;L.render();return w.P}); let q=P(); console.log('aron',q);
+  near('2 wattmètres (triangle équilibré) : P(I1,U13) = 2400 W',Math.abs(q[0]),2400,12); near('2 wattmètres : P(I2,U23) = 2400 W',Math.abs(q[1]),2400,12); yes('2 wattmètres : les deux mesures ont le même signe',q[0]*q[1]>0);
+  r[0].val=200; q=P(); near('2 wattmètres (déséquilibré) : P1 + P2 = 4000 W',Math.abs(q[0])+Math.abs(q[1]),4000,25); }
+{ L.reset(); const g=L.add('ac'),p=L.add('pince'),r=L.add('res'); g.val=230; r.val=100; p.disp='Wh'; p.mode='AC'; L.wire(g.id+':1',r.id+':0');L.wire(r.id+':1',g.id+':0');L.wire(p.id+':1',g.id+':1');L.wire(p.id+':0',g.id+':0');
+  place(p,L.wires[0],.5);L.render(); near('pince : P active = 529 W',p.P,529,4); p.eacc=3600; L.enTick(1); near('pince : 1 s × 3600 → 529 Wh',p.E,529,4); p.E=0; L.render(); near('pince : remise à zéro',p.E,0,1e-9); }
+// v3.11.0 : nouveaux exemples (ex35 à ex45)
+store['ex35'].onclick(); { const o=L.comps.find(c=>c.type==='scope'); yes('ex35 : pas d\'erreur, voie Maths tracée',!L.err&&/#e040fb/.test(L.traces(o,30))); }
+store['ex36'].onclick(); { const w=L.comps.find(c=>c.type==='watt'); yes('ex36 : transformateur 230/24 V sans erreur',!L.err); yes('ex36 : P primaire > P charge (≈ 29 W)',w.P>28&&w.P<45); }
+store['ex37'].onclick(); { const t=L.comps.find(c=>c.type==='tr3'); yes('ex37 : tr3 Dy11 sans erreur',!L.err&&!!t.tx); near('ex37 : U2 ligne ≈ 230 V',t.tx.U2,230,12); }
+store['ex38'].onclick(); { const s=L.comps.find(c=>c.type==='smps'); yes('ex38 : smps actif',!L.err&&s.smon===true); near('ex38 : Uo = 12 V',s.Uo,12,.1); }
+store['ex39'].onclick(); { const f=L.comps.find(c=>c.type==='four'); yes('ex39 : four sans erreur',!L.err); L.thermAdvance(.1); for(let i=0;i<1200;i++)L.thermAdvance(5); yes('ex39 : four proche de 180 °C',Math.abs(L.thOf(f).T1-180)<15); }
+store['ex40'].onclick(); { const e=L.comps.find(c=>c.type==='enc'); yes('ex40 : enceinte + TOR sans erreur',!L.err); L.thermAdvance(.1); for(let i=0;i<1500;i++)L.thermAdvance(10); yes('ex40 : enceinte proche de 60 °C',Math.abs(L.thOf(e).Ts-60)<8); }
+store['ex41'].onclick(); { const e=L.comps.find(c=>c.type==='enc'); yes('ex41 : enceinte + PID sans erreur',!L.err); L.thermAdvance(.1); for(let i=0;i<1500;i++)L.thermAdvance(10); yes('ex41 : PID stable à 60 °C (±2 K)',Math.abs(L.thOf(e).Ts-60)<2); }
+store['ex42'].onclick(); { const e=L.comps.find(c=>c.type==='enc'); L.thermAdvance(.1); let mn=1e9,mx=-1e9; for(let i=0;i<900;i++){L.thermAdvance(10);if(i>400){const x=L.thOf(e).Ts;mn=Math.min(mn,x);mx=Math.max(mx,x)}} yes('ex42 : PID qui oscille (amplitude > 15 K)',mx-mn>15); }
+store['ex43'].onclick(); { const m=L.comps.find(c=>c.type==='cem'),p=L.comps.find(c=>c.type==='pince'); yes('ex43 : compteur mono sans erreur',!L.err); near('ex43 : P compteur ≈ 529 W',m.P,529,5); near('ex43 : P pince ≈ 529 W',p.P,529,5); L.enTick(1); near('ex43 : énergie compteur = pince',m.E,p.E,1); }
+store['ex44'].onclick(); { const m=L.comps.find(c=>c.type==='cet'); yes('ex44 : compteur tri sans erreur',!L.err); near('ex44 : P ≈ 4000 W',m.P,4000,30); }
+store['ex45'].onclick(); { const k=L.comps.find(c=>c.type==='cwm'),w=L.comps.find(c=>c.type==='watt'); yes('ex45 : sans erreur',!L.err); const a=Math.abs(w.P); k.cwp=1; L.render(); const b=Math.abs(w.P); near('ex45 : P1 + P2 ≈ 4000 W',a+b,4000,30); }
+// v3.12 (essai) : API — automate compact + modules TOR / ANALOG
+{ L.reset(); const b=L.add('bat'),p=L.add('plc'),s1=L.add('sw'),s2=L.add('sw'),bu=L.add('bulb'); b.val=24; bu.un=24; bu.val=5; p.prg='Q1 = I1 & !I2';
+  L.wire(b.id+':1',p.id+':0');L.wire(b.id+':0',p.id+':1');
+  L.wire(b.id+':1',s1.id+':0');L.wire(s1.id+':1',p.id+':2');L.wire(b.id+':1',s2.id+':0');L.wire(s2.id+':1',p.id+':3');
+  L.wire(b.id+':1',p.id+':10');L.wire(p.id+':11',bu.id+':0');L.wire(bu.id+':1',b.id+':0'); L.render();
+  yes('API : alimenté en 24 V',p.plOn===true); yes('API : entrées lues à 0',p.plV[0]===0&&p.plV[1]===0);
+  L.plcScan(p,.05); L.render(); yes('API : lampe éteinte au repos',!(bu.Ir>0.01));
+  s1.closed=true; L.render(); yes('API : I1 lue à 1',p.plV[0]===1); L.plcScan(p,.05); L.render(); yes('API : Q1 collée',p.plQ[0]===1); yes('API : lampe allumée',bu.Ir>0.05);
+  s2.closed=true; L.render(); L.plcScan(p,.05); L.render(); yes('API : Q1 retombe (I1 & !I2)',p.plQ[0]===0);
+  b.val=10; L.render(); yes('API : alim. insuffisante → hors tension',p.plOn===false); }
+{ L.reset(); const b=L.add('bat'),p=L.add('plc'),s1=L.add('sw'); b.val=24; p.prg='M1 = (I1 | M1) & !I2\nQ1 = M1\nQ2 = TON(I3, 1)\nQ3 = RISE(I3)';
+  L.wire(b.id+':1',p.id+':0');L.wire(b.id+':0',p.id+':1');L.wire(b.id+':1',s1.id+':0');L.wire(s1.id+':1',p.id+':4');L.render();
+  L.plcScan(p,.05); yes('API : TON repos',p.plQ[1]===0); s1.closed=true; L.render(); L.plcScan(p,.05); yes('API : RISE impulsion',p.plQ[2]===1); L.plcScan(p,.05); yes('API : RISE retombe',p.plQ[2]===0);
+  for(let i=0;i<10;i++)L.plcScan(p,.05); yes('API : TON pas encore à 0,5 s',p.plQ[1]===0); for(let i=0;i<12;i++)L.plcScan(p,.05); yes('API : TON passe après 1 s',p.plQ[1]===1);
+  p.prg='Q1 = I1 &'; L.plcScan(p,.05); yes('API : erreur de programme signalée',!!p.plE&&p.plQ[0]===0); }
+{ L.reset(); const b=L.add('bat'),p=L.add('plc',300,300),m=L.add('plct',700,300),a=L.add('plca',300,600),sw=L.add('sw'),b2=L.add('bat'),r=L.add('res'); b.val=24; b2.val=7; r.val=1000; p.prg='Q1 = AI1 > 5\nQ5 = I9\nAO1 = AI1 / 2'; 
+  L.wire(b.id+':1',p.id+':0');L.wire(b.id+':0',p.id+':1');
+  L.wire(b2.id+':1',a.id+':1');L.wire(b2.id+':0',a.id+':0');
+  L.wire(b.id+':1',sw.id+':0');L.wire(sw.id+':1',m.id+':1');L.wire(b.id+':0',m.id+':0');
+  L.wire(a.id+':3',r.id+':0');L.wire(r.id+':1',a.id+':0'); L.render(); L.plcMap();
+  yes('API : module TOR raccordé (I9)',m.plB===p.id&&m.plI0===8&&m.plQ0===4); yes('API : module ANALOG raccordé',a.plB===p.id&&a.plA0===0);
+  near('API : AI1 = 7 V',a.plA[0],7,.05); L.plcScan(p,.05); L.render(); yes('API : Q1 = (AI1 > 5)',p.plQ[0]===1); near('API : AO1 = AI1/2 = 3,5 V',a.plAO[0],3.5,.01);
+  L.render(); near('API : tension de AO1 sur la charge (V)',Math.abs(r.U),3.5,.1); sw.closed=true; L.render(); yes('API : I9 (module TOR) lue',m.plV[0]===1); L.plcScan(p,.05); yes('API : Q5 (module TOR) collée',m.plQ[0]===1); }
+store['ex46'].onclick(); { const p=L.comps.find(c=>c.type==='plc'),pb=L.comps.filter(c=>c.type==='pb'),l=L.comps.filter(c=>c.type==='bulb'); yes('ex46 : sans erreur, automate alimenté',!L.err&&p.plOn===true); pb[0].closed=true; L.render(); L.plcScan(p,.05); pb[0].closed=false; L.render(); L.plcScan(p,.05); L.render(); yes('ex46 : auto-maintien Q1',p.plQ[0]===1&&l[0].Ir>0.05); for(let i=0;i<120;i++)L.plcScan(p,.05); L.render(); yes('ex46 : Q2 après 5 s',p.plQ[1]===1); pb[1].closed=true; L.render(); L.plcScan(p,.05); yes('ex46 : arrêt par I2',p.plQ[0]===0); }
+store['ex47'].onclick(); { const p=L.comps.find(c=>c.type==='plc'),a=L.comps.find(c=>c.type==='plca'); yes('ex47 : sans erreur',!L.err&&a.plB===p.id); L.plcScan(p,.05); L.render(); yes('ex47 : Q1 (AI1 > 5 V)',p.plQ[0]===1); near('ex47 : AO1 = 3 V',a.plAO[0],3,.05); }
+{ const r=L.ladNew(); r.cols[0][0]={k:'NO',v:'I1'};r.cols[0][1]={k:'NO',v:'M1'};r.cols[1][0]={k:'NC',v:'I2'};r.coil={k:'M',n:1,t:0}; const r2=L.ladNew();r2.cols[0][0]={k:'CMP',v:'AI1',op:'>',x:5};r2.coil={k:'TON',n:2,t:3};
+  const tx=L.ladToText([r,r2]); yes('ladder → texte : auto-maintien',tx.includes('M1 = (I1 | M1) & !I2')); yes('ladder → texte : TON + comparaison',tx.includes('T2 = TON((AI1 > 5), 3)')); const rs=L.ladNew();rs.coil={k:'S',n:2,t:0};yes('ladder → texte : S / R',L.ladToText([rs]).includes('Q2 = (1) | Q2')); }
+store['ex48'].onclick(); { const p=L.comps.find(c=>c.type==='plc'),pb=L.comps.filter(c=>c.type==='pb'),l=L.comps.filter(c=>c.type==='bulb'); yes('ex48 : ladder compilé sans erreur',!L.err&&!p.plE&&p.plOn===true&&/T1 = TON/.test(p.prg)); pb[0].closed=true; L.render(); L.plcScan(p,.05); pb[0].closed=false; L.render(); L.plcScan(p,.05); L.render(); yes('ex48 : auto-maintien Q1 (ladder)',p.plQ[0]===1&&l[0].Ir>0.05); for(let i=0;i<120;i++)L.plcScan(p,.05); yes('ex48 : T1 → Q2 après 5 s',p.plQ[1]===1); pb[1].closed=true; L.render(); L.plcScan(p,.05); L.plcScan(p,.05); yes('ex48 : arrêt par I2',p.plQ[0]===0); }
+// 12 tricies ter. Four, enceinte chauffée, régulateurs TOR et PID (v3.10.0)
+{ L.reset(); const g=L.add('ac'),f=L.add('four'); g.val=230; f.cons=180; f.hy=5;
+  L.wire(g.id+':1',f.id+':0');L.wire(g.id+':0',f.id+':1');L.render(); L.thermAdvance(0.1);
+  yes('four : chauffe dès le départ (thermostat)',f.hon===true); near('four : puissance 2000 W',f.P,2000,20);
+  for(let i=0;i<1200;i++)L.thermAdvance(5); const T=L.thOf(f).T1; yes('four : température proche de la consigne (±15 K)',Math.abs(T-180)<15);
+  let mn=1e9,mx=-1e9; for(let i=0;i<400;i++){L.thermAdvance(5);const x=L.thOf(f).T1;mn=Math.min(mn,x);mx=Math.max(mx,x)} yes('four : régulation TOR (oscillation bornée)',mn>160&&mx<200);
+  g.val=0; L.render(); f.cons=250; L.thermAdvance(1); near('four non alimenté : P = 0',f.P||0,0,0.5); }
+{ L.reset(); const g=L.add('ac'),e=L.add('enc'),r=L.add('rpid'),a=L.add('tr1'); g.val=230; e.pn=1000; e.rth=.1; e.cth=30; r.cons=60; r.kp=20; r.ti=300; r.tdv=20; r.pe=true; r.ie=true; r.de=false; r.tc=10;
+  L.wire(g.id+':1',r.id+':2');L.wire(r.id+':3',e.id+':0');L.wire(e.id+':1',g.id+':0');L.wire(e.id+':2',r.id+':0');L.wire(e.id+':3',r.id+':1');L.render();
+  for(let i=0;i<1500;i++)L.thermAdvance(10); const t=L.thOf(e); yes('PID : enceinte régulée à la consigne (±2 K)',Math.abs(t.Ts-60)<2); yes('PID : mesure lue sur la sonde (10 mV/°C)',Math.abs(L.thOf(r).Tm-t.Ts)<1.5);
+  r.cons=80; for(let i=0;i<1500;i++)L.thermAdvance(10); yes('PID : nouvelle consigne atteinte',Math.abs(L.thOf(e).Ts-80)<2); }
+{ L.reset(); const g=L.add('ac'),e=L.add('enc'),r=L.add('rtor'); g.val=230; e.pn=1000; e.rth=.1; r.cons=50; r.hy=2;
+  L.wire(g.id+':1',r.id+':2');L.wire(r.id+':3',e.id+':0');L.wire(e.id+':1',g.id+':0');L.wire(e.id+':2',r.id+':0');L.wire(e.id+':3',r.id+':1');L.render();
+  for(let i=0;i<1500;i++)L.thermAdvance(10); let mn=1e9,mx=-1e9; for(let i=0;i<600;i++){L.thermAdvance(5);const x=L.thOf(e).Ts;mn=Math.min(mn,x);mx=Math.max(mx,x)}
+  yes('TOR : température entre consigne ± hystérésis (+ inertie)',mn>46&&mx<55); yes('TOR : sonde = 10 mV/°C',Math.abs(r.U-0.01*L.thOf(e).Ts)<0.02); }
 console.log(fail ? `\n${fail} test(s) en échec` : '\nTous les tests passent'); process.exit(fail ? 1 : 0);

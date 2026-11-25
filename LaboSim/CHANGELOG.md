@@ -1,3 +1,17 @@
+## v3.12.0
+
+- API : **éditeur ladder** (échelons en grille : contacts NO/NC, ffronts, comparaisons, bobines Q/M/S/R, temporisations TON/TOF), converti en programme texte ; exemple ex48.
+- **Rubrique « API (automates) »** : automate compact sans marque (alim. dédiée 24 V= / 24 V~ / 230 V~, 8 entrées TOR, 4 sorties relais, programme texte avec mémoires, TON/TOF, RISE/FALL, comparaisons), module d’extension TOR (6 E / 4 S relais) et module ANALOG (2 E / 2 S 0–10 V) raccordés automatiquement à l’automate voisin. Exemples ex46 (marche/arrêt avec auto-maintien et temporisation) et ex47 (module ANALOG).
+
+## v3.11.0
+- **Exemples** : 11 nouveaux montages (menu « Exemples ») : oscilloscope voie Maths, transformateur monophasé et triphasé Dy11, alimentation à découpage, four (thermostat TOR), enceinte + régulateur TOR, enceinte + PID stable, PID qui oscille, compteur d’énergie monophasé + pince en Wh, compteur triphasé, méthode des 2 wattmètres (commutateur).
+- **Énergie** : pince PROVA 21 et wattmètre : affichage « Wh » (énergie active P × t, temps accéléré, remise à zéro) ; bouton noir de la pince : défilement des modes P, Q, S, U, I, E ; nouveaux appareils de mesure : compteur d’énergie monophasé, compteur d’énergie triphasé (afficheur kWh) et commutateur de wattmètre (méthode des 2 wattmètres : I1·U13 / I2·U23).
+- Champs numériques : les préfixes SI (1m, 1k, 4u7…) sont acceptés partout (avant : ignorés dans les champs en s, K/W, °C…).
+- Courbe agrandie : zoom horizontal et vertical (boutons, molette, glisser) ; bandeau de sortie conservé pour le four, retiré pour l’enceinte.
+- **Four électrique** (Charges domestiques) : thermostat tout ou rien (consigne, hystérésis), courbe de température affichée sur l'appareil et dans le panneau, modèle thermique à deux capacités, temps accéléré (×1 à ×1000). Courbe lissée avec axes (°C, minutes), quadrillage pointillé, consigne en orange et bandeau de la sortie du thermostat (0 / 100 %) ; sonde avec retard et inertie (réglables, aussi pour l'enceinte) donc dépassement puis oscillations amorties. **Double-clic** sur le four, l'enceinte ou un régulateur (ou bouton « Courbe agrandie + export ») : fenêtre agrandie avec réglages et export PDF / PNG, comme l'oscilloscope.
+- **Enceinte isolée chauffée** (Charges industrielles) : résistance chauffante, capacité et isolation thermiques réglables, sonde de température intérieure (10 mV/°C).
+- **Nouvelle rubrique « Régulation »** : régulateur de température **TOR** (consigne, hystérésis) et **PID** (choix des actions P / I / D, curseurs Kp, Ti, Td, période de sortie, anti-saturation de l'intégrale) ; la sortie est un contact à placer en série avec la résistance chauffante.
+
 ## v3.10.0
 - **Menu de gauche réorganisé** : 18 catégories classées par ordre alphabétique (Alimentations, Appareils de mesure, Audio, Boîtes noires, Capteurs, Charges, Charges domestiques, Charges industrielles, Circuits intégrés, Commandes, Composants, Composants électroniques, Micro-contrôleur, Moteurs, Relais et Contacteurs, Repérage, Semi-conducteurs, Transformateurs). Les étiquettes (filtre) sont inchangées.
 - **Oscilloscope** : voie mathématique (CH1 + CH2, CH1 − CH2, CH2 − CH1, CH1 × CH2) avec échelle auto ou réglable ; mémorisation d'une courbe de référence (CH1 ou CH2, pointillés blancs) et enregistrement des courbes en fichier CSV.
