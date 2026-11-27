@@ -1,3 +1,19 @@
+## v3.14.0
+
+- **Variateurs de vitesse** (menu Moteurs) : mono → tri (entrée 230 V) et tri → tri (entrée 400 V), sans marque. Sortie triphasée à fréquence réglable (consigne 1–200 Hz) avec loi **V/f constante** (tension plafonnée à la tension nominale au-dessus de la fréquence de base), bouton RUN/STOP, afficheur de fréquence, tension et courant de sortie, puissance d'entrée (rendement réglable) ; l'alimentation se coupe si la tension d'entrée est hors plage. Le moteur asynchrone suit la fréquence (vitesse ≈ 30·f tr/min).
+- **Bornier de commande** : LI1 (marche avant), LI2 (marche arrière), +24 V et +10 V internes, AI1 (0–10 V = 0 à fréquence max), COM. Réglages « Commande » (panneau ou bornier) et « Consigne » (panneau ou AI1). Le sens de rotation s'inverse (séquence des phases) ; le moteur et le tachymètre l'indiquent.
+- Le potentiomètre n'impose plus la simulation temporelle (il est calculé comme une résistance en régime permanent).
+- Exemples ex49 (mono → tri), ex50 (tri → tri) et ex51 (commutateur de sens + potentiomètre de consigne).
+- Limite : en simulation temporelle (présence d'un bouton, diode…), la puissance d'entrée du variateur n'est pas modélisée et le moteur n'affiche pas sa vitesse (limite existante).
+
+## v3.13.0
+
+- **Borne de connexion** (menu Alimentations) : 2 à 12 points reliés entre eux (même potentiel), couleur au choix (orange, jaune, rouge, vert, bleu, blanc, noir, gris), points resserrés ; réduire le nombre de points retire les câbles devenus orphelins.
+- **Contacteur 3 pôles + 1 NO auxiliaire** (A1/A2, 1-2, 3-4, 5-6, 13-14) et **bloc additif 2 NO + 2 NC** (13-14, 23-24, 31-32, 41-42) : le bloc s'aimante à côté d'un contacteur (contour vert en pointillés quand il est attaché, 2 blocs maximum par contacteur) et suit son état ; il se déplace avec lui.
+- **Aimantation des modules API** : les modules TOR et ANALOG se collent à droite (ou à gauche) de l'automate, sur la même ligne, et suivent l'automate quand on le déplace.
+- **Relais et contacteurs** : le panneau indique « tension de bobine insuffisante » quand la bobine est alimentée sous 80 % de sa tension (ex. 9 V sur un relais 12 V).
+- La carte « Arduino Uno » devient **Micronio One** (dessin, menu, volet de programmation, notice) ; forme et couleur inchangées.
+
 ## v3.12.0
 
 - API : **éditeur ladder** (échelons en grille : contacts NO/NC, ffronts, comparaisons, bobines Q/M/S/R, temporisations TON/TOF), converti en programme texte ; exemple ex48.
